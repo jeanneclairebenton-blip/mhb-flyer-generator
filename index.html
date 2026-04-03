@@ -910,7 +910,7 @@ body{background:#e1dbcf;display:flex;justify-content:center;padding:24px;font-fa
   <div class="price-section">
     <div class="price-bar"></div>
     <div>
-      <div class="price-lbl">Acquisition Price</div>
+      <div class="price-lbl">Start Price</div>
       <div class="price-val">${esc(fields.startingPrice)}</div>
     </div>
   </div>
@@ -995,7 +995,7 @@ body{background:#e1dbcf;display:flex;justify-content:center;padding:24px;font-fa
       body: JSON.stringify({
         _subject: "✨ New Flyer Generated: " + fields.address,
         Address: fields.address,
-        "Acquisition Price": fields.startingPrice,
+        "Start Price": fields.startingPrice,
         "Est. ARV": fields.arv,
         Agent: fields.salesAgent || "Not listed",
         Timestamp: new Date().toLocaleString()
@@ -1221,7 +1221,7 @@ function openEmailModal() {
     <table cellpadding="0" cellspacing="0" border="0"><tr>
       <td style="width:5px;background:#D6A327;"></td>
       <td style="padding-left:14px;">
-        <div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:2px;margin-bottom:4px;">Acquisition Price</div>
+        <div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:2px;margin-bottom:4px;">Start Price</div>
         <div style="font-size:38px;font-weight:900;color:#111;line-height:1;letter-spacing:-1px;">${esc(f.startingPrice)}</div>
       </td>
     </tr></table>
