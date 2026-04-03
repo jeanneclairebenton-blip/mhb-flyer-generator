@@ -1198,7 +1198,7 @@ function openEmailModal() {
     </tr></table>
   </td></tr>
 
-  <!-- ── DETAILS: Closing / Occupancy / Roof ── -->
+  <!-- ── DETAILS: Closing / Occupancy ── -->
   <tr><td style="padding:0 20px;border-bottom:1px solid #eee;">
     ${f.closingDate && f.closingDate !== '—' ? `
     <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-bottom:1px solid #f0ece4;"><tr>
@@ -1206,14 +1206,9 @@ function openEmailModal() {
       <td style="padding:10px 0;font-size:13px;font-weight:900;color:#1a1a2e;text-align:right;">${esc(f.closingDate)}</td>
     </tr></table>` : ''}
     ${f.occupancy && f.occupancy !== '—' ? `
-    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-bottom:1px solid #f0ece4;"><tr>
+    <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
       <td style="padding:10px 0;font-size:12px;color:#888;">Occupancy</td>
       <td style="padding:10px 0;font-size:13px;font-weight:900;color:#1a1a2e;text-align:right;">${esc(f.occupancy)}</td>
-    </tr></table>` : ''}
-    ${roofLine ? `
-    <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
-      <td style="padding:10px 0;font-size:12px;color:#888;">Roof · Foundation · HVAC</td>
-      <td style="padding:10px 0;font-size:12px;font-weight:700;color:#1a1a2e;text-align:right;">${esc(roofLine)}</td>
     </tr></table>` : ''}
   </td></tr>
 
@@ -1230,6 +1225,26 @@ function openEmailModal() {
     <div style="font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px;">Description</div>
     <div style="font-size:12px;color:#555;line-height:1.75;">${esc(f.description)}</div>
   </td></tr>` : ''}
+
+  <!-- ── ROOF / FOUNDATION / HVAC ── -->
+  ${roofLine ? `
+  <tr><td style="border-bottom:1px solid #eee;">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;"><tr>
+      <td width="33%" align="center" style="padding:13px 6px;border-right:1px solid #eee;">
+        <div style="font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">Roof</div>
+        <div style="font-size:13px;font-weight:900;color:#1a1a2e;">${esc(f.roof)}</div>
+      </td>
+      <td width="33%" align="center" style="padding:13px 6px;border-right:1px solid #eee;">
+        <div style="font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">Foundation</div>
+        <div style="font-size:13px;font-weight:900;color:#1a1a2e;">${esc(f.foundation)}</div>
+      </td>
+      <td width="34%" align="center" style="padding:13px 6px;">
+        <div style="font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">HVAC</div>
+        <div style="font-size:13px;font-weight:900;color:#1a1a2e;">${esc(f.hvac)}</div>
+      </td>
+    </tr></table>
+  </td></tr>` : ''}
+
 
   <!-- ── TERMS ── -->
   <tr><td style="padding:14px 20px 16px;border-bottom:1px solid #eee;background:#fafaf8;">
