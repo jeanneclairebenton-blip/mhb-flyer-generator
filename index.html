@@ -818,8 +818,8 @@ function generateFlyer() {
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#e1dbcf;display:flex;justify-content:center;padding:24px;font-family:'Inter',Arial,sans-serif}
-.flyer{width:100%;max-width:560px;background:#fff;border:1px solid #d4ceb8;color:#1a1a2e}
-@media print{@page{size:letter portrait;margin:0.25in}body{display:block;padding:0;background:white}.flyer{width:100%;border:none}}
+.flyer{width:100%;max-width:560px;background:#fff;border:1px solid #d4ceb8;color:#1a1a2e;margin:0 auto;}
+@media print{@page{size:letter portrait;margin:0.25in}body{display:block;padding:0;background:white;margin:0}.flyer{width:100%;max-width:7.5in;height:10.3in;max-height:10.3in;overflow:hidden;border:none;margin:0 auto} .hero{height:150px;}}
 .top-header{background:#fff;padding:20px 24px 16px;border-bottom:2px solid #D6A327}
 .header-top-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
 .prop-type-label{font-size:11px;font-weight:700;color:#D6A327;letter-spacing:2px;text-transform:uppercase}
@@ -876,9 +876,9 @@ body{background:#e1dbcf;display:flex;justify-content:center;padding:24px;font-fa
           <polygon points="103,38 60,62 60,100 103,76" fill="#C8922A"/>
           <polygon points="60,82 76,91 76,100 60,100" fill="#A87020"/>
         </svg>
-        <div style="display:flex;flex-direction:column;line-height:0.9;padding-top:2px;">
-          <span style="font-family:'Inter',Arial,sans-serif;font-weight:400;font-size:32px;color:#111;letter-spacing:-1.5px;">Myers</span>
-          <span style="font-family:'Inter',Arial,sans-serif;font-weight:300;font-size:16px;color:#111;letter-spacing:-0.5px;padding-left:1px;">Home Buyers</span>
+        <div style="display:flex;flex-direction:column;line-height:0.9;padding-top:4px;">
+          <span style="font-family:'Century Gothic',Futura,'Tw Cen MT',sans-serif;font-weight:400;font-size:38px;color:#000;letter-spacing:-1.5px;">Myers</span>
+          <span style="font-family:'Century Gothic',Futura,'Tw Cen MT',sans-serif;font-weight:300;font-size:17px;color:#000;letter-spacing:-0.2px;padding-left:1px;margin-top:2px;">Home Buyers</span>
         </div>
       </div>
       <div class="prop-type-label">${esc(fields.propType)}</div>
@@ -1160,9 +1160,9 @@ function openEmailModal() {
               <polygon points="60,82 76,91 76,100 60,100" fill="#A87020"/>
             </svg>
           </td>
-          <td valign="middle">
-            <div style="font-family:'Inter',Arial,sans-serif;font-weight:400;font-size:32px;color:#111;line-height:0.9;letter-spacing:-1.5px;">Myers</div>
-            <div style="font-family:'Inter',Arial,sans-serif;font-weight:300;font-size:16px;color:#111;line-height:0.9;letter-spacing:-0.5px;padding-left:1px;">Home Buyers</div>
+          <td valign="middle" style="padding-top:3px;">
+            <div style="font-family:'Century Gothic',Futura,'Tw Cen MT',sans-serif;font-weight:400;font-size:38px;color:#000;line-height:0.9;letter-spacing:-1.5px;">Myers</div>
+            <div style="font-family:'Century Gothic',Futura,'Tw Cen MT',sans-serif;font-weight:300;font-size:17px;color:#000;line-height:0.9;letter-spacing:-0.2px;padding-left:1px;margin-top:2px;">Home Buyers</div>
           </td>
         </tr></table>
       </td>
