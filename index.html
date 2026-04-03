@@ -814,53 +814,54 @@ function generateFlyer() {
 
   flyerHtml = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#ece9e3;display:flex;justify-content:center;padding:16px;font-family:Arial,Helvetica,sans-serif}
-.flyer{width:560px;max-width:100%;background:#fff;border:1px solid #ddd;color:#1a1a2e}
+body{background:#e1dbcf;display:flex;justify-content:center;padding:24px;font-family:'Inter',Arial,sans-serif}
+.flyer{width:560px;max-width:100%;background:#fff;border:1px solid #d4ceb8;color:#1a1a2e}
 @media print{@page{size:letter portrait;margin:0.25in}body{display:block;padding:0;background:white}.flyer{width:100%;border:none}}
-.top-header{background:#fff;padding:16px 20px 18px;border-bottom:3px solid #f5b731}
-.header-top-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.prop-type-label{font-size:12px;font-weight:700;color:#f5b731;letter-spacing:1.8px;text-transform:uppercase}
-.address-main{font-size:26px;font-weight:900;color:#1a1a2e;line-height:1.2}
-.hero{width:100%;height:250px;background:#f0ede6;overflow:hidden;display:flex;align-items:center;justify-content:center}
-.hero-placeholder{color:rgba(0,0,0,0.18);font-size:12px;letter-spacing:3px;text-transform:uppercase}
-.icon-row{display:flex;background:#fff;border-bottom:1px solid #eee}
-.icon-cell{flex:1;display:flex;flex-direction:column;align-items:center;padding:16px 8px 14px;gap:4px}
-.icon-cell+.icon-cell{border-left:1px solid #eee}
-.icon-lbl{font-size:11px;font-weight:700;color:#bbb;text-transform:uppercase;letter-spacing:.8px;text-align:center;margin-top:6px}
-.icon-val{font-size:22px;font-weight:900;color:#1a1a2e;text-align:center}
-.price-section{padding:16px 20px;border-bottom:1px solid #eee}
-.price-inner{display:flex;align-items:center;gap:14px}
-.price-bar{width:4px;min-height:52px;background:#f5b731;border-radius:2px;flex-shrink:0;align-self:stretch}
-.price-lbl{font-size:11px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px}
-.price-val{font-size:34px;font-weight:900;color:#1a1a2e;line-height:1}
-.stats-row{display:flex;border-bottom:1px solid #eee}
-.stat-cell{flex:1;padding:12px 14px;border-right:1px solid #eee}
+.top-header{background:#fff;padding:24px 24px 20px;border-bottom:2px solid #D6A327}
+.header-top-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.prop-type-label{font-size:11px;font-weight:700;color:#D6A327;letter-spacing:2px;text-transform:uppercase}
+.address-main{font-size:24px;font-weight:900;color:#111;line-height:1.2;letter-spacing:-0.5px}
+.hero{width:100%;height:220px;background:#ece9e1;display:flex;align-items:center;justify-content:center;border-bottom:1px solid #e1dbcf}
+.hero-placeholder{color:#b3afa3;font-size:12px;font-weight:600;letter-spacing:4px;text-transform:uppercase}
+.icon-row{display:flex;background:#fff;border-bottom:1px solid #e1dbcf}
+.icon-cell{flex:1;display:flex;flex-direction:column;align-items:center;padding:20px 8px 16px;gap:6px}
+.icon-cell+.icon-cell{border-left:1px solid #e1dbcf}
+.icon-lbl{font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:1px}
+.icon-val{font-size:22px;font-weight:900;color:#111;text-align:center}
+.price-section{padding:20px 24px;border-bottom:1px solid #e1dbcf;display:flex;align-items:center;gap:14px}
+.price-bar{width:5px;height:48px;background:#D6A327;flex-shrink:0}
+.price-lbl{font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:2px;margin-bottom:6px}
+.price-val{font-size:38px;font-weight:900;color:#111;line-height:1;letter-spacing:-1px}
+.stats-row{display:flex;border-bottom:1px solid #e1dbcf;background:#f8f6f2}
+.stat-cell{flex:1;padding:14px 16px;text-align:center;border-right:1px solid #e1dbcf}
 .stat-cell:last-child{border-right:none}
-.stat-label{font-size:11px;font-weight:700;color:#888;letter-spacing:.8px;text-transform:uppercase;margin-bottom:5px}
-.stat-value{font-size:20px;font-weight:900;color:#1a1a2e}
-.info-rows{border-bottom:1px solid #eee}
-.info-row{display:flex;justify-content:space-between;align-items:baseline;padding:11px 20px}
-.info-row+.info-row{border-top:1px solid #f5f3ee}
-.info-lbl{font-size:13px;color:#888}
-.info-val{font-size:14px;font-weight:700;color:#1a1a2e;text-align:right;max-width:55%}
-.showing-center{text-align:center;padding:18px 20px;border-bottom:1px solid #e5d9b6;background:#fdfaf3;border-top:1px solid #e5d9b6}
-.showing-label{font-size:11px;font-weight:600;color:#c9a432;text-transform:uppercase;letter-spacing:1.8px;margin-bottom:6px}
-.showing-date{font-size:26px;font-weight:700;color:#1a1a2e}
-.section-header{background:#fafaf8;border-top:1px solid #eee;border-bottom:1px solid #eee;padding:8px 20px;font-size:11px;font-weight:700;color:#aaa;letter-spacing:1.2px;text-transform:uppercase}
-.desc-block{padding:14px 20px 16px;border-bottom:1px solid #eee}
-.desc-block p{font-size:14px;color:#444;line-height:1.75}
-.terms-block{padding:12px 20px 14px;border-bottom:1px solid #eee}
-.terms-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 16px}
-.terms-grid span{font-size:13px;color:#444;line-height:1.65}
-.cta-block{padding:20px 22px 16px;text-align:center;border-bottom:1px solid #eee}
-.pill-btn{display:inline-block;background:#f5b731;color:#1a1a2e;font-size:17px;font-weight:900;padding:14px 60px;border-radius:40px;letter-spacing:1px;text-transform:uppercase;text-align:center;text-decoration:none}
-.agent-line{text-align:center;padding:10px 22px 12px;display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap}
-.agent-dot{color:#ccc;font-size:12px}
-.agent-label{font-size:12px;color:#bbb;letter-spacing:1px;text-transform:uppercase}
-.agent-name{font-size:13px;font-weight:700;color:#888}
-.agent-phone{font-size:13px;color:#aaa}
+.stat-label{font-size:10px;font-weight:700;color:#888;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+.stat-value{font-size:16px;font-weight:900;color:#111}
+.info-rows{border-bottom:1px solid #e1dbcf}
+.info-row{display:flex;justify-content:space-between;align-items:center;padding:12px 24px}
+.info-row+.info-row{border-top:1px dashed #e1dbcf}
+.info-lbl{font-size:12px;color:#555}
+.info-val{font-size:13px;font-weight:800;color:#111;text-align:right}
+.showing-center{text-align:center;padding:20px 24px;border-bottom:1px solid #F1D9A7;background:#FFF8E7;border-top:1px solid #F1D9A7;margin:-1px 0 0}
+.showing-label{font-size:11px;font-weight:700;color:#D6A327;text-transform:uppercase;letter-spacing:4px;margin-bottom:8px}
+.showing-date{font-size:22px;font-weight:800;color:#111}
+.section-header{padding:24px 24px 10px;font-size:11px;font-weight:800;color:#999;letter-spacing:3px;text-transform:uppercase}
+.desc-block{padding:0 24px 24px;border-bottom:1px solid #e1dbcf}
+.desc-block p{font-size:12.5px;color:#333;line-height:1.7}
+.terms-block{padding:0 24px 24px;border-bottom:1px solid #e1dbcf}
+.terms-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 20px}
+.terms-grid div{font-size:11px;color:#444;line-height:1.5;display:flex;gap:8px;align-items:flex-start}
+.terms-grid div::before{content:"•";color:#D6A327;font-size:14px;line-height:1.3;font-weight:bold}
+.cta-block{padding:24px;text-align:center;border-bottom:1px solid #e1dbcf;background:#fcfbf9}
+.pill-btn{display:inline-block;background:#F4B324;color:#111;font-size:14px;font-weight:800;padding:14px 60px;border-radius:40px;letter-spacing:2px;text-transform:uppercase;text-decoration:none}
+.agent-line{text-align:center;padding:16px 24px;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;background:#f2efe9}
+.agent-label{font-size:11px;color:#888}
+.agent-name{font-size:12px;font-weight:800;color:#555}
+.agent-phone{font-size:12px;color:#555}
+.dot{color:#bbb;font-size:10px}
 </style></head><body><div class="flyer">
 
   <div class="top-header">
@@ -875,89 +876,80 @@ body{background:#ece9e3;display:flex;justify-content:center;padding:16px;font-fa
       </svg>
       <div class="prop-type-label">${esc(fields.propType)}</div>
     </div>
-    <div class="address-main">${esc(fields.address)}</div>
+    <div class="address-main">${esc(fields.address).replace(/,/g, ',<br>')}</div>
   </div>
 
-  <div class="hero">${hero}</div>
+  <div class="hero"><div class="hero-placeholder">Property Photo</div></div>
 
   <div class="icon-row">
     <div class="icon-cell">
-      <svg width="26" height="26" viewBox="0 0 32 32" fill="none" stroke="#bbb" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="14" width="26" height="11" rx="2"/><rect x="6" y="11" width="8" height="5" rx="1.5"/>
-        <rect x="18" y="11" width="8" height="5" rx="1.5"/><line x1="6" y1="25" x2="6" y2="29"/>
-        <line x1="26" y1="25" x2="26" y2="29"/><path d="M3 14 L3 9 Q3 7 5 7 L27 7 Q29 7 29 9 L29 14"/>
-      </svg>
+      <svg width="24" height="24" viewBox="0 0 32 32" fill="none" stroke="#bbb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="14" width="26" height="11" rx="2"/><rect x="6" y="11" width="8" height="5" rx="1.5"/><rect x="18" y="11" width="8" height="5" rx="1.5"/><line x1="6" y1="25" x2="6" y2="29"/><line x1="26" y1="25" x2="26" y2="29"/><path d="M3 14 L3 9 Q3 7 5 7 L27 7 Q29 7 29 9 L29 14"/></svg>
       <div class="icon-lbl">Beds</div><div class="icon-val">${esc(fields.beds)}</div>
     </div>
     <div class="icon-cell">
-      <svg width="26" height="26" viewBox="0 0 32 32" fill="none" stroke="#bbb" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M6 16 H26 V22 A8 8 0 0 1 18 30 H14 A8 8 0 0 1 6 22 Z"/>
-        <path d="M10 16 V10 A3 3 0 0 1 13 7"/><line x1="20" y1="4" x2="20" y2="8"/>
-      </svg>
+      <svg width="24" height="24" viewBox="0 0 32 32" fill="none" stroke="#bbb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16 H26 V22 A8 8 0 0 1 18 30 H14 A8 8 0 0 1 6 22 Z"/><path d="M10 16 V10 A3 3 0 0 1 13 7"/><line x1="20" y1="4" x2="20" y2="8"/></svg>
       <div class="icon-lbl">Baths</div><div class="icon-val">${esc(fields.baths)}</div>
     </div>
     <div class="icon-cell">
-      <svg width="26" height="26" viewBox="0 0 32 32" fill="none" stroke="#bbb" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M4 14 L16 4 L28 14 L28 30 L4 30 Z"/>
-        <rect x="13" y="21" width="6" height="9" rx="1"/>
-        <rect x="6" y="17" width="6" height="5" rx="1"/><rect x="20" y="17" width="6" height="5" rx="1"/>
-      </svg>
+      <svg width="24" height="24" viewBox="0 0 32 32" fill="none" stroke="#bbb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14 L16 4 L28 14 L28 30 L4 30 Z"/><rect x="13" y="21" width="6" height="9" rx="1"/><rect x="6" y="17" width="6" height="5" rx="1"/><rect x="20" y="17" width="6" height="5" rx="1"/></svg>
       <div class="icon-lbl">Sqft</div><div class="icon-val">${esc(fields.sqft)}</div>
     </div>
     <div class="icon-cell">
-      <svg width="26" height="26" viewBox="0 0 32 32" fill="none" stroke="#bbb" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M4 6 H28 V24 L22 30 H4 Z"/><line x1="4" y1="12" x2="28" y2="12"/>
-        <path d="M28 24 L22 24 L22 30"/>
-        <line x1="10" y1="3" x2="10" y2="9"/><line x1="16" y1="3" x2="16" y2="9"/><line x1="22" y1="3" x2="22" y2="9"/>
-      </svg>
+      <svg width="24" height="24" viewBox="0 0 32 32" fill="none" stroke="#bbb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6 H28 V24 L22 30 H4 Z"/><line x1="4" y1="12" x2="28" y2="12"/><path d="M28 24 L22 24 L22 30"/><line x1="10" y1="3" x2="10" y2="9"/><line x1="16" y1="3" x2="16" y2="9"/><line x1="22" y1="3" x2="22" y2="9"/></svg>
       <div class="icon-lbl">Built</div><div class="icon-val">${esc(fields.yearBuilt)}</div>
     </div>
   </div>
 
   <div class="price-section">
-    <div class="price-inner">
-      <div class="price-bar"></div>
-      <div>
-        <div class="price-lbl">Starting Price</div>
-        <div class="price-val">${esc(fields.startingPrice)}</div>
-      </div>
+    <div class="price-bar"></div>
+    <div>
+      <div class="price-lbl">Acquisition Price</div>
+      <div class="price-val">${esc(fields.startingPrice)}</div>
     </div>
   </div>
 
   <div class="stats-row">
-    <div class="stat-cell"><div class="stat-label">Est. ARV</div><div class="-label">Buy It Now</div><div class="stat-value">${esc(fields.buyNow)}</div></div>
+    <div class="stat-cell"><div class="stat-label">Est. ARV</div><div class="stat-value">${esc(fields.arv)}</div></div>
+    <div class="stat-cell"><div class="stat-label">Buy Now</div><div class="stat-value">${esc(fields.buyNow)}</div></div>
     <div class="stat-cell"><div class="stat-label">Est. Rent</div><div class="stat-value">${esc(fields.rent)}</div></div>
   </div>
-  <div class="showing-center"><div class="showing-label">Showing</div><div class="showing-date">${esc(fields.showing)}</div></div>
-  <div class="two-col">
-    <div class="two-col-cell"><div class="lbl">Closing</div><div class="val">${esc(fields.closingDate)}</div></div>
-    <div class="two-col-cell"><div class="lbl">Occupancy at Closing</div><div class="val">${esc(fields.occupancy)}</div></div>
+
+  <div class="info-rows">
+    ${fields.closingDate && fields.closingDate !== '—' ? `<div class="info-row"><span class="info-lbl">Closing Date</span><span class="info-val">${esc(fields.closingDate)}</span></div>` : ''}
+    ${fields.occupancy && fields.occupancy !== '—' ? `<div class="info-row"><span class="info-lbl">Occupancy</span><span class="info-val">${esc(fields.occupancy)}</span></div>` : ''}
+    ${roofLine ? `<div class="info-row"><span class="info-lbl">Roof · Foundation · HVAC</span><span class="info-val">${esc(roofLine)}</span></div>` : ''}
   </div>
+
+  ${fields.showing && fields.showing !== '—' ? `
+  <div class="showing-center">
+    <div class="showing-label">Showing</div>
+    <div class="showing-date">${esc(fields.showing)}</div>
+  </div>` : ''}
+
+  ${fields.description && fields.description !== '—' ? `
   <div class="section-header">Description</div>
-  <div class="details-grid">
-    <div class="detail-cell"><div class="lbl">Roof</div><div class="val">${esc(fields.roof)}</div></div>
-    <div class="detail-cell"><div class="lbl">Foundation</div><div class="val">${esc(fields.foundation)}</div></div>
-    <div class="detail-cell"><div class="lbl">HVAC</div><div class="val">${esc(fields.hvac)}</div></div>
-  </div>
-  <div class="desc-block"><p>${esc(fields.description)}</p></div>
+  <div class="desc-block"><p>${esc(fields.description)}</p></div>` : ''}
+
   <div class="section-header">Terms &amp; Conditions</div>
   <div class="terms-block"><div class="terms-grid">
-    <span>One time, one hour showing</span><span>$5,000 deposit due within the hour upon acceptance</span>
-    <span>You may bring your contractor</span><span>Cashier's check or wire</span>
-    <span>Offers due within 30 min of the end of the showing</span><span>Deposit is non-refundable if you are unable to perform</span>
-    <span>Deposit is refundable if MHB is unable to perform or title does not clear</span>
-    <span>All closings via double closing; buyers pay closing fees</span>
+    <div>One time, one hour showing</div>
+    <div>$5,000 deposit on acceptance</div>
+    <div>Bring your contractor</div>
+    <div>Cashier's check or wire</div>
+    <div>Offers due within 30 min</div>
+    <div>Double close — buyers pay fees</div>
   </div></div>
+
   <div class="cta-block">
     <a class="pill-btn" href="${(fields.driveLink||'#').replace(/"/g,'&quot;')}" target="_blank">More Info</a>
   </div>
+
   <div class="agent-line">
     <span class="agent-label">Sales Agent</span>
-    ${fields.salesAgent ? `<span class="agent-dot">·</span><span class="agent-name">${esc(fields.salesAgent)}</span>` : ''}
-    ${fields.salesPhone ? `<span class="agent-dot">·</span><span class="agent-phone">${esc(fields.salesPhone)}</span>` : ''}
+    ${fields.salesAgent ? `<span class="dot">·</span><span class="agent-name">${esc(fields.salesAgent)}</span>` : ''}
+    ${fields.salesPhone ? `<span class="dot">·</span><span class="agent-phone">${esc(fields.salesPhone)}</span>` : ''}
   </div>
-</div>
-</body></html>`;
+</div></body></html>`;
 
   // Show in preview iframe
   const blob = new Blob([flyerHtml], { type: 'text/html' });
@@ -1100,21 +1092,21 @@ function openEmailModal() {
   emailHtmlContent = `<!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <title>${esc(addr)} — Myers Home Buyers</title>
 </head>
-<body style="margin:0;padding:20px 0;background:#e8e4dc;font-family:'Inter',Arial,Helvetica,sans-serif;">
-<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#e8e4dc;">
-<tr><td align="center">
+<body style="margin:0;padding:24px 0;background:#e1dbcf;font-family:'Inter',Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#e1dbcf;">
+<tr><td align="center" style="padding:0 16px;">
 
-<table width="480" cellpadding="0" cellspacing="0" border="0"
-  style="max-width:480px;width:100%;background:#fff;border:1px solid #e0dbd0;border-radius:4px;overflow:hidden;">
+<table width="560" cellpadding="0" cellspacing="0" border="0"
+  style="max-width:560px;width:100%;background:#fff;border:1px solid #d4ceb8;color:#111;">
 
   <!-- ── HEADER: Logo + Property Type ── -->
-  <tr><td style="padding:16px 20px 12px;">
+  <tr><td style="padding:24px 24px 16px;border-bottom:2px solid #D6A327;">
     <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
-      <td>
-        <svg height="32" viewBox="0 0 120 138" xmlns="http://www.w3.org/2000/svg">
+      <td width="50%">
+        <svg height="36" viewBox="0 0 120 138" xmlns="http://www.w3.org/2000/svg">
           <polygon points="60,2 114,32 114,106 60,136 6,106 6,32" fill="#F5A623"/>
           <polygon points="60,14 103,38 103,100 60,124 17,100 17,38" fill="#fff"/>
           <polygon points="60,14 103,38 60,62 17,38" fill="#F5B731"/>
@@ -1123,172 +1115,147 @@ function openEmailModal() {
           <polygon points="60,82 76,91 76,100 60,100" fill="#A87020"/>
         </svg>
       </td>
-      <td align="right">
-        <span style="color:#f5b731;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;">${esc(f.propType)}</span>
+      <td width="50%" align="right">
+        <span style="color:#D6A327;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;">${esc(f.propType)}</span>
       </td>
     </tr></table>
   </td></tr>
 
   <!-- ── ADDRESS ── -->
-  <tr><td style="padding:6px 20px 16px;border-bottom:3px solid #f5b731;">
-    <div style="font-size:22px;font-weight:900;color:#1a1a2e;line-height:1.2;">${esc(f.address)}</div>
+  <tr><td style="padding:16px 24px 20px;">
+    <div style="font-size:24px;font-weight:900;color:#111;line-height:1.2;letter-spacing:-0.5px;">${esc(f.address).replace(/,/g, ',<br>')}</div>
   </td></tr>
 
   <!-- ── PHOTO PLACEHOLDER ── -->
-  <tr><td style="background:#f5f3ee;height:170px;text-align:center;vertical-align:middle;border-bottom:1px solid #e0dbd0;">
-    <span style="color:#ccc;font-size:11px;letter-spacing:3px;text-transform:uppercase;">Property Photo</span>
+  <tr><td style="background:#ece9e1;height:220px;text-align:center;vertical-align:middle;border-bottom:1px solid #e1dbcf;">
+    <span style="color:#b3afa3;font-size:12px;font-weight:600;letter-spacing:4px;text-transform:uppercase;">Property Photo</span>
   </td></tr>
 
   <!-- ── STATS: Beds / Baths / Sqft / Built ── -->
-  <tr><td style="border-bottom:1px solid #e8e0d0;">
+  <tr><td style="border-bottom:1px solid #e1dbcf;">
     <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;"><tr>
-      <td width="25%" align="center" style="padding:13px 6px 11px;border-right:1px solid #eee;">
-        <svg width="20" height="20" viewBox="0 0 32 32" fill="none" stroke="#bbb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="14" width="26" height="11" rx="2"/><rect x="6" y="11" width="8" height="5" rx="1.5"/>
-          <rect x="18" y="11" width="8" height="5" rx="1.5"/><line x1="6" y1="25" x2="6" y2="29"/>
-          <line x1="26" y1="25" x2="26" y2="29"/><path d="M3 14 L3 9 Q3 7 5 7 L27 7 Q29 7 29 9 L29 14"/>
+      <td width="25%" align="center" style="padding:20px 6px 16px;border-right:1px solid #e1dbcf;">
+        <svg width="24" height="24" viewBox="0 0 32 32" fill="none" stroke="#bbb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="14" width="26" height="11" rx="2"/><rect x="6" y="11" width="8" height="5" rx="1.5"/><rect x="18" y="11" width="8" height="5" rx="1.5"/><line x1="6" y1="25" x2="6" y2="29"/><line x1="26" y1="25" x2="26" y2="29"/><path d="M3 14 L3 9 Q3 7 5 7 L27 7 Q29 7 29 9 L29 14"/>
         </svg>
-        <div style="font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.8px;margin-top:5px;">Beds</div>
-        <div style="font-size:18px;font-weight:900;color:#1a1a2e;">${esc(f.beds)}</div>
+        <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:1px;margin-top:6px;margin-bottom:2px;">Beds</div>
+        <div style="font-size:22px;font-weight:900;color:#111;">${esc(f.beds)}</div>
       </td>
-      <td width="25%" align="center" style="padding:13px 6px 11px;border-right:1px solid #eee;">
-        <svg width="20" height="20" viewBox="0 0 32 32" fill="none" stroke="#bbb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M6 16 H26 V22 A8 8 0 0 1 18 30 H14 A8 8 0 0 1 6 22 Z"/>
-          <path d="M10 16 V10 A3 3 0 0 1 13 7"/><line x1="20" y1="4" x2="20" y2="8"/>
+      <td width="25%" align="center" style="padding:20px 6px 16px;border-right:1px solid #e1dbcf;">
+        <svg width="24" height="24" viewBox="0 0 32 32" fill="none" stroke="#bbb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 16 H26 V22 A8 8 0 0 1 18 30 H14 A8 8 0 0 1 6 22 Z"/><path d="M10 16 V10 A3 3 0 0 1 13 7"/><line x1="20" y1="4" x2="20" y2="8"/>
         </svg>
-        <div style="font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.8px;margin-top:5px;">Baths</div>
-        <div style="font-size:18px;font-weight:900;color:#1a1a2e;">${esc(f.baths)}</div>
+        <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:1px;margin-top:6px;margin-bottom:2px;">Baths</div>
+        <div style="font-size:22px;font-weight:900;color:#111;">${esc(f.baths)}</div>
       </td>
-      <td width="25%" align="center" style="padding:13px 6px 11px;border-right:1px solid #eee;">
-        <svg width="20" height="20" viewBox="0 0 32 32" fill="none" stroke="#bbb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M4 14 L16 4 L28 14 L28 30 L4 30 Z"/><rect x="13" y="21" width="6" height="9" rx="1"/>
-          <rect x="6" y="17" width="6" height="5" rx="1"/><rect x="20" y="17" width="6" height="5" rx="1"/>
+      <td width="25%" align="center" style="padding:20px 6px 16px;border-right:1px solid #e1dbcf;">
+        <svg width="24" height="24" viewBox="0 0 32 32" fill="none" stroke="#bbb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 14 L16 4 L28 14 L28 30 L4 30 Z"/><rect x="13" y="21" width="6" height="9" rx="1"/><rect x="6" y="17" width="6" height="5" rx="1"/><rect x="20" y="17" width="6" height="5" rx="1"/>
         </svg>
-        <div style="font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.8px;margin-top:5px;">Sqft</div>
-        <div style="font-size:18px;font-weight:900;color:#1a1a2e;">${esc(f.sqft)}</div>
+        <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:1px;margin-top:6px;margin-bottom:2px;">Sqft</div>
+        <div style="font-size:22px;font-weight:900;color:#111;">${esc(f.sqft)}</div>
       </td>
-      <td width="25%" align="center" style="padding:13px 6px 11px;">
-        <svg width="20" height="20" viewBox="0 0 32 32" fill="none" stroke="#bbb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M4 6 H28 V24 L22 30 H4 Z"/><line x1="4" y1="12" x2="28" y2="12"/>
-          <path d="M28 24 L22 24 L22 30"/><line x1="10" y1="3" x2="10" y2="9"/>
-          <line x1="16" y1="3" x2="16" y2="9"/><line x1="22" y1="3" x2="22" y2="9"/>
+      <td width="25%" align="center" style="padding:20px 6px 16px;">
+        <svg width="24" height="24" viewBox="0 0 32 32" fill="none" stroke="#bbb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 6 H28 V24 L22 30 H4 Z"/><line x1="4" y1="12" x2="28" y2="12"/><path d="M28 24 L22 24 L22 30"/><line x1="10" y1="3" x2="10" y2="9"/><line x1="16" y1="3" x2="16" y2="9"/><line x1="22" y1="3" x2="22" y2="9"/>
         </svg>
-        <div style="font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.8px;margin-top:5px;">Built</div>
-        <div style="font-size:18px;font-weight:900;color:#1a1a2e;">${esc(f.yearBuilt)}</div>
+        <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:1px;margin-top:6px;margin-bottom:2px;">Built</div>
+        <div style="font-size:22px;font-weight:900;color:#111;">${esc(f.yearBuilt)}</div>
       </td>
     </tr></table>
   </td></tr>
 
   <!-- ── ACQUISITION PRICE ── -->
-  <tr><td style="padding:16px 20px;border-bottom:1px solid #eee;">
+  <tr><td style="padding:20px 24px;border-bottom:1px solid #e1dbcf;">
     <table cellpadding="0" cellspacing="0" border="0"><tr>
-      <td style="width:3px;background:#f5b731;border-radius:2px;">&nbsp;&nbsp;</td>
-      <td style="padding-left:12px;">
-        <div style="font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:3px;">Starting Price</div>
-        <div style="font-size:34px;font-weight:900;color:#1a1a2e;line-height:1;">${esc(f.startingPrice)}</div>
+      <td style="width:5px;background:#D6A327;"></td>
+      <td style="padding-left:14px;">
+        <div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:2px;margin-bottom:4px;">Acquisition Price</div>
+        <div style="font-size:38px;font-weight:900;color:#111;line-height:1;letter-spacing:-1px;">${esc(f.startingPrice)}</div>
       </td>
     </tr></table>
   </td></tr>
 
   <!-- ── ARV / BUY NOW / RENT ── -->
-  <tr><td style="border-bottom:1px solid #eee;">
+  <tr><td style="border-bottom:1px solid #e1dbcf;background:#f8f6f2;">
     <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;"><tr>
-      <td width="33%" style="padding:11px 14px;border-right:1px solid #eee;">
-        <div style="font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px;">Est. ARV</div>
-        <div style="font-size:15px;font-weight:900;color:#1a1a2e;">${esc(f.arv)}</div>
+      <td width="33%" align="center" style="padding:14px 16px;border-right:1px solid #e1dbcf;">
+        <div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Est. ARV</div>
+        <div style="font-size:16px;font-weight:900;color:#111;">${esc(f.arv)}</div>
       </td>
-      <td width="33%" style="padding:11px 14px;border-right:1px solid #eee;">
-        <div style="font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px;">Buy Now</div>
-        <div style="font-size:15px;font-weight:900;color:#1a1a2e;">${esc(f.buyNow)}</div>
+      <td width="33%" align="center" style="padding:14px 16px;border-right:1px solid #e1dbcf;">
+        <div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Buy Now</div>
+        <div style="font-size:16px;font-weight:900;color:#111;">${esc(f.buyNow)}</div>
       </td>
-      <td width="34%" style="padding:11px 14px;">
-        <div style="font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px;">Est. Rent</div>
-        <div style="font-size:15px;font-weight:900;color:#1a1a2e;">${esc(f.rent)}</div>
+      <td width="34%" align="center" style="padding:14px 16px;">
+        <div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Est. Rent</div>
+        <div style="font-size:16px;font-weight:900;color:#111;">${esc(f.rent)}</div>
       </td>
     </tr></table>
   </td></tr>
 
-  <!-- ── DETAILS: Closing / Occupancy ── -->
-  <tr><td style="padding:0 20px;border-bottom:1px solid #eee;">
+  <!-- ── DETAILS: Closing / Occupancy / HVAC ── -->
+  <tr><td style="padding:0 24px;border-bottom:1px solid #e1dbcf;">
     ${f.closingDate && f.closingDate !== '—' ? `
-    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-bottom:1px solid #f0ece4;"><tr>
-      <td style="padding:10px 0;font-size:12px;color:#888;">Closing Date</td>
-      <td style="padding:10px 0;font-size:13px;font-weight:900;color:#1a1a2e;text-align:right;">${esc(f.closingDate)}</td>
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-bottom:1px dashed #e1dbcf;"><tr>
+      <td style="padding:12px 0;font-size:12px;color:#555;">Closing Date</td>
+      <td style="padding:12px 0;font-size:13px;font-weight:800;color:#111;text-align:right;">${esc(f.closingDate)}</td>
     </tr></table>` : ''}
     ${f.occupancy && f.occupancy !== '—' ? `
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" ${roofLine ? 'style="border-bottom:1px dashed #e1dbcf;"' : ''}><tr>
+      <td style="padding:12px 0;font-size:12px;color:#555;">Occupancy</td>
+      <td style="padding:12px 0;font-size:13px;font-weight:800;color:#111;text-align:right;">${esc(f.occupancy)}</td>
+    </tr></table>` : ''}
+    ${roofLine ? `
     <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
-      <td style="padding:10px 0;font-size:12px;color:#888;">Occupancy</td>
-      <td style="padding:10px 0;font-size:13px;font-weight:900;color:#1a1a2e;text-align:right;">${esc(f.occupancy)}</td>
+      <td style="padding:12px 0;font-size:12px;color:#555;">Roof · Foundation · HVAC</td>
+      <td style="padding:12px 0;font-size:13px;font-weight:800;color:#111;text-align:right;">${esc(roofLine)}</td>
     </tr></table>` : ''}
   </td></tr>
 
   <!-- ── SHOWING ── -->
   ${f.showing && f.showing !== '—' ? `
-  <tr><td style="background:#fdfaf3;padding:18px 20px;text-align:center;border-top:1px solid #e5d9b6;border-bottom:1px solid #e5d9b6;">
-    <div style="font-size:10px;font-weight:600;color:#c9a432;text-transform:uppercase;letter-spacing:1.8px;margin-bottom:6px;font-family:'Inter',Arial,Helvetica,sans-serif;">Showing</div>
-    <div style="font-size:24px;font-weight:700;color:#1a1a2e;font-family:'Inter',Arial,Helvetica,sans-serif;">${esc(f.showing)}</div>
+  <tr><td style="background:#FFF8E7;padding:20px 24px;text-align:center;border-top:1px solid #F1D9A7;border-bottom:1px solid #F1D9A7;margin-top:-1px;">
+    <div style="font-size:11px;font-weight:700;color:#D6A327;text-transform:uppercase;letter-spacing:4px;margin-bottom:8px;">Showing</div>
+    <div style="font-size:22px;font-weight:800;color:#111;">${esc(f.showing)}</div>
   </td></tr>` : ''}
 
   <!-- ── DESCRIPTION ── -->
   ${f.description && f.description !== '—' ? `
-  <tr><td style="padding:16px 20px;border-top:1px solid #eee;border-bottom:1px solid #eee;">
-    <div style="font-size:9px;font-weight:700;color:#f5b731;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px;font-family:'Inter',Arial,Helvetica,sans-serif;">Description</div>
-    <div style="font-size:12px;color:#555;line-height:1.75;font-family:'Inter',Arial,Helvetica,sans-serif;">${esc(f.description)}</div>
+  <tr><td style="padding:24px 24px 20px;">
+    <div style="font-size:11px;font-weight:800;color:#999;text-transform:uppercase;letter-spacing:3px;margin-bottom:12px;">Description</div>
+    <div style="font-size:12.5px;color:#333;line-height:1.7;">${esc(f.description)}</div>
   </td></tr>` : ''}
-
-  <!-- ── ROOF / FOUNDATION / HVAC ── -->
-  ${roofLine ? `
-  <tr><td style="border-bottom:1px solid #eee;">
-    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;"><tr>
-      <td width="33%" align="center" style="padding:13px 6px;border-right:1px solid #eee;">
-        <div style="font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px;font-family:'Inter',Arial,Helvetica,sans-serif;">Roof</div>
-        <div style="font-size:15px;font-weight:900;color:#1a1a2e;font-family:'Inter',Arial,Helvetica,sans-serif;">${esc(f.roof)}</div>
-      </td>
-      <td width="33%" align="center" style="padding:13px 6px;border-right:1px solid #eee;">
-        <div style="font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px;font-family:'Inter',Arial,Helvetica,sans-serif;">Foundation</div>
-        <div style="font-size:15px;font-weight:900;color:#1a1a2e;font-family:'Inter',Arial,Helvetica,sans-serif;">${esc(f.foundation)}</div>
-      </td>
-      <td width="34%" align="center" style="padding:13px 6px;">
-        <div style="font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px;font-family:'Inter',Arial,Helvetica,sans-serif;">HVAC</div>
-        <div style="font-size:15px;font-weight:900;color:#1a1a2e;font-family:'Inter',Arial,Helvetica,sans-serif;">${esc(f.hvac)}</div>
-      </td>
-    </tr></table>
-  </td></tr>` : ''}
-
 
   <!-- ── TERMS ── -->
-  <tr><td style="padding:14px 20px 16px;border-bottom:1px solid #eee;background:#fafaf8;">
-    <div style="font-size:9px;font-weight:700;color:#f5b731;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:10px;font-family:'Inter',Arial,Helvetica,sans-serif;">Terms &amp; Conditions</div>
+  <tr><td style="padding:${(f.description && f.description !== '—') ? '0' : '24px'} 24px 24px;border-bottom:1px solid #e1dbcf;">
+    <div style="font-size:11px;font-weight:800;color:#999;text-transform:uppercase;letter-spacing:3px;margin-bottom:12px;">Terms &amp; Conditions</div>
     <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
-      <td width="50%" valign="top" style="padding-right:8px;">
-        <div style="font-size:11px;color:#555;line-height:1.9;">
-          <span style="color:#f5b731;font-size:14px;">•</span> One time, one hour showing<br>
-          <span style="color:#f5b731;font-size:14px;">•</span> Bring your contractor<br>
-          <span style="color:#f5b731;font-size:14px;">•</span> Offers due within 30 min
-        </div>
+      <td width="50%" valign="top" style="padding-right:10px;">
+        <div style="font-size:11px;color:#444;line-height:1.7;margin-bottom:6px;"><span style="color:#D6A327;font-size:14px;font-weight:bold;">•</span> One time, one hour showing</div>
+        <div style="font-size:11px;color:#444;line-height:1.7;margin-bottom:6px;"><span style="color:#D6A327;font-size:14px;font-weight:bold;">•</span> Bring your contractor</div>
+        <div style="font-size:11px;color:#444;line-height:1.7;margin-bottom:6px;"><span style="color:#D6A327;font-size:14px;font-weight:bold;">•</span> Offers due within 30 min</div>
       </td>
       <td width="50%" valign="top">
-        <div style="font-size:11px;color:#555;line-height:1.9;">
-          <span style="color:#f5b731;font-size:14px;">•</span> $5,000 deposit on acceptance<br>
-          <span style="color:#f5b731;font-size:14px;">•</span> Cashier's check or wire<br>
-          <span style="color:#f5b731;font-size:14px;">•</span> Double close — buyers pay fees
-        </div>
+        <div style="font-size:11px;color:#444;line-height:1.7;margin-bottom:6px;"><span style="color:#D6A327;font-size:14px;font-weight:bold;">•</span> $5,000 deposit on acceptance</div>
+        <div style="font-size:11px;color:#444;line-height:1.7;margin-bottom:6px;"><span style="color:#D6A327;font-size:14px;font-weight:bold;">•</span> Cashier's check or wire</div>
+        <div style="font-size:11px;color:#444;line-height:1.7;margin-bottom:6px;"><span style="color:#D6A327;font-size:14px;font-weight:bold;">•</span> Double close — buyers pay fees</div>
       </td>
     </tr></table>
   </td></tr>
 
   <!-- ── MORE INFO CTA ── -->
-  <tr><td align="center" style="padding:20px;">
+  <tr><td align="center" style="padding:24px;background:#fcfbf9;border-bottom:1px solid #e1dbcf;">
     ${driveHref
-      ? `<a href="${driveHref}" target="_blank" style="display:inline-block;background:#f5b731;color:#1a1a2e;font-size:14px;font-weight:900;padding:15px 60px;border-radius:40px;text-decoration:none;letter-spacing:1px;text-transform:uppercase;">More Info</a>`
-      : `<div style="display:inline-block;background:#f5b731;color:#1a1a2e;font-size:14px;font-weight:900;padding:15px 60px;border-radius:40px;letter-spacing:1px;text-transform:uppercase;">More Info</div>`}
+      ? `<a href="${driveHref}" target="_blank" style="display:inline-block;background:#F4B324;color:#111;font-size:14px;font-weight:800;padding:14px 60px;border-radius:40px;text-decoration:none;letter-spacing:2px;text-transform:uppercase;">More Info</a>`
+      : `<div style="display:inline-block;background:#F4B324;color:#111;font-size:14px;font-weight:800;padding:14px 60px;border-radius:40px;letter-spacing:2px;text-transform:uppercase;">More Info</div>`}
   </td></tr>
 
   <!-- ── FOOTER ── -->
-  <tr><td style="padding:12px 20px;background:#f8f7f4;border-top:1px solid #eee;text-align:center;">
-    <span style="font-size:10px;color:#bbb;text-transform:uppercase;letter-spacing:.8px;">Sales Agent</span>
-    ${f.salesAgent ? `<span style="font-size:10px;color:#bbb;"> &nbsp;|&nbsp; </span><span style="font-size:12px;font-weight:700;color:#555;">${esc(f.salesAgent)}</span>` : ''}
-    ${f.salesPhone ? `<span style="font-size:10px;color:#bbb;"> &nbsp;·&nbsp; </span><span style="font-size:11px;color:#888;">${esc(f.salesPhone)}</span>` : ''}
+  <tr><td style="padding:16px 24px;background:#f2efe9;text-align:center;">
+    <span style="font-size:11px;color:#888;">Sales Agent</span>
+    ${f.salesAgent ? `<span style="font-size:10px;color:#bbb;"> &nbsp;·&nbsp; </span><span style="font-size:12px;font-weight:800;color:#555;">${esc(f.salesAgent)}</span>` : ''}
+    ${f.salesPhone ? `<span style="font-size:10px;color:#bbb;"> &nbsp;·&nbsp; </span><span style="font-size:12px;color:#555;">${esc(f.salesPhone)}</span>` : ''}
   </td></tr>
 
 </table>
