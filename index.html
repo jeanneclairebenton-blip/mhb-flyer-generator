@@ -822,10 +822,10 @@ body{background:#f0f0f0;display:flex;justify-content:center;padding:16px;font-fa
   body{display:block;padding:0;background:white}
   .flyer{width:100%;border:none;box-shadow:none}
 }
-.top-header{background:#fff;padding:20px 24px;border-bottom:3px solid #f5b731;display:flex;align-items:center;gap:18px}
-.header-text{display:flex;flex-direction:column;gap:4px}
-.address-main{font-size:28px;font-weight:900;color:#1a1a2e;line-height:1.15}
-.prop-type-label{font-size:13px;font-weight:600;color:#bbb;letter-spacing:1.2px;text-transform:uppercase}
+.top-header{background:#fff;padding:16px 20px 18px;border-bottom:3px solid #f5b731}
+.header-top-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.address-main{font-size:26px;font-weight:900;color:#1a1a2e;line-height:1.2}
+.prop-type-label{font-size:12px;font-weight:700;color:#f5b731;letter-spacing:1.8px;text-transform:uppercase}
 .hero{width:100%;height:280px;background:#c8a060;overflow:hidden;border-top:2px solid #f5b731;border-bottom:2px solid #f5b731;display:flex;align-items:center;justify-content:center}
 .hero-placeholder{color:rgba(0,0,0,0.25);font-size:14px;letter-spacing:3px;text-transform:uppercase}
 .icon-row{display:flex;background:#fff}
@@ -870,11 +870,19 @@ body{background:#f0f0f0;display:flex;justify-content:center;padding:16px;font-fa
 .agent-phone{font-size:14px;color:#aaa}
 </style></head><body>
 <div class="flyer">
-  <div class="top-header" style="padding:20px 24px;">
-    <div class="header-text">
-      <div class="address-main">${esc(fields.address)}</div>
+  <div class="top-header">
+    <div class="header-top-row">
+      <svg height="36" viewBox="0 0 120 138" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="60,2 114,32 114,106 60,136 6,106 6,32" fill="#F5A623"/>
+        <polygon points="60,14 103,38 103,100 60,124 17,100 17,38" fill="#fff"/>
+        <polygon points="60,14 103,38 60,62 17,38" fill="#F5B731"/>
+        <polygon points="17,38 60,62 60,100 17,76" fill="#fff"/>
+        <polygon points="103,38 60,62 60,100 103,76" fill="#C8922A"/>
+        <polygon points="60,82 76,91 76,100 60,100" fill="#A87020"/>
+      </svg>
       <div class="prop-type-label">${esc(fields.propType)}</div>
     </div>
+    <div class="address-main">${esc(fields.address)}</div>
   </div>
   <div class="hero">${hero}</div>
   <div class="icon-row">
@@ -1215,9 +1223,9 @@ function openEmailModal() {
 
   <!-- ── SHOWING ── -->
   ${f.showing && f.showing !== '—' ? `
-  <tr><td style="background:#f5b731;padding:18px 20px;text-align:center;">
-    <div style="font-size:9px;font-weight:800;color:#7a5c00;text-transform:uppercase;letter-spacing:2px;margin-bottom:6px;">Showing</div>
-    <div style="font-size:22px;font-weight:900;color:#1a1a2e;">${esc(f.showing)}</div>
+  <tr><td style="background:#fdfaf3;padding:18px 20px;text-align:center;border-top:1px solid #e5d9b6;border-bottom:1px solid #e5d9b6;">
+    <div style="font-size:10px;font-weight:600;color:#c9a432;text-transform:uppercase;letter-spacing:1.8px;margin-bottom:6px;font-family:'Inter',Arial,Helvetica,sans-serif;">Showing</div>
+    <div style="font-size:24px;font-weight:700;color:#1a1a2e;font-family:'Inter',Arial,Helvetica,sans-serif;">${esc(f.showing)}</div>
   </td></tr>` : ''}
 
   <!-- ── DESCRIPTION ── -->
