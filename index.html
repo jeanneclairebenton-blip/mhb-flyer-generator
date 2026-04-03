@@ -886,7 +886,7 @@ body{background:#e1dbcf;display:flex;justify-content:center;padding:24px;font-fa
     <div class="address-main">${esc(fields.address)}</div>
   </div>
 
-  <div class="hero"><div class="hero-placeholder">Property Photo</div></div>
+  <div class="hero">${hero}</div>
 
   <div class="icon-row">
     <div class="icon-cell">
@@ -1128,6 +1128,10 @@ function openEmailModal() {
   const driveHref = (f.driveLink && f.driveLink !== '#' && f.driveLink !== '—') ? f.driveLink : null;
   const roofLine  = [f.roof, f.foundation, f.hvac].filter(v => v && v !== '—').join(' · ') || null;
 
+  const heroEmail = photoDataUrl
+    ? `<img src="${photoDataUrl}" style="width:100%;height:100%;object-fit:cover;display:block;" alt="Property Image"/>`
+    : `<span style="color:#b3afa3;font-size:12px;font-weight:600;letter-spacing:4px;text-transform:uppercase;">Property Photo</span>`;
+
   emailHtmlContent = `<!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -1175,7 +1179,7 @@ function openEmailModal() {
 
   <!-- ── PHOTO PLACEHOLDER ── -->
   <tr><td style="background:#ece9e1;height:220px;text-align:center;vertical-align:middle;border-bottom:1px solid #e1dbcf;">
-    <span style="color:#b3afa3;font-size:12px;font-weight:600;letter-spacing:4px;text-transform:uppercase;">Property Photo</span>
+    ${heroEmail}
   </td></tr>
 
   <!-- ── STATS: Beds / Baths / Sqft / Built ── -->
