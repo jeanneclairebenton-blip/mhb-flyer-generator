@@ -528,6 +528,8 @@ const FIELD_CONFIG = [
   { key: 'showing',       label: 'Showing Date & Time', full: true },
   { key: 'closingDate',   label: 'Closing Date' },
   { key: 'occupancy',     label: 'Occupancy at Closing' },
+  { key: 'leaseEndDate',  label: 'Leaseback/Lease End Date' },
+  { key: 'leaseDeposit',  label: 'Leaseback/Lease Deposit Amount' },
   { key: 'roof',          label: 'Roof' },
   { key: 'foundation',    label: 'Foundation' },
   { key: 'hvac',          label: 'HVAC' },
@@ -715,6 +717,8 @@ function parseListing() {
     description:   g(t, /Property Description\s+(.+?)(?=Closing Date)/is),
     closingDate:   g(t, /Closing Date\s+(.+?)(?=Occupancy at Closing)/is),
     occupancy:     g(t, /Occupancy at Closing\s+(.+?)(?=Leaseback\/Lease|Showing Type)/is),
+    leaseEndDate:  g(t, /Leaseback\/Lease End Date\s+(.+?)(?=Leaseback\/Lease Deposit Amount|Showing Type)/is),
+    leaseDeposit:  g(t, /Leaseback\/Lease Deposit Amount\s*\$?\s*([\d,]+\.?\d*)/i, 'Empty') !== 'Empty' ? '$' + parseFloat(g(t, /Leaseback\/Lease Deposit Amount\s*\$?\s*([\d,]+\.?\d*)/i).replace(/,/g,'')).toLocaleString('en-US',{minimumFractionDigits:0}) : '—',
     showing:       (dtRaw && dtRaw!=='—') ? dtRaw : tpRaw,
     driveLink:     g(t, /Google Drive Link\s+(https:\/\/\S+)/i, '#'),
     agent:         g(t, /Congratulations to\s+(.+?)\s+for the acquisition/i),
@@ -819,12 +823,12 @@ function generateFlyer() {
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#e1dbcf;display:flex;justify-content:center;padding:24px;font-family:'Inter',Arial,sans-serif}
 .flyer{width:100%;max-width:560px;background:#fff;border:1px solid #d4ceb8;color:#1a1a2e;margin:0 auto;}
-@media print{@page{size:letter portrait;margin:0.25in}body{display:block;padding:0;background:white;margin:0}.flyer{width:100%;max-width:7.5in;height:10.3in;max-height:10.3in;overflow:hidden;border:none;margin:0 auto} .hero{height:150px;}}
+@media print{@page{size:letter portrait;margin:0.25in}body{display:block;padding:0;background:white;margin:0}.flyer{width:100%;max-width:7.5in;height:10.5in;max-height:10.5in;overflow:hidden;border:none;margin:0 auto} .hero{height:200px!important;} .top-header{padding:14px 20px 10px!important;} .price-section{padding:12px 20px!important;} .desc-block, .terms-block{padding:0 20px 12px!important;} .section-header{padding:16px 20px 6px!important;} .showing-center{padding:12px 20px!important;} .info-row{padding:8px 20px!important;} .icon-cell{padding:12px 8px 8px!important;} .stats-row .stat-cell{padding:10px 12px!important;} .agent-line{padding:12px 20px!important;}}
 .top-header{background:#fff;padding:20px 24px 16px;border-bottom:2px solid #D6A327}
 .header-top-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
 .prop-type-label{font-size:11px;font-weight:700;color:#D6A327;letter-spacing:2px;text-transform:uppercase}
 .address-main{font-size:24px;font-weight:900;color:#111;line-height:1.2;letter-spacing:-0.5px}
-.hero{width:100%;height:180px;background:#ece9e1;display:flex;align-items:center;justify-content:center;border-bottom:1px solid #e1dbcf}
+.hero{width:100%;height:260px;background:#ece9e1;display:flex;align-items:center;justify-content:center;border-bottom:1px solid #e1dbcf}
 .hero-placeholder{color:#b3afa3;font-size:12px;font-weight:600;letter-spacing:4px;text-transform:uppercase}
 .icon-row{display:flex;background:#fff;border-bottom:1px solid #e1dbcf}
 .icon-cell{flex:1;display:flex;flex-direction:column;align-items:center;padding:16px 8px 12px;gap:6px}
@@ -867,19 +871,8 @@ body{background:#e1dbcf;display:flex;justify-content:center;padding:24px;font-fa
 
   <div class="top-header">
     <div class="header-top-row">
-      <div style="display:flex;align-items:center;gap:12px;">
-        <svg height="40" viewBox="0 0 120 138" xmlns="http://www.w3.org/2000/svg">
-          <polygon points="60,2 114,32 114,106 60,136 6,106 6,32" fill="#F5A623"/>
-          <polygon points="60,14 103,38 103,100 60,124 17,100 17,38" fill="#fff"/>
-          <polygon points="60,14 103,38 60,62 17,38" fill="#F5B731"/>
-          <polygon points="17,38 60,62 60,100 17,76" fill="#fff"/>
-          <polygon points="103,38 60,62 60,100 103,76" fill="#C8922A"/>
-          <polygon points="60,82 76,91 76,100 60,100" fill="#A87020"/>
-        </svg>
-        <div style="display:flex;flex-direction:column;line-height:0.9;padding-top:4px;">
-          <span style="font-family:'Century Gothic',Futura,'Tw Cen MT',sans-serif;font-weight:400;font-size:38px;color:#000;letter-spacing:-1.5px;">Myers</span>
-          <span style="font-family:'Century Gothic',Futura,'Tw Cen MT',sans-serif;font-weight:300;font-size:17px;color:#000;letter-spacing:-0.2px;padding-left:1px;margin-top:2px;">Home Buyers</span>
-        </div>
+      <div style="display:flex;align-items:center;">
+        <img src="logo.png" style="height:44px;object-fit:contain;display:block;" alt="Myers Home Buyers">
       </div>
       <div class="prop-type-label">${esc(fields.propType)}</div>
     </div>
@@ -924,6 +917,8 @@ body{background:#e1dbcf;display:flex;justify-content:center;padding:24px;font-fa
   <div class="info-rows">
     ${fields.closingDate && fields.closingDate !== '—' ? `<div class="info-row"><span class="info-lbl">Closing Date</span><span class="info-val">${esc(fields.closingDate)}</span></div>` : ''}
     ${fields.occupancy && fields.occupancy !== '—' ? `<div class="info-row"><span class="info-lbl">Occupancy</span><span class="info-val">${esc(fields.occupancy)}</span></div>` : ''}
+    ${fields.occupancy && fields.occupancy.toLowerCase().includes('leaseback') && fields.leaseEndDate && fields.leaseEndDate !== '—' ? `<div class="info-row"><span class="info-lbl">Lease End Date</span><span class="info-val">${esc(fields.leaseEndDate)}</span></div>` : ''}
+    ${fields.occupancy && fields.occupancy.toLowerCase().includes('leaseback') && fields.leaseDeposit && fields.leaseDeposit !== '—' ? `<div class="info-row"><span class="info-lbl">Lease Deposit</span><span class="info-val">${esc(fields.leaseDeposit)}</span></div>` : ''}
   </div>
 
   ${fields.showing && fields.showing !== '—' ? `
@@ -1150,19 +1145,8 @@ function openEmailModal() {
     <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
       <td width="70%" valign="middle">
         <table cellpadding="0" cellspacing="0" border="0"><tr>
-          <td valign="middle" style="padding-right:12px;">
-            <svg height="40" viewBox="0 0 120 138" xmlns="http://www.w3.org/2000/svg">
-              <polygon points="60,2 114,32 114,106 60,136 6,106 6,32" fill="#F5A623"/>
-              <polygon points="60,14 103,38 103,100 60,124 17,100 17,38" fill="#fff"/>
-              <polygon points="60,14 103,38 60,62 17,38" fill="#F5B731"/>
-              <polygon points="17,38 60,62 60,100 17,76" fill="#fff"/>
-              <polygon points="103,38 60,62 60,100 103,76" fill="#C8922A"/>
-              <polygon points="60,82 76,91 76,100 60,100" fill="#A87020"/>
-            </svg>
-          </td>
-          <td valign="middle" style="padding-top:3px;">
-            <div style="font-family:'Century Gothic',Futura,'Tw Cen MT',sans-serif;font-weight:400;font-size:38px;color:#000;line-height:0.9;letter-spacing:-1.5px;">Myers</div>
-            <div style="font-family:'Century Gothic',Futura,'Tw Cen MT',sans-serif;font-weight:300;font-size:17px;color:#000;line-height:0.9;letter-spacing:-0.2px;padding-left:1px;margin-top:2px;">Home Buyers</div>
+          <td valign="middle">
+            <img src="https://jeanneclairebenton-blip.github.io/mhb-flyer-generator/logo.png" style="height:44px;object-fit:contain;display:block;" alt="Myers Home Buyers">
           </td>
         </tr></table>
       </td>
@@ -1178,7 +1162,7 @@ function openEmailModal() {
   </td></tr>
 
   <!-- ── PHOTO PLACEHOLDER ── -->
-  <tr><td style="background:#ece9e1;height:220px;text-align:center;vertical-align:middle;border-bottom:1px solid #e1dbcf;">
+  <tr><td style="background:#ece9e1;height:240px;text-align:center;vertical-align:middle;border-bottom:1px solid #e1dbcf;">
     ${heroEmail}
   </td></tr>
 
@@ -1245,7 +1229,7 @@ function openEmailModal() {
     </tr></table>
   </td></tr>
 
-  <!-- ── DETAILS: Closing / Occupancy / HVAC ── -->
+  <!-- ── DETAILS: Closing / Occupancy / Leaseback ── -->
   <tr><td style="padding:0 24px;border-bottom:1px solid #e1dbcf;">
     ${f.closingDate && f.closingDate !== '—' ? `
     <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-bottom:1px dashed #e1dbcf;"><tr>
@@ -1253,9 +1237,19 @@ function openEmailModal() {
       <td style="padding:12px 0;font-size:13px;font-weight:800;color:#111;text-align:right;">${esc(f.closingDate)}</td>
     </tr></table>` : ''}
     ${f.occupancy && f.occupancy !== '—' ? `
-    <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-bottom:1px dashed #e1dbcf;"><tr>
       <td style="padding:12px 0;font-size:12px;color:#555;">Occupancy</td>
       <td style="padding:12px 0;font-size:13px;font-weight:800;color:#111;text-align:right;">${esc(f.occupancy)}</td>
+    </tr></table>` : ''}
+    ${f.occupancy && f.occupancy.toLowerCase().includes('leaseback') && f.leaseEndDate && f.leaseEndDate !== '—' ? `
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-bottom:1px dashed #e1dbcf;"><tr>
+      <td style="padding:12px 0;font-size:12px;color:#555;">Lease End Date</td>
+      <td style="padding:12px 0;font-size:13px;font-weight:800;color:#111;text-align:right;">${esc(f.leaseEndDate)}</td>
+    </tr></table>` : ''}
+    ${f.occupancy && f.occupancy.toLowerCase().includes('leaseback') && f.leaseDeposit && f.leaseDeposit !== '—' ? `
+    <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+      <td style="padding:12px 0;font-size:12px;color:#555;">Lease Deposit</td>
+      <td style="padding:12px 0;font-size:13px;font-weight:800;color:#111;text-align:right;">${esc(f.leaseDeposit)}</td>
     </tr></table>` : ''}
   </td></tr>
 
@@ -1355,6 +1349,8 @@ function openEmailModal() {
     f.showing && f.showing !== '—' ? `Showing: ${f.showing}` : '',
     plain('Closing Date:',      f.closingDate),
     plain('Occupancy at Close:',f.occupancy),
+    f.occupancy && f.occupancy.toLowerCase().includes('leaseback') && f.leaseEndDate && f.leaseEndDate !== '—' ? plain('Lease End Date:', f.leaseEndDate) : '',
+    f.occupancy && f.occupancy.toLowerCase().includes('leaseback') && f.leaseDeposit && f.leaseDeposit !== '—' ? plain('Lease Deposit:', f.leaseDeposit) : '',
     '',
     f.roof       && f.roof       !== '—' ? `Roof:        ${f.roof}`       : '',
     f.foundation && f.foundation !== '—' ? `Foundation:  ${f.foundation}` : '',
