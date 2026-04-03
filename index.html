@@ -1091,9 +1091,10 @@ function openEmailModal() {
   emailHtmlContent = `<!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
 <title>${esc(addr)} — Myers Home Buyers</title>
 </head>
-<body style="margin:0;padding:20px 0;background:#e8e4dc;font-family:Arial,Helvetica,sans-serif;">
+<body style="margin:0;padding:20px 0;background:#e8e4dc;font-family:'Inter',Arial,Helvetica,sans-serif;">
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#e8e4dc;">
 <tr><td align="center">
 
@@ -1222,8 +1223,8 @@ function openEmailModal() {
   <!-- ── DESCRIPTION ── -->
   ${f.description && f.description !== '—' ? `
   <tr><td style="padding:16px 20px;border-top:1px solid #eee;border-bottom:1px solid #eee;">
-    <div style="font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px;">Description</div>
-    <div style="font-size:12px;color:#555;line-height:1.75;">${esc(f.description)}</div>
+    <div style="font-size:9px;font-weight:700;color:#f5b731;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px;font-family:'Inter',Arial,Helvetica,sans-serif;">Description</div>
+    <div style="font-size:12px;color:#555;line-height:1.75;font-family:'Inter',Arial,Helvetica,sans-serif;">${esc(f.description)}</div>
   </td></tr>` : ''}
 
   <!-- ── ROOF / FOUNDATION / HVAC ── -->
@@ -1231,16 +1232,16 @@ function openEmailModal() {
   <tr><td style="border-bottom:1px solid #eee;">
     <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;"><tr>
       <td width="33%" align="center" style="padding:13px 6px;border-right:1px solid #eee;">
-        <div style="font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">Roof</div>
-        <div style="font-size:13px;font-weight:900;color:#1a1a2e;">${esc(f.roof)}</div>
+        <div style="font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px;font-family:'Inter',Arial,Helvetica,sans-serif;">Roof</div>
+        <div style="font-size:15px;font-weight:900;color:#1a1a2e;font-family:'Inter',Arial,Helvetica,sans-serif;">${esc(f.roof)}</div>
       </td>
       <td width="33%" align="center" style="padding:13px 6px;border-right:1px solid #eee;">
-        <div style="font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">Foundation</div>
-        <div style="font-size:13px;font-weight:900;color:#1a1a2e;">${esc(f.foundation)}</div>
+        <div style="font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px;font-family:'Inter',Arial,Helvetica,sans-serif;">Foundation</div>
+        <div style="font-size:15px;font-weight:900;color:#1a1a2e;font-family:'Inter',Arial,Helvetica,sans-serif;">${esc(f.foundation)}</div>
       </td>
       <td width="34%" align="center" style="padding:13px 6px;">
-        <div style="font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">HVAC</div>
-        <div style="font-size:13px;font-weight:900;color:#1a1a2e;">${esc(f.hvac)}</div>
+        <div style="font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px;font-family:'Inter',Arial,Helvetica,sans-serif;">HVAC</div>
+        <div style="font-size:15px;font-weight:900;color:#1a1a2e;font-family:'Inter',Arial,Helvetica,sans-serif;">${esc(f.hvac)}</div>
       </td>
     </tr></table>
   </td></tr>` : ''}
@@ -1248,7 +1249,7 @@ function openEmailModal() {
 
   <!-- ── TERMS ── -->
   <tr><td style="padding:14px 20px 16px;border-bottom:1px solid #eee;background:#fafaf8;">
-    <div style="font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:10px;">Terms &amp; Conditions</div>
+    <div style="font-size:9px;font-weight:700;color:#f5b731;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:10px;font-family:'Inter',Arial,Helvetica,sans-serif;">Terms &amp; Conditions</div>
     <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
       <td width="50%" valign="top" style="padding-right:8px;">
         <div style="font-size:11px;color:#555;line-height:1.9;">
