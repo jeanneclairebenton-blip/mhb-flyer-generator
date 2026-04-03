@@ -1086,175 +1086,192 @@ function openEmailModal() {
 
   // ── Build HTML email ──────────────────────────────────────────────────────
   const driveHref = (f.driveLink && f.driveLink !== '#' && f.driveLink !== '—') ? f.driveLink : null;
+  const roofLine  = [f.roof, f.foundation, f.hvac].filter(v => v && v !== '—').join(' · ') || null;
 
   emailHtmlContent = `<!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(addr)} — Myers Home Buyers</title>
 </head>
-<body style="margin:0;padding:0;background:#f0efe9;font-family:Arial,Helvetica,sans-serif;">
-<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f0efe9;padding:24px 0;">
-  <tr><td align="center">
-    <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;">
+<body style="margin:0;padding:20px 0;background:#e8e4dc;font-family:Arial,Helvetica,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#e8e4dc;">
+<tr><td align="center">
 
-      <!-- HEADER -->
-      <tr><td style="background:#1a1a2e;padding:18px 28px;border-radius:10px 10px 0 0;">
-        <table width="100%" cellpadding="0" cellspacing="0">
-          <tr>
-            <td>
-              <div style="font-size:22px;font-weight:900;color:#f5b731;letter-spacing:-0.3px;">Myers Home Buyers</div>
-              <div style="font-size:10px;color:rgba(255,255,255,.4);letter-spacing:2px;text-transform:uppercase;margin-top:2px;">Investment Property Opportunity</div>
-            </td>
-            <td align="right">
-              <div style="background:#f5b731;color:#1a1a2e;font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;padding:5px 12px;border-radius:20px;">New Listing</div>
-            </td>
-          </tr>
-        </table>
-      </td></tr>
+<table width="480" cellpadding="0" cellspacing="0" border="0"
+  style="max-width:480px;width:100%;background:#fff;border:1px solid #e0dbd0;border-radius:4px;overflow:hidden;">
 
-      <!-- HERO BAND -->
-      <tr><td style="background:#f5b731;padding:20px 28px;">
-        <div style="font-size:26px;font-weight:900;color:#1a1a2e;line-height:1.1;">${esc(f.address)}</div>
-        <div style="font-size:13px;color:#7a5c00;margin-top:5px;font-weight:600;">${esc(f.propType)}</div>
-      </td></tr>
-
-      <!-- STATS GRID -->
-      <tr><td style="background:#fff;padding:0;">
-        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
-          <tr>
-            <td width="25%" align="center" style="padding:16px 8px;border-right:1px dashed #f0d88a;border-bottom:1px solid #f0dfa0;">
-              <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">Bedrooms</div>
-              <div style="font-size:22px;font-weight:900;color:#1a1a2e;">${esc(f.beds)}</div>
-            </td>
-            <td width="25%" align="center" style="padding:16px 8px;border-right:1px dashed #f0d88a;border-bottom:1px solid #f0dfa0;">
-              <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">Bathrooms</div>
-              <div style="font-size:22px;font-weight:900;color:#1a1a2e;">${esc(f.baths)}</div>
-            </td>
-            <td width="25%" align="center" style="padding:16px 8px;border-right:1px dashed #f0d88a;border-bottom:1px solid #f0dfa0;">
-              <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">Sq Ft</div>
-              <div style="font-size:22px;font-weight:900;color:#1a1a2e;">${esc(f.sqft)}</div>
-            </td>
-            <td width="25%" align="center" style="padding:16px 8px;border-bottom:1px solid #f0dfa0;">
-              <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">Year Built</div>
-              <div style="font-size:22px;font-weight:900;color:#1a1a2e;">${esc(f.yearBuilt)}</div>
-            </td>
-          </tr>
-          <tr>
-            <td colspan="4" align="center" style="padding:18px 22px;background:#fffbee;border-bottom:1px solid #f0dfa0;">
-              <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;">Starting Price</div>
-              <div style="font-size:34px;font-weight:900;color:#1a1a2e;">${esc(f.startingPrice)}</div>
-            </td>
-          </tr>
-          <tr>
-            <td colspan="2" align="center" style="padding:14px 8px;border-right:1px solid #eee;border-bottom:1px solid #eee;">
-              <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">Est. ARV</div>
-              <div style="font-size:18px;font-weight:900;color:#1a1a2e;">${esc(f.arv)}</div>
-            </td>
-            <td colspan="2" align="center" style="padding:14px 8px;border-bottom:1px solid #eee;">
-              <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">Est. Monthly Rent</div>
-              <div style="font-size:18px;font-weight:900;color:#1a1a2e;">${esc(f.rent)}</div>
-            </td>
-          </tr>
-        </table>
-      </td></tr>
-
-      <!-- SHOWING -->
-      ${f.showing && f.showing !== '—' ? `
-      <tr><td style="background:#fffbee;padding:16px 28px;text-align:center;border-top:1px solid #f0dfa0;border-bottom:1px solid #f0dfa0;">
-        <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px;">Showing</div>
-        <div style="font-size:22px;font-weight:900;color:#1a1a2e;">${esc(f.showing)}</div>
-      </td></tr>` : ''}
-
-      <!-- CLOSING & OCCUPANCY -->
-      <tr><td style="background:#fff;padding:0;">
-        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
-          <tr>
-            <td width="50%" align="center" style="padding:12px 14px;border-right:1px solid #eee;border-bottom:1px solid #eee;">
-              <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">Closing Date</div>
-              <div style="font-size:15px;font-weight:900;color:#1a1a2e;">${esc(f.closingDate)}</div>
-            </td>
-            <td width="50%" align="center" style="padding:12px 14px;border-bottom:1px solid #eee;">
-              <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">Occupancy at Closing</div>
-              <div style="font-size:15px;font-weight:900;color:#1a1a2e;">${esc(f.occupancy)}</div>
-            </td>
-          </tr>
-        </table>
-      </td></tr>
-
-      <!-- PROPERTY DETAILS -->
-      ${(f.roof || f.foundation || f.hvac) && [f.roof,f.foundation,f.hvac].some(v=>v&&v!=='—') ? `
-      <tr><td style="background:#fffbee;padding:8px 28px;border-top:1px solid #f0dfa0;border-bottom:1px solid #f0dfa0;">
-        <span style="font-size:10px;font-weight:800;color:#1a1a2e;letter-spacing:.8px;text-transform:uppercase;">Property Details</span>
-      </td></tr>
-      <tr><td style="background:#fff;padding:0;">
-        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
-          <tr>
-            <td width="33%" align="center" style="padding:12px 8px;border-right:1px dashed #eee;">
-              <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">Roof</div>
-              <div style="font-size:13px;font-weight:700;color:#1a1a2e;">${esc(f.roof)}</div>
-            </td>
-            <td width="33%" align="center" style="padding:12px 8px;border-right:1px dashed #eee;">
-              <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">Foundation</div>
-              <div style="font-size:13px;font-weight:700;color:#1a1a2e;">${esc(f.foundation)}</div>
-            </td>
-            <td width="34%" align="center" style="padding:12px 8px;">
-              <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">HVAC</div>
-              <div style="font-size:13px;font-weight:700;color:#1a1a2e;">${esc(f.hvac)}</div>
-            </td>
-          </tr>
-        </table>
-      </td></tr>` : ''}
-
-      <!-- DESCRIPTION -->
-      ${f.description && f.description !== '—' ? `
-      <tr><td style="background:#fff;padding:14px 28px 18px;border-top:1px solid #eee;">
-        <div style="font-size:10px;font-weight:800;color:#f5b731;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px;">Property Description</div>
-        <div style="font-size:13px;color:#444;line-height:1.8;">${esc(f.description)}</div>
-      </td></tr>` : ''}
-
-      <!-- TERMS -->
-      <tr><td style="background:#f8f7f4;padding:14px 28px 18px;border-top:2px solid #f5b731;">
-        <div style="font-size:10px;font-weight:800;color:#1a1a2e;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;">Terms &amp; Conditions</div>
-        <table width="100%" cellpadding="0" cellspacing="0" border="0">
-          <tr>
-            <td width="50%" valign="top" style="padding-right:12px;">
-              <div style="font-size:11px;color:#555;line-height:1.8;">
-                • One time, one hour showing<br>
-                • You may bring your contractor<br>
-                • Offers due within 30 min of end of showing<br>
-                • Deposit is refundable if MHB cannot perform
-              </div>
-            </td>
-            <td width="50%" valign="top">
-              <div style="font-size:11px;color:#555;line-height:1.8;">
-                • $5,000 deposit due within the hour upon acceptance<br>
-                • Cashier's check or wire<br>
-                • Deposit is non-refundable if you cannot perform<br>
-                • All closings via double closing; buyers pay closing fees
-              </div>
-            </td>
-          </tr>
-        </table>
-      </td></tr>
-
-      <!-- CTA -->
-      <tr><td align="center" style="background:#fff;padding:22px 28px;border-top:1px solid #eee;">
-        ${driveHref ? `<a href="${driveHref}" target="_blank" style="display:inline-block;background:#f5b731;color:#1a1a2e;font-size:15px;font-weight:900;padding:14px 52px;border-radius:40px;text-decoration:none;letter-spacing:1px;text-transform:uppercase;">More Info</a>` : `<div style="background:#f5b731;color:#1a1a2e;font-size:15px;font-weight:900;padding:14px 52px;border-radius:40px;letter-spacing:1px;text-transform:uppercase;display:inline-block;">More Info</div>`}
-        <div style="font-size:11px;color:#bbb;margin-top:10px;">Click the button above to access photos and additional property details.</div>
-      </td></tr>
-
-      <!-- AGENT FOOTER -->
-      <tr><td style="background:#1a1a2e;padding:16px 28px;border-radius:0 0 10px 10px;text-align:center;">
-        <div style="color:rgba(255,255,255,.4);font-size:10px;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:5px;">Sales Agent</div>
-        ${f.salesAgent ? `<div style="color:#f5b731;font-size:14px;font-weight:700;">${esc(f.salesAgent)}</div>` : ''}
-        ${f.salesPhone ? `<div style="color:rgba(255,255,255,.55);font-size:12px;margin-top:2px;">${esc(f.salesPhone)}</div>` : ''}
-        <div style="color:rgba(255,255,255,.25);font-size:10px;margin-top:10px;">Myers Home Buyers · This email was generated by the MHB Flyer Tool</div>
-      </td></tr>
-
-    </table>
+  <!-- ── HEADER: Logo + Property Type ── -->
+  <tr><td style="padding:16px 20px 12px;">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+      <td>
+        <svg height="32" viewBox="0 0 120 138" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="60,2 114,32 114,106 60,136 6,106 6,32" fill="#F5A623"/>
+          <polygon points="60,14 103,38 103,100 60,124 17,100 17,38" fill="#fff"/>
+          <polygon points="60,14 103,38 60,62 17,38" fill="#F5B731"/>
+          <polygon points="17,38 60,62 60,100 17,76" fill="#fff"/>
+          <polygon points="103,38 60,62 60,100 103,76" fill="#C8922A"/>
+          <polygon points="60,82 76,91 76,100 60,100" fill="#A87020"/>
+        </svg>
+      </td>
+      <td align="right">
+        <span style="color:#f5b731;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;">${esc(f.propType)}</span>
+      </td>
+    </tr></table>
   </td></tr>
+
+  <!-- ── ADDRESS ── -->
+  <tr><td style="padding:6px 20px 16px;border-bottom:3px solid #f5b731;">
+    <div style="font-size:22px;font-weight:900;color:#1a1a2e;line-height:1.2;">${esc(f.address)}</div>
+  </td></tr>
+
+  <!-- ── PHOTO PLACEHOLDER ── -->
+  <tr><td style="background:#f5f3ee;height:170px;text-align:center;vertical-align:middle;border-bottom:1px solid #e0dbd0;">
+    <span style="color:#ccc;font-size:11px;letter-spacing:3px;text-transform:uppercase;">Property Photo</span>
+  </td></tr>
+
+  <!-- ── STATS: Beds / Baths / Sqft / Built ── -->
+  <tr><td style="border-bottom:1px solid #e8e0d0;">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;"><tr>
+      <td width="25%" align="center" style="padding:13px 6px 11px;border-right:1px solid #eee;">
+        <svg width="20" height="20" viewBox="0 0 32 32" fill="none" stroke="#bbb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="14" width="26" height="11" rx="2"/><rect x="6" y="11" width="8" height="5" rx="1.5"/>
+          <rect x="18" y="11" width="8" height="5" rx="1.5"/><line x1="6" y1="25" x2="6" y2="29"/>
+          <line x1="26" y1="25" x2="26" y2="29"/><path d="M3 14 L3 9 Q3 7 5 7 L27 7 Q29 7 29 9 L29 14"/>
+        </svg>
+        <div style="font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.8px;margin-top:5px;">Beds</div>
+        <div style="font-size:18px;font-weight:900;color:#1a1a2e;">${esc(f.beds)}</div>
+      </td>
+      <td width="25%" align="center" style="padding:13px 6px 11px;border-right:1px solid #eee;">
+        <svg width="20" height="20" viewBox="0 0 32 32" fill="none" stroke="#bbb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 16 H26 V22 A8 8 0 0 1 18 30 H14 A8 8 0 0 1 6 22 Z"/>
+          <path d="M10 16 V10 A3 3 0 0 1 13 7"/><line x1="20" y1="4" x2="20" y2="8"/>
+        </svg>
+        <div style="font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.8px;margin-top:5px;">Baths</div>
+        <div style="font-size:18px;font-weight:900;color:#1a1a2e;">${esc(f.baths)}</div>
+      </td>
+      <td width="25%" align="center" style="padding:13px 6px 11px;border-right:1px solid #eee;">
+        <svg width="20" height="20" viewBox="0 0 32 32" fill="none" stroke="#bbb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 14 L16 4 L28 14 L28 30 L4 30 Z"/><rect x="13" y="21" width="6" height="9" rx="1"/>
+          <rect x="6" y="17" width="6" height="5" rx="1"/><rect x="20" y="17" width="6" height="5" rx="1"/>
+        </svg>
+        <div style="font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.8px;margin-top:5px;">Sqft</div>
+        <div style="font-size:18px;font-weight:900;color:#1a1a2e;">${esc(f.sqft)}</div>
+      </td>
+      <td width="25%" align="center" style="padding:13px 6px 11px;">
+        <svg width="20" height="20" viewBox="0 0 32 32" fill="none" stroke="#bbb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 6 H28 V24 L22 30 H4 Z"/><line x1="4" y1="12" x2="28" y2="12"/>
+          <path d="M28 24 L22 24 L22 30"/><line x1="10" y1="3" x2="10" y2="9"/>
+          <line x1="16" y1="3" x2="16" y2="9"/><line x1="22" y1="3" x2="22" y2="9"/>
+        </svg>
+        <div style="font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.8px;margin-top:5px;">Built</div>
+        <div style="font-size:18px;font-weight:900;color:#1a1a2e;">${esc(f.yearBuilt)}</div>
+      </td>
+    </tr></table>
+  </td></tr>
+
+  <!-- ── ACQUISITION PRICE ── -->
+  <tr><td style="padding:16px 20px;border-bottom:1px solid #eee;">
+    <table cellpadding="0" cellspacing="0" border="0"><tr>
+      <td style="width:3px;background:#f5b731;border-radius:2px;">&nbsp;&nbsp;</td>
+      <td style="padding-left:12px;">
+        <div style="font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:3px;">Acquisition Price</div>
+        <div style="font-size:34px;font-weight:900;color:#1a1a2e;line-height:1;">${esc(f.startingPrice)}</div>
+      </td>
+    </tr></table>
+  </td></tr>
+
+  <!-- ── ARV / BUY NOW / RENT ── -->
+  <tr><td style="border-bottom:1px solid #eee;">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;"><tr>
+      <td width="33%" style="padding:11px 14px;border-right:1px solid #eee;">
+        <div style="font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px;">Est. ARV</div>
+        <div style="font-size:15px;font-weight:900;color:#1a1a2e;">${esc(f.arv)}</div>
+      </td>
+      <td width="33%" style="padding:11px 14px;border-right:1px solid #eee;">
+        <div style="font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px;">Buy Now</div>
+        <div style="font-size:15px;font-weight:900;color:#1a1a2e;">${esc(f.buyNow)}</div>
+      </td>
+      <td width="34%" style="padding:11px 14px;">
+        <div style="font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px;">Est. Rent</div>
+        <div style="font-size:15px;font-weight:900;color:#1a1a2e;">${esc(f.rent)}</div>
+      </td>
+    </tr></table>
+  </td></tr>
+
+  <!-- ── DETAILS: Closing / Occupancy / Roof ── -->
+  <tr><td style="padding:0 20px;border-bottom:1px solid #eee;">
+    ${f.closingDate && f.closingDate !== '—' ? `
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-bottom:1px solid #f0ece4;"><tr>
+      <td style="padding:10px 0;font-size:12px;color:#888;">Closing Date</td>
+      <td style="padding:10px 0;font-size:13px;font-weight:900;color:#1a1a2e;text-align:right;">${esc(f.closingDate)}</td>
+    </tr></table>` : ''}
+    ${f.occupancy && f.occupancy !== '—' ? `
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-bottom:1px solid #f0ece4;"><tr>
+      <td style="padding:10px 0;font-size:12px;color:#888;">Occupancy</td>
+      <td style="padding:10px 0;font-size:13px;font-weight:900;color:#1a1a2e;text-align:right;">${esc(f.occupancy)}</td>
+    </tr></table>` : ''}
+    ${roofLine ? `
+    <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+      <td style="padding:10px 0;font-size:12px;color:#888;">Roof · Foundation · HVAC</td>
+      <td style="padding:10px 0;font-size:12px;font-weight:700;color:#1a1a2e;text-align:right;">${esc(roofLine)}</td>
+    </tr></table>` : ''}
+  </td></tr>
+
+  <!-- ── SHOWING ── -->
+  ${f.showing && f.showing !== '—' ? `
+  <tr><td style="background:#f5b731;padding:18px 20px;text-align:center;">
+    <div style="font-size:9px;font-weight:800;color:#7a5c00;text-transform:uppercase;letter-spacing:2px;margin-bottom:6px;">Showing</div>
+    <div style="font-size:22px;font-weight:900;color:#1a1a2e;">${esc(f.showing)}</div>
+  </td></tr>` : ''}
+
+  <!-- ── DESCRIPTION ── -->
+  ${f.description && f.description !== '—' ? `
+  <tr><td style="padding:16px 20px;border-top:1px solid #eee;border-bottom:1px solid #eee;">
+    <div style="font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px;">Description</div>
+    <div style="font-size:12px;color:#555;line-height:1.75;">${esc(f.description)}</div>
+  </td></tr>` : ''}
+
+  <!-- ── TERMS ── -->
+  <tr><td style="padding:14px 20px 16px;border-bottom:1px solid #eee;background:#fafaf8;">
+    <div style="font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:10px;">Terms &amp; Conditions</div>
+    <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+      <td width="50%" valign="top" style="padding-right:8px;">
+        <div style="font-size:11px;color:#555;line-height:1.9;">
+          <span style="color:#f5b731;font-size:14px;">•</span> One time, one hour showing<br>
+          <span style="color:#f5b731;font-size:14px;">•</span> Bring your contractor<br>
+          <span style="color:#f5b731;font-size:14px;">•</span> Offers due within 30 min
+        </div>
+      </td>
+      <td width="50%" valign="top">
+        <div style="font-size:11px;color:#555;line-height:1.9;">
+          <span style="color:#f5b731;font-size:14px;">•</span> $5,000 deposit on acceptance<br>
+          <span style="color:#f5b731;font-size:14px;">•</span> Cashier's check or wire<br>
+          <span style="color:#f5b731;font-size:14px;">•</span> Double close — buyers pay fees
+        </div>
+      </td>
+    </tr></table>
+  </td></tr>
+
+  <!-- ── MORE INFO CTA ── -->
+  <tr><td align="center" style="padding:20px;">
+    ${driveHref
+      ? `<a href="${driveHref}" target="_blank" style="display:inline-block;background:#f5b731;color:#1a1a2e;font-size:14px;font-weight:900;padding:15px 60px;border-radius:40px;text-decoration:none;letter-spacing:1px;text-transform:uppercase;">More Info</a>`
+      : `<div style="display:inline-block;background:#f5b731;color:#1a1a2e;font-size:14px;font-weight:900;padding:15px 60px;border-radius:40px;letter-spacing:1px;text-transform:uppercase;">More Info</div>`}
+  </td></tr>
+
+  <!-- ── FOOTER ── -->
+  <tr><td style="padding:12px 20px;background:#f8f7f4;border-top:1px solid #eee;text-align:center;">
+    <span style="font-size:10px;color:#bbb;text-transform:uppercase;letter-spacing:.8px;">Sales Agent</span>
+    ${f.salesAgent ? `<span style="font-size:10px;color:#bbb;"> &nbsp;|&nbsp; </span><span style="font-size:12px;font-weight:700;color:#555;">${esc(f.salesAgent)}</span>` : ''}
+    ${f.salesPhone ? `<span style="font-size:10px;color:#bbb;"> &nbsp;·&nbsp; </span><span style="font-size:11px;color:#888;">${esc(f.salesPhone)}</span>` : ''}
+  </td></tr>
+
 </table>
+
+</td></tr></table>
 </body></html>`;
+
+
 
   // ── Build Plain Text email ───────────────────────────────────────────────
   const line  = '─'.repeat(52);
