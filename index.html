@@ -871,8 +871,19 @@ body{background:#e1dbcf;display:flex;justify-content:center;padding:24px;font-fa
 
   <div class="top-header">
     <div class="header-top-row">
-      <div style="display:flex;align-items:center;">
-        <img src="https://jeanneclairebenton-blip.github.io/mhb-flyer-generator/logo.png" style="height:44px;object-fit:contain;display:block;" alt="Myers Home Buyers">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <svg height="44" viewBox="0 0 120 138" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="60,2 114,32 114,106 60,136 6,106 6,32" fill="#F5A623"/>
+          <polygon points="60,14 103,38 103,100 60,124 17,100 17,38" fill="#fff"/>
+          <polygon points="60,14 103,38 60,62 17,38" fill="#F5B731"/>
+          <polygon points="17,38 60,62 60,100 17,76" fill="#fff"/>
+          <polygon points="103,38 60,62 60,100 103,76" fill="#C8922A"/>
+          <polygon points="60,82 76,91 76,100 60,100" fill="#A87020"/>
+        </svg>
+        <div style="display:flex;flex-direction:column;line-height:0.9;padding-top:4px;">
+          <span style="font-family:'Century Gothic',Futura,'Tw Cen MT',sans-serif;font-weight:400;font-size:38px;color:#000;letter-spacing:-1.5px;">Myers</span>
+          <span style="font-family:'Century Gothic',Futura,'Tw Cen MT',sans-serif;font-weight:300;font-size:17px;color:#000;letter-spacing:-0.2px;padding-left:1px;margin-top:2px;">Home Buyers</span>
+        </div>
       </div>
       <div class="prop-type-label">${esc(fields.propType)}</div>
     </div>
@@ -1145,8 +1156,19 @@ function openEmailModal() {
     <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
       <td width="70%" valign="middle">
         <table cellpadding="0" cellspacing="0" border="0"><tr>
-          <td valign="middle">
-            <img src="https://jeanneclairebenton-blip.github.io/mhb-flyer-generator/logo.png" style="height:44px;object-fit:contain;display:block;" alt="Myers Home Buyers">
+          <td valign="middle" style="padding-right:12px;">
+            <svg height="40" viewBox="0 0 120 138" xmlns="http://www.w3.org/2000/svg" style="display:block;">
+              <polygon points="60,2 114,32 114,106 60,136 6,106 6,32" fill="#F5A623"/>
+              <polygon points="60,14 103,38 103,100 60,124 17,100 17,38" fill="#fff"/>
+              <polygon points="60,14 103,38 60,62 17,38" fill="#F5B731"/>
+              <polygon points="17,38 60,62 60,100 17,76" fill="#fff"/>
+              <polygon points="103,38 60,62 60,100 103,76" fill="#C8922A"/>
+              <polygon points="60,82 76,91 76,100 60,100" fill="#A87020"/>
+            </svg>
+          </td>
+          <td valign="middle" style="padding-top:3px;">
+            <div style="font-family:'Century Gothic',Futura,'Tw Cen MT',sans-serif;font-weight:400;font-size:38px;color:#000;line-height:0.9;letter-spacing:-1.5px;">Myers</div>
+            <div style="font-family:'Century Gothic',Futura,'Tw Cen MT',sans-serif;font-weight:300;font-size:17px;color:#000;line-height:0.9;letter-spacing:-0.2px;padding-left:1px;margin-top:2px;">Home Buyers</div>
           </td>
         </tr></table>
       </td>
