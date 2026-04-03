@@ -812,65 +812,65 @@ function generateFlyer() {
   const esc = s => (s||'—').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
   flyerHtml = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#f0f0f0;display:flex;justify-content:center;padding:20px;font-family:Arial,sans-serif}
-.flyer{width:700px;background:#fff;border:1px solid #e8e0d0;color:#1a1a2e}
+body{background:#f0f0f0;display:flex;justify-content:center;padding:16px;font-family:Arial,sans-serif}
+.flyer{width:560px;max-width:100%;background:#fff;border:1px solid #e8e0d0;color:#1a1a2e}
 @media print{
   @page{size:letter portrait;margin:0.25in}
   body{display:block;padding:0;background:white}
   .flyer{width:100%;border:none;box-shadow:none}
 }
-.top-header{background:#fff;padding:18px 24px;border-bottom:3px solid #f5b731;display:flex;align-items:center;gap:18px}
-.header-text{display:flex;flex-direction:column;gap:3px}
-.address-main{font-size:24px;font-weight:900;color:#1a1a2e;line-height:1.1}
-.prop-type-label{font-size:10px;font-weight:600;color:#bbb;letter-spacing:1.2px;text-transform:uppercase}
-.hero{width:100%;height:320px;background:#c8a060;overflow:hidden;border-top:2px solid #f5b731;border-bottom:2px solid #f5b731;display:flex;align-items:center;justify-content:center}
-.hero-placeholder{color:rgba(0,0,0,0.25);font-size:13px;letter-spacing:3px;text-transform:uppercase}
+.top-header{background:#fff;padding:20px 24px;border-bottom:3px solid #f5b731;display:flex;align-items:center;gap:18px}
+.header-text{display:flex;flex-direction:column;gap:4px}
+.address-main{font-size:28px;font-weight:900;color:#1a1a2e;line-height:1.15}
+.prop-type-label{font-size:13px;font-weight:600;color:#bbb;letter-spacing:1.2px;text-transform:uppercase}
+.hero{width:100%;height:280px;background:#c8a060;overflow:hidden;border-top:2px solid #f5b731;border-bottom:2px solid #f5b731;display:flex;align-items:center;justify-content:center}
+.hero-placeholder{color:rgba(0,0,0,0.25);font-size:14px;letter-spacing:3px;text-transform:uppercase}
 .icon-row{display:flex;background:#fff}
-.icon-cell{flex:1;display:flex;flex-direction:column;align-items:center;padding:14px 8px 12px;gap:4px}
+.icon-cell{flex:1;display:flex;flex-direction:column;align-items:center;padding:16px 8px 14px;gap:4px}
 .icon-cell+.icon-cell{border-left:2px dashed #f0d88a}
-.icon-lbl{font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.8px;text-align:center;margin-top:6px}
-.icon-val{font-size:16px;font-weight:900;color:#1a1a2e;text-align:center}
+.icon-lbl{font-size:13px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.8px;text-align:center;margin-top:6px}
+.icon-val{font-size:22px;font-weight:900;color:#1a1a2e;text-align:center}
 .gold-divider{height:3px;background:#f5b731;width:100%}
-.price-banner{background:#fffbee;border-bottom:1px solid #f0dfa0;padding:14px 22px;text-align:center}
-.price-banner .lbl{font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
-.price-banner .price{font-size:28px;font-weight:900;color:#1a1a2e}
+.price-banner{background:#fffbee;border-bottom:1px solid #f0dfa0;padding:16px 22px;text-align:center}
+.price-banner .lbl{font-size:13px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px}
+.price-banner .price{font-size:36px;font-weight:900;color:#1a1a2e}
 .stats-row{display:flex;border-bottom:1px solid #eee}
-.stat-cell{flex:1;padding:12px;text-align:center;border-right:1px solid #eee}
+.stat-cell{flex:1;padding:14px 8px;text-align:center;border-right:1px solid #eee}
 .stat-cell:last-child{border-right:none}
-.stat-label{font-size:10px;font-weight:700;color:#888;letter-spacing:.8px;text-transform:uppercase;margin-bottom:5px}
-.stat-value{font-size:17px;font-weight:900;color:#1a1a2e}
-.showing-center{text-align:center;padding:16px 22px;border-bottom:1px solid #eee;background:#fffbee;border-top:1px solid #f0dfa0}
-.showing-label{font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px}
-.showing-date{font-size:22px;font-weight:900;color:#1a1a2e}
+.stat-label{font-size:13px;font-weight:700;color:#888;letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px}
+.stat-value{font-size:22px;font-weight:900;color:#1a1a2e}
+.showing-center{text-align:center;padding:18px 22px;border-bottom:1px solid #eee;background:#fffbee;border-top:1px solid #f0dfa0}
+.showing-label{font-size:13px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+.showing-date{font-size:28px;font-weight:900;color:#1a1a2e}
 .two-col{display:flex;border-bottom:1px solid #eee;text-align:center}
-.two-col-cell{flex:1;padding:12px 22px;border-right:1px solid #eee}
+.two-col-cell{flex:1;padding:14px 18px;border-right:1px solid #eee}
 .two-col-cell:last-child{border-right:none}
-.two-col-cell .lbl{font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
-.two-col-cell .val{font-size:15px;color:#1a1a2e;font-weight:900}
-.section-header{background:#fffbee;border-top:1px solid #f0dfa0;border-bottom:1px solid #f0dfa0;padding:8px 22px;font-size:10px;font-weight:800;color:#1a1a2e;letter-spacing:.8px;text-transform:uppercase}
+.two-col-cell .lbl{font-size:13px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px}
+.two-col-cell .val{font-size:18px;color:#1a1a2e;font-weight:900}
+.section-header{background:#fffbee;border-top:1px solid #f0dfa0;border-bottom:1px solid #f0dfa0;padding:9px 22px;font-size:13px;font-weight:800;color:#1a1a2e;letter-spacing:.8px;text-transform:uppercase}
 .details-grid{display:flex;border-bottom:1px solid #eee}
-.detail-cell{flex:1;text-align:center;padding:10px 8px;border-right:1px solid #eee}
+.detail-cell{flex:1;text-align:center;padding:12px 8px;border-right:1px solid #eee}
 .detail-cell:last-child{border-right:none}
-.detail-cell .lbl{font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
-.detail-cell .val{font-size:14px;color:#1a1a2e;font-weight:900}
-.desc-block{padding:12px 22px 14px;border-bottom:1px solid #eee}
-.desc-block p{font-size:13px;color:#444;line-height:1.75}
-.terms-block{padding:12px 22px 16px;border-bottom:1px solid #eee}
-.terms-cols{display:grid;grid-template-columns:1fr 1fr;gap:4px 22px}
-.terms-cols li{font-size:11px;color:#444;line-height:1.7;padding-left:14px;position:relative;list-style:none}
-.terms-cols li::before{content:"•";position:absolute;left:0;color:#f5b731;font-size:14px}
+.detail-cell .lbl{font-size:13px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px}
+.detail-cell .val{font-size:17px;color:#1a1a2e;font-weight:900}
+.desc-block{padding:14px 22px 16px;border-bottom:1px solid #eee}
+.desc-block p{font-size:16px;color:#444;line-height:1.75}
+.terms-block{padding:12px 22px 14px;border-bottom:1px solid #eee}
+.terms-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 20px}
+.terms-grid span{font-size:14px;color:#444;line-height:1.65}
 .cta-block{padding:18px 22px 14px;text-align:center;border-bottom:1px solid #eee}
-.pill-btn{display:inline-block;background:#f5b731;color:#1a1a2e;font-size:15px;font-weight:900;padding:13px 60px;border-radius:40px;letter-spacing:1px;text-transform:uppercase;min-width:240px;text-align:center;text-decoration:none}
-.agent-line{text-align:center;padding:9px 22px 11px;display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap}
-.agent-dot{color:#ccc;font-size:10px}
-.agent-label{font-size:10px;color:#bbb;letter-spacing:1px;text-transform:uppercase}
-.agent-name{font-size:11px;font-weight:600;color:#888}
-.agent-phone{font-size:11px;color:#aaa}
+.pill-btn{display:inline-block;background:#f5b731;color:#1a1a2e;font-size:18px;font-weight:900;padding:14px 60px;border-radius:40px;letter-spacing:1px;text-transform:uppercase;min-width:220px;text-align:center;text-decoration:none}
+.agent-line{text-align:center;padding:10px 22px 12px;display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap}
+.agent-dot{color:#ccc;font-size:12px}
+.agent-label{font-size:13px;color:#bbb;letter-spacing:1px;text-transform:uppercase}
+.agent-name{font-size:14px;font-weight:600;color:#888}
+.agent-phone{font-size:14px;color:#aaa}
 </style></head><body>
 <div class="flyer">
-  <div class="top-header" style="padding:18px 24px;">
+  <div class="top-header" style="padding:20px 24px;">
     <div class="header-text">
       <div class="address-main">${esc(fields.address)}</div>
       <div class="prop-type-label">${esc(fields.propType)}</div>
@@ -879,7 +879,7 @@ body{background:#f0f0f0;display:flex;justify-content:center;padding:20px;font-fa
   <div class="hero">${hero}</div>
   <div class="icon-row">
     <div class="icon-cell">
-      <svg width="28" height="28" viewBox="0 0 32 32" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
         <rect x="3" y="14" width="26" height="11" rx="2"/><rect x="6" y="11" width="8" height="5" rx="1.5"/>
         <rect x="18" y="11" width="8" height="5" rx="1.5"/><line x1="6" y1="25" x2="6" y2="29"/>
         <line x1="26" y1="25" x2="26" y2="29"/><path d="M3 14 L3 9 Q3 7 5 7 L27 7 Q29 7 29 9 L29 14"/>
@@ -887,7 +887,7 @@ body{background:#f0f0f0;display:flex;justify-content:center;padding:20px;font-fa
       <div class="icon-lbl">Bedrooms</div><div class="icon-val">${esc(fields.beds)}</div>
     </div>
     <div class="icon-cell">
-      <svg width="28" height="28" viewBox="0 0 32 32" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
         <path d="M6 16 H26 V22 A8 8 0 0 1 18 30 H14 A8 8 0 0 1 6 22 Z"/>
         <path d="M10 16 V10 A3 3 0 0 1 13 7"/>
         <line x1="20" y1="4" x2="20" y2="8"/>
@@ -895,7 +895,7 @@ body{background:#f0f0f0;display:flex;justify-content:center;padding:20px;font-fa
       <div class="icon-lbl">Bathrooms</div><div class="icon-val">${esc(fields.baths)}</div>
     </div>
     <div class="icon-cell">
-      <svg width="28" height="28" viewBox="0 0 32 32" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
         <path d="M4 14 L16 4 L28 14 L28 30 L4 30 Z"/>
         <rect x="13" y="21" width="6" height="9" rx="1"/>
         <rect x="6" y="17" width="6" height="5" rx="1"/><rect x="20" y="17" width="6" height="5" rx="1"/>
@@ -903,7 +903,7 @@ body{background:#f0f0f0;display:flex;justify-content:center;padding:20px;font-fa
       <div class="icon-lbl">Square Feet</div><div class="icon-val">${esc(fields.sqft)}</div>
     </div>
     <div class="icon-cell">
-      <svg width="28" height="28" viewBox="0 0 32 32" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
         <path d="M4 6 H28 V24 L22 30 H4 Z"/><line x1="4" y1="12" x2="28" y2="12"/>
         <path d="M28 24 L22 24 L22 30"/>
         <line x1="10" y1="3" x2="10" y2="9"/><line x1="16" y1="3" x2="16" y2="9"/><line x1="22" y1="3" x2="22" y2="9"/>
@@ -932,13 +932,13 @@ body{background:#f0f0f0;display:flex;justify-content:center;padding:20px;font-fa
   </div>
   <div class="desc-block"><p>${esc(fields.description)}</p></div>
   <div class="section-header">Terms &amp; Conditions</div>
-  <div class="terms-block"><ul class="terms-cols">
-    <li>One time, one hour showing</li><li>$5,000 deposit due within the hour upon acceptance</li>
-    <li>You may bring your contractor</li><li>Cashier's check or wire</li>
-    <li>Offers due within 30 minutes of the end of the showing</li><li>Deposit is non-refundable if you are unable to perform</li>
-    <li>Deposit is refundable if Myers Home Buyers is unable to perform, including if title does not clear</li>
-    <li>All closings are done through a double closing process; buyers are responsible for closing fees</li>
-  </ul></div>
+  <div class="terms-block"><div class="terms-grid">
+    <span>One time, one hour showing</span><span>$5,000 deposit due within the hour upon acceptance</span>
+    <span>You may bring your contractor</span><span>Cashier's check or wire</span>
+    <span>Offers due within 30 min of the end of the showing</span><span>Deposit is non-refundable if you are unable to perform</span>
+    <span>Deposit is refundable if MHB is unable to perform or title does not clear</span>
+    <span>All closings via double closing; buyers pay closing fees</span>
+  </div></div>
   <div class="cta-block">
     <a class="pill-btn" href="${(fields.driveLink||'#').replace(/"/g,'&quot;')}" target="_blank">More Info</a>
   </div>
