@@ -761,16 +761,32 @@ function photoSelected(e) { const f = e.target.files[0]; if (f) loadPhoto(f); }
 function loadPhoto(file) {
   const reader = new FileReader();
   reader.onload = ev => {
-    photoDataUrl = ev.target.result;
-    const drop   = document.getElementById('photoDrop');
-    const prev   = document.getElementById('photoPreview');
-    const ph     = document.getElementById('photoPlaceholder');
-    const rm     = document.getElementById('removePhoto');
-    prev.src     = photoDataUrl;
-    prev.style.display = 'block';
-    ph.style.display   = 'none';
-    rm.classList.remove('hidden');
-    drop.classList.add('has-photo');
+    const img = new Image();
+    img.onload = () => {
+      let w = img.width, h = img.height;
+      const MAX_W = 800, MAX_H = 800;
+      if (w > MAX_W || h > MAX_H) {
+        if (w/h > MAX_W/MAX_H) { h = Math.round(h * MAX_W/w); w = MAX_W; }
+        else { w = Math.round(w * MAX_H/h); h = MAX_H; }
+      }
+      const cvs = document.createElement('canvas');
+      cvs.width = w; cvs.height = h;
+      cvs.getContext('2d').drawImage(img, 0, 0, w, h);
+      
+      // Compress to 60% quality JPEG
+      photoDataUrl = cvs.toDataURL('image/jpeg', 0.6);
+      
+      const drop   = document.getElementById('photoDrop');
+      const prev   = document.getElementById('photoPreview');
+      const ph     = document.getElementById('photoPlaceholder');
+      const rm     = document.getElementById('removePhoto');
+      prev.src     = photoDataUrl;
+      prev.style.display = 'block';
+      ph.style.display   = 'none';
+      rm.classList.remove('hidden');
+      drop.classList.add('has-photo');
+    };
+    img.src = ev.target.result;
   };
   reader.readAsDataURL(file);
 }
