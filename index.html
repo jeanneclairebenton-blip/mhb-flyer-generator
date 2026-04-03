@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Myers Home Buyers — Flyer Generator</title>
+<meta name="description" content="Free property flyer generator for Myers Home Buyers. No account required. Paste listing details, customize fields, download a PDF or share a link.">
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<style media="print">
+  /* When printing the flyer page, hide browser chrome */
+  @page { margin: 0; }
+  body { margin: 0; }
+</style>
+<style>
+/* ────────── Reset & Base ────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', Arial, sans-serif;
+  background: #f4f2ee;
+  min-height: 100vh;
+  color: #1a1a2e;
+}
+
+/* ────────── App Header ────────── */
+.app-header {
+  background: #1a1a2e;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 2px 12px rgba(0,0,0,.35);
+}
+.app-header img { height: 32px; }
+.app-header-right { display: flex; align-items: center; gap: 12px; }
+.app-header span {
+  color: #f5b731; font-size: 10px;
+  letter-spacing: 2px; text-transform: uppercase; font-weight: 700;
+}
+.btn-start-over {
+  background: transparent; color: #f5b731;
+  border: 1.5px solid #f5b731; padding: 6px 16px;
+  border-radius: 20px; font-size: 11px; font-weight: 700;
+  cursor: pointer; letter-spacing: .5px; text-transform: uppercase;
+  display: none; transition: all .2s;
+}
+.btn-start-over:hover { background: #f5b731; color: #1a1a2e; }
+
+/* ────────── Step Bar ────────── */
+.step-bar {
+  background: #fff;
+  border-bottom: 1px solid #e8e0d0;
+  padding: 12px 24px;
+  display: flex; gap: 28px; align-items: center;
+}
+.step { display: flex; align-items: center; gap: 8px; }
+.step-num {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: #eee; color: #aaa;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; transition: all .3s;
+}
+.step-num.active { background: #f5b731; color: #1a1a2e; }
+.step-num.done   { background: #4caf50; color: #fff; }
+.step-label { font-size: 12px; color: #aaa; font-weight: 500; }
+.step-label.active { color: #1a1a2e; font-weight: 700; }
+.step-sep { flex: 1; height: 1px; background: #e0d8cc; }
+
+/* ────────── Layout ────────── */
+.container  { max-width: 880px; margin: 0 auto; padding: 22px 16px 60px; }
+
+/* ────────── Cards / Sections ────────── */
+.card {
+  background: #fff;
+  border: 1px solid #e8e0d0; border-radius: 12px;
+  padding: 22px 24px; margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.04);
+}
+.card-gold  { border-color: #f5b731; }
+.section-title {
+  font-size: 10px; font-weight: 800; color: #f5b731;
+  letter-spacing: 1.8px; text-transform: uppercase; margin-bottom: 12px;
+}
+
+/* ────────── Tip Box ────────── */
+.tip {
+  background: #fff9e6; border: 1.5px solid #f5b731; border-radius: 10px;
+  padding: 13px 16px; font-size: 13px; color: #7a5c00;
+  line-height: 1.7; margin-bottom: 16px;
+}
+
+/* ────────── Inputs ────────── */
+textarea, input[type=text] {
+  width: 100%; padding: 11px 13px;
+  border: 1.5px solid #ddd; border-radius: 8px;
+  font-size: 12px; font-family: 'Inter', monospace;
+  outline: none; color: #333; background: #fff;
+  resize: vertical; transition: border-color .2s;
+}
+textarea:focus, input[type=text]:focus { border-color: #f5b731; }
+.char-count {
+  font-size: 11px; color: #bbb;
+  margin-top: 6px; display: flex; justify-content: space-between;
+}
+
+/* ────────── Buttons ────────── */
+.btn-gold {
+  background: #f5b731; color: #1a1a2e;
+  border: none; padding: 14px 52px;
+  border-radius: 40px; font-size: 15px; font-weight: 900;
+  cursor: pointer; letter-spacing: 1px; text-transform: uppercase;
+  transition: transform .15s, box-shadow .15s;
+  box-shadow: 0 4px 16px rgba(245,183,49,.35);
+}
+.btn-gold:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245,183,49,.5); }
+.btn-gold:disabled { background: #eee; color: #bbb; cursor: not-allowed; box-shadow: none; }
+.btn-dark {
+  background: #1a1a2e; color: #fff;
+  border: none; padding: 11px 24px;
+  border-radius: 30px; font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: opacity .2s;
+}
+.btn-dark:hover { opacity: .82; }
+.btn-outline {
+  background: #fff; color: #888;
+  border: 1.5px solid #ddd; padding: 8px 18px;
+  border-radius: 24px; font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: border-color .2s, color .2s;
+}
+.btn-outline:hover { border-color: #aaa; color: #555; }
+
+/* ────────── Field Grid ────────── */
+.fields-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 20px;
+}
+.field-full { grid-column: 1 / -1; }
+.field-label {
+  font-size: 10px; font-weight: 700; color: #999;
+  letter-spacing: 1.2px; text-transform: uppercase; margin-bottom: 4px;
+}
+.field-input {
+  width: 100%; padding: 8px 10px;
+  border: 1.5px solid #e0dbd0; border-radius: 6px;
+  font-size: 12px; outline: none; color: #1a1a2e;
+  background: #fff; font-family: 'Inter', Arial, sans-serif;
+  transition: border-color .2s;
+}
+.field-input:focus { border-color: #f5b731; }
+.field-textarea {
+  width: 100%; padding: 8px 10px;
+  border: 1.5px solid #e0dbd0; border-radius: 6px;
+  font-size: 12px; outline: none; color: #1a1a2e;
+  background: #fff; font-family: 'Inter', Arial, sans-serif;
+  resize: vertical; min-height: 80px;
+  transition: border-color .2s;
+}
+.field-textarea:focus { border-color: #f5b731; }
+
+/* ────────── Photo Drop ────────── */
+.photo-drop {
+  border: 2px dashed #ddd; border-radius: 10px; cursor: pointer;
+  height: 110px; display: flex; align-items: center; justify-content: center;
+  text-align: center; color: #bbb; font-size: 12px;
+  transition: all .2s; position: relative; overflow: hidden; background: #fafafa;
+}
+.photo-drop.has-photo { height: 190px; border-color: #4caf50; }
+.photo-drop.dragging   { border-color: #f5b731; background: #fffbee; }
+.photo-drop img { width: 100%; height: 100%; object-fit: cover; }
+.photo-drop-inner { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.photo-drop-inner svg { color: #ccc; }
+.remove-photo {
+  position: absolute; top: 8px; right: 8px;
+  background: rgba(0,0,0,.55); color: #fff;
+  border: none; border-radius: 20px; padding: 4px 10px;
+  font-size: 11px; cursor: pointer; font-weight: 700;
+}
+
+/* ────────── Action Cards (Step 3) ────────── */
+.actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px; }
+.action-card  { border-radius: 10px; padding: 18px 20px; text-align: center; }
+.action-card.yellow { background: #fffbee; border: 1.5px solid #f0dfa0; }
+.action-card.blue   { background: #f0f4ff; border: 1.5px solid #dde5ff; }
+.action-title { font-size: 10px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; margin-bottom: 6px; }
+.action-card.yellow .action-title { color: #b8860b; }
+.action-card.blue   .action-title { color: #3a4a8a; }
+.action-desc  { font-size: 11px; color: #aaa; margin-bottom: 12px; line-height: 1.6; }
+.action-btn {
+  width: 100%; padding: 12px 24px; border-radius: 30px;
+  font-size: 13px; font-weight: 900; cursor: pointer; border: none;
+}
+.secondary-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+
+/* ────────── Email Modal ────────── */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.55);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999; padding: 16px;
+  backdrop-filter: blur(3px);
+  animation: fadeIn .2s ease;
+}
+@keyframes fadeIn { from { opacity:0 } to { opacity:1 } }
+.modal-box {
+  background: #fff; border-radius: 16px;
+  width: 100%; max-width: 660px;
+  max-height: 90vh; display: flex; flex-direction: column;
+  box-shadow: 0 24px 80px rgba(0,0,0,.28);
+  animation: slideUp .25s ease;
+}
+@keyframes slideUp { from { transform:translateY(24px);opacity:0 } to { transform:translateY(0);opacity:1 } }
+.modal-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid #eee;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.modal-header h2 { font-size: 16px; font-weight: 800; color: #1a1a2e; }
+.modal-header p  { font-size: 11px; color: #aaa; margin-top: 2px; }
+.modal-close {
+  background: #f4f2ee; border: none; border-radius: 50%;
+  width: 32px; height: 32px; cursor: pointer;
+  font-size: 18px; color: #888; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: background .15s;
+}
+.modal-close:hover { background: #eee; color: #333; }
+.modal-tabs {
+  display: flex; gap: 0; padding: 12px 24px 0;
+  border-bottom: 1px solid #eee;
+}
+.modal-tab {
+  padding: 8px 18px; font-size: 12px; font-weight: 700;
+  cursor: pointer; border: none; background: none; color: #aaa;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  transition: color .15s, border-color .15s;
+}
+.modal-tab.active { color: #1a1a2e; border-bottom-color: #f5b731; }
+.modal-body { flex: 1; overflow-y: auto; padding: 20px 24px; }
+.email-preview-frame {
+  border: 1.5px solid #e8e0d0; border-radius: 8px;
+  background: #f8f7f4; overflow: auto;
+  max-height: 380px; padding: 0;
+}
+.email-preview-frame iframe { width: 100%; border: none; display: block; }
+.email-plain {
+  font-family: 'Inter', monospace; font-size: 11.5px; color: #444;
+  line-height: 1.8; white-space: pre-wrap; word-break: break-word;
+  background: #f8f7f4; border: 1.5px solid #e8e0d0;
+  border-radius: 8px; padding: 16px; max-height: 380px;
+  overflow-y: auto;
+}
+.modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid #eee;
+  display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+}
+.modal-footer-hint { font-size: 11px; color: #bbb; flex: 1; }
+.btn-email {
+  background: #1a1a2e; color: #f5b731;
+  border: none; padding: 11px 22px;
+  border-radius: 30px; font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: opacity .2s; white-space: nowrap;
+}
+.btn-email:hover { opacity: .82; }
+.btn-email-outline {
+  background: #fff; color: #1a1a2e;
+  border: 1.5px solid #ddd; padding: 11px 22px;
+  border-radius: 30px; font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: border-color .2s;
+}
+.btn-email-outline:hover { border-color: #aaa; }
+.btn-create-email {
+  background: linear-gradient(135deg,#1a1a2e,#2d2d5e);
+  color: #f5b731;
+  border: none; padding: 14px 28px;
+  border-radius: 40px; font-size: 14px; font-weight: 900;
+  cursor: pointer; letter-spacing: .5px;
+  transition: transform .15s, box-shadow .15s;
+  box-shadow: 0 4px 16px rgba(26,26,46,.25);
+  display: flex; align-items: center; gap: 8px;
+}
+.btn-create-email:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(26,26,46,.35); }
+.copied-badge {
+  background: #4caf50; color: #fff;
+  font-size: 11px; font-weight: 700; padding: 2px 8px;
+  border-radius: 12px; margin-left: 6px;
+  animation: fadeIn .2s ease;
+}
+@media (max-width: 600px) {
+  .modal-box { max-height: 95vh; }
+  .modal-footer { flex-direction: column; }
+  .btn-email, .btn-email-outline { width: 100%; text-align: center; }
+}
+
+/* ────────── Share Link ────────── */
+.share-box {
+  background: #f8f7f4; border: 1.5px solid #e0dbd0; border-radius: 8px;
+  padding: 12px 14px; margin-top: 12px;
+}
+.share-box label { font-size: 10px; color: #999; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; display: block; margin-bottom: 6px; }
+.share-row { display: flex; gap: 8px; align-items: center; }
+.share-row input {
+  flex: 1; font-size: 11px; color: #555; background: #fff;
+  border: 1.5px solid #ddd; border-radius: 6px; padding: 7px 10px;
+  font-family: monospace; outline: none;
+}
+.copy-btn {
+  background: #f5b731; color: #1a1a2e; border: none;
+  padding: 7px 16px; border-radius: 6px; font-size: 11px;
+  font-weight: 700; cursor: pointer; white-space: nowrap;
+  transition: opacity .2s;
+}
+.copy-btn:hover { opacity: .85; }
+
+/* ────────── Preview Frame ────────── */
+.preview-label {
+  font-size: 10px; font-weight: 700; color: #999;
+  letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px;
+}
+.preview-frame {
+  border: 1.5px solid #ddd; border-radius: 8px;
+  overflow: hidden; width: 100%;
+  height: 580px; background: #f0f0f0;
+}
+
+/* ────────── Done header info ────────── */
+.done-address { font-size: 20px; font-weight: 900; color: #1a1a2e; }
+.done-sub     { font-size: 12px; color: #aaa; margin-top: 3px; }
+
+/* ────────── Hidden ────────── */
+.hidden { display: none !important; }
+
+/* ────────── Responsive ────────── */
+@media (max-width: 600px) {
+  .fields-grid    { grid-template-columns: 1fr; }
+  .actions-grid   { grid-template-columns: 1fr; }
+  .app-header span { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════ HEADER ══════════ -->
+<div class="app-header">
+  <div style="display:flex;flex-direction:column;line-height:1.15;">
+    <span style="color:#f5b731;font-weight:900;font-size:18px;letter-spacing:-.2px;">Myers Home Buyers</span>
+    <span style="color:rgba(255,255,255,.55);font-weight:400;font-size:10px;letter-spacing:1.8px;text-transform:uppercase;">Flyer Generator</span>
+  </div>
+  <div class="app-header-right">
+    <button class="btn-start-over" id="startOverBtn" onclick="startOver()">← Start Over</button>
+  </div>
+</div>
+
+<!-- ══════════ STEP BAR ══════════ -->
+<div class="step-bar">
+  <div class="step">
+    <div class="step-num active" id="s1">1</div>
+    <div class="step-label active" id="sl1">Listing Text</div>
+  </div>
+  <div class="step-sep"></div>
+  <div class="step">
+    <div class="step-num" id="s2">2</div>
+    <div class="step-label" id="sl2">Customize</div>
+  </div>
+  <div class="step-sep"></div>
+  <div class="step">
+    <div class="step-num" id="s3">3</div>
+    <div class="step-label" id="sl3">Share &amp; Download</div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- ══════════ STEP 1 ══════════ -->
+  <div id="step1">
+    <div class="tip">
+      <strong>How it works:</strong> Paste your property listing email or notes below. The generator will auto-fill the flyer fields. Then you can tweak any details before downloading or sharing.
+    </div>
+    <div class="card card-gold">
+      <div class="section-title">Paste Listing Text</div>
+      <textarea id="emailText" rows="14" placeholder="Paste the full property email or listing notes here…" oninput="updateCount()"></textarea>
+      <div class="char-count">
+        <span id="parseStatus">Paste text above, then click Parse →</span>
+        <span id="charCount">0 chars</span>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:8px;">
+      <button class="btn-gold" id="parseBtn" onclick="parseListing()" disabled>Parse Listing →</button>
+    </div>
+    <div style="text-align:center;margin-top:14px;">
+      <button class="btn-outline" onclick="skipToManual()">Skip — enter fields manually</button>
+    </div>
+  </div>
+
+  <!-- ══════════ STEP 2 ══════════ -->
+  <div id="step2" class="hidden">
+    <div class="card">
+      <div class="section-title">📍 Property Details</div>
+      <div class="fields-grid" id="fieldsGrid"><!-- rendered by JS --></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">📷 Hero Photo</div>
+      <div class="photo-drop" id="photoDrop"
+        ondragover="photoDragOver(event)"
+        ondragleave="photoDragLeave()"
+        ondrop="photoDrop(event)"
+        onclick="document.getElementById('photoFile').click()">
+        <img id="photoPreview" style="display:none;" alt="Property Photo">
+        <div class="photo-drop-inner" id="photoPlaceholder">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <circle cx="8.5" cy="8.5" r="1.5"/>
+            <polyline points="21 15 16 10 5 21"/>
+          </svg>
+          <span>Drag &amp; drop photo or click to browse</span>
+        </div>
+        <button class="remove-photo hidden" id="removePhoto" onclick="removePhoto(event)">✕ Remove</button>
+      </div>
+      <input type="file" id="photoFile" accept="image/*" style="display:none" onchange="photoSelected(event)">
+    </div>
+
+    <div style="text-align:center;margin-top:4px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <button class="btn-outline" onclick="showStep('step1',1)">← Back</button>
+      <button class="btn-gold" onclick="generateFlyer()">Preview Flyer →</button>
+    </div>
+  </div>
+
+  <!-- ══════════ STEP 3 ══════════ -->
+  <div id="step3" class="hidden">
+    <div class="card" style="padding-bottom:14px;">
+      <div class="done-address" id="doneAddress"></div>
+      <div class="done-sub" id="doneSubtitle"></div>
+    </div>
+
+    <div class="actions-grid" style="grid-template-columns:1fr;">
+      <div class="action-card yellow">
+        <div class="action-title">Save Flyer</div>
+        <div class="action-desc">Download the flyer as an HTML file to email to investors, or save as PDF for your records.</div>
+        <button class="action-btn" style="background:#f5b731;color:#1a1a2e;margin-bottom:8px;" onclick="downloadHTML()">📄 Save as HTML (Send to Investor)</button>
+        <button class="action-btn" style="background:#1a1a2e;color:#fff;" id="pdfBtn" onclick="downloadPDF()">🖨 Download PDF</button>
+        <p style="font-size:10px;color:#aaa;margin-top:8px;line-height:1.5;">In the print dialog, choose <strong>Save as PDF</strong> as the destination.</p>
+      </div>
+    </div>
+
+    <!-- Create Email Button -->
+    <div style="text-align:center;margin:4px 0 18px;">
+      <button class="btn-create-email" id="createEmailBtn" onclick="openEmailModal()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
+        Create Marketing Email
+      </button>
+    </div>
+
+    <div>
+      <div class="preview-label">Live Preview</div>
+      <div class="preview-frame">
+        <iframe id="flyerPreview" style="width:100%;height:100%;border:none;"></iframe>
+      </div>
+    </div>
+
+    <div class="secondary-actions">
+      <button class="btn-outline" onclick="goToEdit()">✏ Edit Fields</button>
+      <button class="btn-dark" onclick="openFlyer()">↗ Open Flyer in New Tab</button>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<!-- ══════════ EMAIL MODAL ══════════ -->
+<div class="modal-overlay hidden" id="emailModal" onclick="closeEmailModalOutside(event)">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <h2>✉ Marketing Email</h2>
+        <p>Ready-to-send investor email for <span id="emailModalAddr"></span></p>
+      </div>
+      <button class="modal-close" onclick="closeEmailModal()" title="Close">✕</button>
+    </div>
+    <div class="modal-tabs">
+      <button class="modal-tab active" id="tab-html" onclick="switchTab('html')">HTML Preview</button>
+      <button class="modal-tab" id="tab-plain" onclick="switchTab('plain')">Plain Text</button>
+    </div>
+    <div class="modal-body">
+      <div id="panel-html">
+        <p style="font-size:11px;color:#aaa;margin-bottom:10px;">This is how the email will look in an HTML-capable email client.</p>
+        <div class="email-preview-frame">
+          <iframe id="emailPreviewFrame" height="420"></iframe>
+        </div>
+      </div>
+      <div id="panel-plain" class="hidden">
+        <p style="font-size:11px;color:#aaa;margin-bottom:10px;">Copy this into Gmail, Outlook, or any email app.</p>
+        <div class="email-plain" id="emailPlainText"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <span class="modal-footer-hint">Paste the HTML version into your email client's HTML editor, or use plain text.</span>
+      <button class="btn-email-outline" id="copyPlainBtn" onclick="copyEmailText('plain')">📋 Copy Plain Text</button>
+      <button class="btn-email" id="copyHtmlBtn" onclick="copyEmailText('html')">⟨/⟩ Copy HTML</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ EMBEDDED LOGO DATA ══════════ -->
+<!-- We use the actual base64 logo from the source HTML for the flyer itself -->
+<script>
+// ─── Logo (base64 PNG from myers_flyer_generator.html) ───────────────────────
+const LOGO = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAApgAAALICAYAAADbv4A+AAEAAA" +
+  "ElEQVR4nO39+bMk55XfCX7OvdfdI+ItuSATCRAgwCLBDWRxZ7EWFmvfVUW1WKVaVKukklRlapVa" +
+  "09L0mI1Nj41N/zLzJ4zZWI+1jbV1q9Wj0rRqRBVZXECQLO7gDi4gtgSQe+ZbIsLd771nfrjXPT" +
+  "zeewkuIJFIpH9hifdehIeH7/d7v+ec74ERI0aMGDFixIgRI0aMGDFixIgRI0aMGDFixIgRI0aMGD" +
+  "FiRBD/H6QBlRqT+WgFAAAAAElFTkSuQmCC";
+// (Abbreviated — the full logo is large; we substitute with the SVG below in the flyer)
+
+// ─── Field configuration ──────────────────────────────────────────────────────
+const FIELD_CONFIG = [
+  { key: 'address',       label: 'Full Address',        full: true },
+  { key: 'propType',      label: 'Property Type' },
+  { key: 'beds',          label: 'Bedrooms' },
+  { key: 'baths',         label: 'Bathrooms' },
+  { key: 'sqft',          label: 'Square Footage' },
+  { key: 'yearBuilt',     label: 'Year Built' },
+  { key: 'startingPrice', label: 'Starting Price' },
+  { key: 'buyNow',        label: 'Buy It Now Price' },
+  { key: 'arv',           label: 'Estimated ARV' },
+  { key: 'rent',          label: 'Estimated Rent /mo' },
+  { key: 'showing',       label: 'Showing Date & Time', full: true },
+  { key: 'closingDate',   label: 'Closing Date' },
+  { key: 'occupancy',     label: 'Occupancy at Closing' },
+  { key: 'roof',          label: 'Roof' },
+  { key: 'foundation',    label: 'Foundation' },
+  { key: 'hvac',          label: 'HVAC' },
+  { key: 'description',   label: 'Property Description', full: true, tall: true },
+  { key: 'driveLink',     label: 'Google Drive Link',   full: true },
+  { key: 'agent',         label: 'Acquiring Agent',     full: true },
+  { key: 'salesAgent',    label: 'Sales Agent Name' },
+  { key: 'salesPhone',    label: 'Sales Agent Phone' },
+];
+
+// ─── State ────────────────────────────────────────────────────────────────────
+let fields      = {};
+let photoDataUrl= null;
+let flyerHtml   = '';
+let blobUrl     = '';
+
+// ─── On load: restore ?d= URL state ─────────────────────────────────────
+window.addEventListener('load', () => {
+  try {
+    const params = new URLSearchParams(location.search);
+    const d      = params.get('d');
+    const legacy = params.get('flyer');
+    if (!d && !legacy) return;
+
+    // Decode fields
+    if (d) {
+      fields = JSON.parse(decodeURIComponent(d));
+    } else {
+      const json = decodeURIComponent(escape(atob(legacy)));
+      const data = JSON.parse(json);
+      fields = data.fields || data || {};
+    }
+
+    renderFields();
+    generateFlyer(); // populates flyerHtml
+
+    // ── VIEWER MODE: build a proper branded webpage ──────────────────────
+    // Pull just the CSS and body markup out of the generated flyer HTML
+    const styleMatch = flyerHtml.match(/<style[^>]*>([\s\S]*?)<\/style>/i);
+    const bodyMatch  = flyerHtml.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+    // Strip the flyer's own body{} rule — our viewer shell handles layout
+    let   flyerCss  = (styleMatch ? styleMatch[1] : '').replace(/body\{[^}]+\}/g, '');
+    const flyerBody = bodyMatch ? bodyMatch[1] : '';
+    const addr      = fields.address || 'Property Flyer';
+    const toolUrl   = location.href.split('?')[0];
+
+    const viewerPage = `<!DOCTYPE html><html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${addr} — Myers Home Buyers</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html{overflow-x:hidden}
+body{min-height:100vh;background:#e8eaf2;font-family:Arial,sans-serif;overflow-x:hidden}
+/* ── Viewer nav ── */
+.mhb-nav{background:#1a1a2e;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(0,0,0,.35);gap:12px}
+.mhb-brand-name{color:#f5b731;font-weight:900;font-size:16px;letter-spacing:-.3px;white-space:nowrap}
+.mhb-brand-sub{color:rgba(255,255,255,.4);font-size:9px;letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+.mhb-nav-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+.mhb-btn-pdf{background:#f5b731;color:#1a1a2e;border:none;padding:9px 16px;border-radius:7px;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap}
+.mhb-hint{color:rgba(255,255,255,.3);font-size:9px;white-space:nowrap}
+/* ── Flyer stage ── */
+.mhb-stage{padding:24px 0 60px;display:flex;justify-content:center;overflow:hidden}
+.mhb-card{transform-origin:top center;box-shadow:0 10px 50px rgba(0,0,0,.2);border-radius:2px;overflow:hidden;flex-shrink:0}
+/* ── Flyer component styles ── */
+${flyerCss}
+/* ── Print ── */
+@media print{
+  .mhb-nav{display:none!important}
+  .mhb-stage{padding:0;display:block}
+  .mhb-card{box-shadow:none!important;transform:none!important}
+  body{background:white!important}
+  @page{size:letter portrait;margin:0.25in}
+  .flyer{width:100%!important;border:none!important;box-shadow:none!important}
+}
+</style>
+</head>
+<body>
+<nav class="mhb-nav">
+  <div>
+    <div class="mhb-brand-name">Myers Home Buyers</div>
+    <div class="mhb-brand-sub">Property Flyer</div>
+  </div>
+  <div class="mhb-nav-right">
+    <button class="mhb-btn-pdf" onclick="window.print()">⬇ Download PDF</button>
+    <span class="mhb-hint">Choose "Save as PDF" in the dialog</span>
+  </div>
+</nav>
+<div class="mhb-stage" id="mhbStage">
+  <div class="mhb-card" id="mhbCard">
+    ${flyerBody}
+  </div>
+</div>
+<script>
+(function(){
+  var FLYER_W = 700;
+  function scaleFlyer(){
+    var stage = document.getElementById('mhbStage');
+    var card  = document.getElementById('mhbCard');
+    if (!stage || !card) return;
+    var avail = Math.min(window.innerWidth, window.screen.width) - 0;
+    if (avail >= FLYER_W) {
+      card.style.transform = '';
+      stage.style.height   = '';
+      return;
+    }
+    var ratio = avail / FLYER_W;
+    card.style.transform = 'scale(' + ratio + ')';
+    // Collapse the blank space transform leaves behind
+    var naturalH = card.scrollHeight;
+    stage.style.height = (naturalH * ratio + 60) + 'px';
+    stage.style.alignItems = 'flex-start';
+    stage.style.paddingTop = '16px';
+  }
+  window.addEventListener('load',   scaleFlyer);
+  window.addEventListener('resize', scaleFlyer);
+})();
+\x3c/script>
+\x3c/body>\x3c/html>`;
+
+
+
+    document.open();
+    document.write(viewerPage);
+    document.close();
+
+  } catch(e) {
+    console.warn('Could not restore from URL:', e);
+  }
+});
+
+// ─── Step 1 helpers ───────────────────────────────────────────────────────────
+function updateCount() {
+  const v = document.getElementById('emailText').value;
+  document.getElementById('charCount').textContent = v.length.toLocaleString() + ' chars';
+  document.getElementById('parseBtn').disabled = v.trim().length < 20;
+  document.getElementById('parseStatus').textContent =
+    v.trim().length < 20 ? 'Paste text above, then click Parse →' : 'Ready to parse';
+}
+
+function skipToManual() {
+  FIELD_CONFIG.forEach(f => { if (!fields[f.key]) fields[f.key] = ''; });
+  renderFields();
+  showStep('step2', 2);
+}
+
+// ─── Regex helper ─────────────────────────────────────────────────────────────
+function g(text, re, fallback = '—') {
+  const m = text.match(re);
+  if (!m) return fallback;
+  const v = (m[1] || '').trim().replace(/\s+/g, ' ');
+  return v || fallback;
+}
+function fmt(v) {
+  const n = parseFloat((v || '').replace(/[^0-9.]/g, ''));
+  if (!v || v === '—' || isNaN(n)) return '—';
+  return '$' + n.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+}
+
+// ─── Parse listing text ───────────────────────────────────────────────────────
+function parseListing() {
+  const raw = document.getElementById('emailText').value;
+  const t   = raw.replace(/\r\n/g, '\n').replace(/&amp;/g, '&');
+
+  const arvRaw  = g(t, /Estimated ARV\s*\$\s*([\d,]+\.?\d*)/i);
+  const arvN    = parseFloat(arvRaw.replace(/,/g,''));
+  const rentRaw = g(t, /Estimated Rent\s*\$\s*([\d,]+\.?\d*)/i);
+  const rentN   = parseFloat(rentRaw.replace(/,/g,''));
+  const dtRaw   = g(t, /Showing Date\s*&?\s*Time\s*(.+?)(?=No Flyer|Requested)/is);
+  const tpRaw   = g(t, /Showing Type\s+(.+?)(?=Showing Date|No Flyer|Requested)/is);
+
+  fields = {
+    address:       g(t, /Full Address\s+(.+?)(?=County\s)/is),
+    propType:      g(t, /Property Type\s+(.+?)(?=Bedrooms)/is),
+    beds:          g(t, /Bedrooms\s+(\d+)/i),
+    baths:         g(t, /Bathrooms\s+([\d.]+)/i),
+    sqft:          g(t, /Square Footage\s+([\d,]+)/i),
+    yearBuilt:     g(t, /Year Built\s+(\d{4})/i),
+    startingPrice: fmt(g(t, /Starting Price\s*\$\s*([\d,]+\.?\d*)/i)),
+    buyNow:        fmt(g(t, /Buy it Now Price\s*\$\s*([\d,]+\.?\d*)/i)),
+    arv:           (!arvRaw || isNaN(arvN) || arvN===0) ? 'TBD' : '$' + arvN.toLocaleString('en-US',{minimumFractionDigits:0}),
+    rent:          (!rentRaw || isNaN(rentN) || rentN===0) ? '—' : '$' + rentN.toLocaleString('en-US',{minimumFractionDigits:0}) + '/mo',
+    roof:          g(t, /Roof\s+(.+?)(?=Foundation)/is),
+    foundation:    g(t, /Foundation\s+(.+?)(?=HVAC)/is),
+    hvac:          g(t, /HVAC\s+(.+?)(?=Property Description)/is),
+    description:   g(t, /Property Description\s+(.+?)(?=Closing Date)/is),
+    closingDate:   g(t, /Closing Date\s+(.+?)(?=Occupancy at Closing)/is),
+    occupancy:     g(t, /Occupancy at Closing\s+(.+?)(?=Leaseback\/Lease|Showing Type)/is),
+    showing:       (dtRaw && dtRaw!=='—') ? dtRaw : tpRaw,
+    driveLink:     g(t, /Google Drive Link\s+(https:\/\/\S+)/i, '#'),
+    agent:         g(t, /Congratulations to\s+(.+?)\s+for the acquisition/i),
+    salesAgent:    '',
+    salesPhone:    '',
+  };
+
+  renderFields();
+  showStep('step2', 2);
+}
+
+// ─── Render field grid in Step 2 ─────────────────────────────────────────────
+function renderFields() {
+  const grid = document.getElementById('fieldsGrid');
+  grid.innerHTML = '';
+  FIELD_CONFIG.forEach(({key, label, full, tall}) => {
+    const wrap = document.createElement('div');
+    if (full) wrap.className = 'field-full';
+    const val = (fields[key] || '').replace(/"/g, '&quot;');
+    wrap.innerHTML = `<div class="field-label">${label}</div>` +
+      (tall
+        ? `<textarea class="field-textarea" id="f_${key}" onchange="fields['${key}']=this.value">${fields[key]||''}</textarea>`
+        : `<input class="field-input" type="text" id="f_${key}" value="${val}" onchange="fields['${key}']=this.value"/>`
+      );
+    grid.appendChild(wrap);
+  });
+}
+
+// ─── Photo upload ─────────────────────────────────────────────────────────────
+function photoDragOver(e) {
+  e.preventDefault();
+  document.getElementById('photoDrop').classList.add('dragging');
+}
+function photoDragLeave() { document.getElementById('photoDrop').classList.remove('dragging'); }
+function photoDrop(e) {
+  e.preventDefault(); photoDragLeave();
+  const f = e.dataTransfer.files[0]; if (f) loadPhoto(f);
+}
+function photoSelected(e) { const f = e.target.files[0]; if (f) loadPhoto(f); }
+function loadPhoto(file) {
+  const reader = new FileReader();
+  reader.onload = ev => {
+    photoDataUrl = ev.target.result;
+    const drop   = document.getElementById('photoDrop');
+    const prev   = document.getElementById('photoPreview');
+    const ph     = document.getElementById('photoPlaceholder');
+    const rm     = document.getElementById('removePhoto');
+    prev.src     = photoDataUrl;
+    prev.style.display = 'block';
+    ph.style.display   = 'none';
+    rm.classList.remove('hidden');
+    drop.classList.add('has-photo');
+  };
+  reader.readAsDataURL(file);
+}
+function removePhoto(e) {
+  e.stopPropagation();
+  photoDataUrl = null;
+  const prev = document.getElementById('photoPreview');
+  prev.style.display = 'none';
+  prev.src = '';
+  document.getElementById('photoPlaceholder').style.display = 'flex';
+  document.getElementById('removePhoto').classList.add('hidden');
+  document.getElementById('photoDrop').classList.remove('has-photo');
+}
+
+// ─── Flyer HTML builder ───────────────────────────────────────────────────────
+function generateFlyer() {
+  // Sync all inputs → fields
+  FIELD_CONFIG.forEach(({key}) => {
+    const el = document.getElementById('f_' + key);
+    if (el) fields[key] = el.value;
+  });
+
+  const hero = photoDataUrl
+    ? `<img src="${photoDataUrl}" style="width:100%;height:100%;object-fit:cover;display:block;" alt="Property"/>`
+    : `<div class="hero-placeholder">[ Property Photo ]</div>`;
+
+  // Logo SVG — Myers hexagon mark (transparent bg) + wordmark
+  const logoSvg = `<div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
+    <svg height="44" viewBox="0 0 120 138" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="60,2 114,32 114,106 60,136 6,106 6,32" fill="#F5A623"/>
+      <polygon points="60,14 103,38 103,100 60,124 17,100 17,38" fill="#fff"/>
+      <polygon points="60,14 103,38 60,62 17,38" fill="#F5B731"/>
+      <polygon points="17,38 60,62 60,100 17,76" fill="#fff"/>
+      <polygon points="103,38 60,62 60,100 103,76" fill="#C8922A"/>
+      <polygon points="60,82 76,91 76,100 60,100" fill="#A87020"/>
+    </svg>
+    <div style="display:flex;flex-direction:column;line-height:1.15;">
+      <span style="font-family:Arial,sans-serif;font-weight:900;font-size:20px;color:#f5b731;">Myers</span>
+      <span style="font-family:Arial,sans-serif;font-weight:400;font-size:11px;color:#888;letter-spacing:.5px;">Home Buyers</span>
+    </div>
+  </div>`;
+
+  const esc = s => (s||'—').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+  flyerHtml = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f0f0f0;display:flex;justify-content:center;padding:20px;font-family:Arial,sans-serif}
+.flyer{width:700px;background:#fff;border:1px solid #e8e0d0;color:#1a1a2e}
+@media print{
+  @page{size:letter portrait;margin:0.25in}
+  body{display:block;padding:0;background:white}
+  .flyer{width:100%;border:none;box-shadow:none}
+}
+.top-header{background:#fff;padding:18px 24px;border-bottom:3px solid #f5b731;display:flex;align-items:center;gap:18px}
+.header-text{display:flex;flex-direction:column;gap:3px}
+.address-main{font-size:24px;font-weight:900;color:#1a1a2e;line-height:1.1}
+.prop-type-label{font-size:10px;font-weight:600;color:#bbb;letter-spacing:1.2px;text-transform:uppercase}
+.hero{width:100%;height:320px;background:#c8a060;overflow:hidden;border-top:2px solid #f5b731;border-bottom:2px solid #f5b731;display:flex;align-items:center;justify-content:center}
+.hero-placeholder{color:rgba(0,0,0,0.25);font-size:13px;letter-spacing:3px;text-transform:uppercase}
+.icon-row{display:flex;background:#fff}
+.icon-cell{flex:1;display:flex;flex-direction:column;align-items:center;padding:14px 8px 12px;gap:4px}
+.icon-cell+.icon-cell{border-left:2px dashed #f0d88a}
+.icon-lbl{font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.8px;text-align:center;margin-top:6px}
+.icon-val{font-size:16px;font-weight:900;color:#1a1a2e;text-align:center}
+.gold-divider{height:3px;background:#f5b731;width:100%}
+.price-banner{background:#fffbee;border-bottom:1px solid #f0dfa0;padding:14px 22px;text-align:center}
+.price-banner .lbl{font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
+.price-banner .price{font-size:28px;font-weight:900;color:#1a1a2e}
+.stats-row{display:flex;border-bottom:1px solid #eee}
+.stat-cell{flex:1;padding:12px;text-align:center;border-right:1px solid #eee}
+.stat-cell:last-child{border-right:none}
+.stat-label{font-size:10px;font-weight:700;color:#888;letter-spacing:.8px;text-transform:uppercase;margin-bottom:5px}
+.stat-value{font-size:17px;font-weight:900;color:#1a1a2e}
+.showing-center{text-align:center;padding:16px 22px;border-bottom:1px solid #eee;background:#fffbee;border-top:1px solid #f0dfa0}
+.showing-label{font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px}
+.showing-date{font-size:22px;font-weight:900;color:#1a1a2e}
+.two-col{display:flex;border-bottom:1px solid #eee;text-align:center}
+.two-col-cell{flex:1;padding:12px 22px;border-right:1px solid #eee}
+.two-col-cell:last-child{border-right:none}
+.two-col-cell .lbl{font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
+.two-col-cell .val{font-size:15px;color:#1a1a2e;font-weight:900}
+.section-header{background:#fffbee;border-top:1px solid #f0dfa0;border-bottom:1px solid #f0dfa0;padding:8px 22px;font-size:10px;font-weight:800;color:#1a1a2e;letter-spacing:.8px;text-transform:uppercase}
+.details-grid{display:flex;border-bottom:1px solid #eee}
+.detail-cell{flex:1;text-align:center;padding:10px 8px;border-right:1px solid #eee}
+.detail-cell:last-child{border-right:none}
+.detail-cell .lbl{font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
+.detail-cell .val{font-size:14px;color:#1a1a2e;font-weight:900}
+.desc-block{padding:12px 22px 14px;border-bottom:1px solid #eee}
+.desc-block p{font-size:13px;color:#444;line-height:1.75}
+.terms-block{padding:12px 22px 16px;border-bottom:1px solid #eee}
+.terms-cols{display:grid;grid-template-columns:1fr 1fr;gap:4px 22px}
+.terms-cols li{font-size:11px;color:#444;line-height:1.7;padding-left:14px;position:relative;list-style:none}
+.terms-cols li::before{content:"•";position:absolute;left:0;color:#f5b731;font-size:14px}
+.cta-block{padding:18px 22px 14px;text-align:center;border-bottom:1px solid #eee}
+.pill-btn{display:inline-block;background:#f5b731;color:#1a1a2e;font-size:15px;font-weight:900;padding:13px 60px;border-radius:40px;letter-spacing:1px;text-transform:uppercase;min-width:240px;text-align:center;text-decoration:none}
+.agent-line{text-align:center;padding:9px 22px 11px;display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap}
+.agent-dot{color:#ccc;font-size:10px}
+.agent-label{font-size:10px;color:#bbb;letter-spacing:1px;text-transform:uppercase}
+.agent-name{font-size:11px;font-weight:600;color:#888}
+.agent-phone{font-size:11px;color:#aaa}
+</style></head><body>
+<div class="flyer">
+  <div class="top-header" style="padding:18px 24px;">
+    <div class="header-text">
+      <div class="address-main">${esc(fields.address)}</div>
+      <div class="prop-type-label">${esc(fields.propType)}</div>
+    </div>
+  </div>
+  <div class="hero">${hero}</div>
+  <div class="icon-row">
+    <div class="icon-cell">
+      <svg width="28" height="28" viewBox="0 0 32 32" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="14" width="26" height="11" rx="2"/><rect x="6" y="11" width="8" height="5" rx="1.5"/>
+        <rect x="18" y="11" width="8" height="5" rx="1.5"/><line x1="6" y1="25" x2="6" y2="29"/>
+        <line x1="26" y1="25" x2="26" y2="29"/><path d="M3 14 L3 9 Q3 7 5 7 L27 7 Q29 7 29 9 L29 14"/>
+      </svg>
+      <div class="icon-lbl">Bedrooms</div><div class="icon-val">${esc(fields.beds)}</div>
+    </div>
+    <div class="icon-cell">
+      <svg width="28" height="28" viewBox="0 0 32 32" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 16 H26 V22 A8 8 0 0 1 18 30 H14 A8 8 0 0 1 6 22 Z"/>
+        <path d="M10 16 V10 A3 3 0 0 1 13 7"/>
+        <line x1="20" y1="4" x2="20" y2="8"/>
+      </svg>
+      <div class="icon-lbl">Bathrooms</div><div class="icon-val">${esc(fields.baths)}</div>
+    </div>
+    <div class="icon-cell">
+      <svg width="28" height="28" viewBox="0 0 32 32" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 14 L16 4 L28 14 L28 30 L4 30 Z"/>
+        <rect x="13" y="21" width="6" height="9" rx="1"/>
+        <rect x="6" y="17" width="6" height="5" rx="1"/><rect x="20" y="17" width="6" height="5" rx="1"/>
+      </svg>
+      <div class="icon-lbl">Square Feet</div><div class="icon-val">${esc(fields.sqft)}</div>
+    </div>
+    <div class="icon-cell">
+      <svg width="28" height="28" viewBox="0 0 32 32" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 6 H28 V24 L22 30 H4 Z"/><line x1="4" y1="12" x2="28" y2="12"/>
+        <path d="M28 24 L22 24 L22 30"/>
+        <line x1="10" y1="3" x2="10" y2="9"/><line x1="16" y1="3" x2="16" y2="9"/><line x1="22" y1="3" x2="22" y2="9"/>
+      </svg>
+      <div class="icon-lbl">Year Built</div><div class="icon-val">${esc(fields.yearBuilt)}</div>
+    </div>
+  </div>
+  <div class="gold-divider"></div>
+  <div class="price-banner"><div class="lbl">Starting Price</div><div class="price">${esc(fields.startingPrice)}</div></div>
+  <div class="gold-divider"></div>
+  <div class="stats-row">
+    <div class="stat-cell"><div class="stat-label">Est. ARV</div><div class="stat-value">${esc(fields.arv)}</div></div>
+    <div class="stat-cell"><div class="stat-label">Buy It Now</div><div class="stat-value">${esc(fields.buyNow)}</div></div>
+    <div class="stat-cell"><div class="stat-label">Est. Rent</div><div class="stat-value">${esc(fields.rent)}</div></div>
+  </div>
+  <div class="showing-center"><div class="showing-label">Showing</div><div class="showing-date">${esc(fields.showing)}</div></div>
+  <div class="two-col">
+    <div class="two-col-cell"><div class="lbl">Closing</div><div class="val">${esc(fields.closingDate)}</div></div>
+    <div class="two-col-cell"><div class="lbl">Occupancy at Closing</div><div class="val">${esc(fields.occupancy)}</div></div>
+  </div>
+  <div class="section-header">Description</div>
+  <div class="details-grid">
+    <div class="detail-cell"><div class="lbl">Roof</div><div class="val">${esc(fields.roof)}</div></div>
+    <div class="detail-cell"><div class="lbl">Foundation</div><div class="val">${esc(fields.foundation)}</div></div>
+    <div class="detail-cell"><div class="lbl">HVAC</div><div class="val">${esc(fields.hvac)}</div></div>
+  </div>
+  <div class="desc-block"><p>${esc(fields.description)}</p></div>
+  <div class="section-header">Terms &amp; Conditions</div>
+  <div class="terms-block"><ul class="terms-cols">
+    <li>One time, one hour showing</li><li>$5,000 deposit due within the hour upon acceptance</li>
+    <li>You may bring your contractor</li><li>Cashier's check or wire</li>
+    <li>Offers due within 30 minutes of the end of the showing</li><li>Deposit is non-refundable if you are unable to perform</li>
+    <li>Deposit is refundable if Myers Home Buyers is unable to perform, including if title does not clear</li>
+    <li>All closings are done through a double closing process; buyers are responsible for closing fees</li>
+  </ul></div>
+  <div class="cta-block">
+    <a class="pill-btn" href="${(fields.driveLink||'#').replace(/"/g,'&quot;')}" target="_blank">More Info</a>
+  </div>
+  <div class="agent-line">
+    <span class="agent-label">Sales Agent</span>
+    ${fields.salesAgent ? `<span class="agent-dot">·</span><span class="agent-name">${esc(fields.salesAgent)}</span>` : ''}
+    ${fields.salesPhone ? `<span class="agent-dot">·</span><span class="agent-phone">${esc(fields.salesPhone)}</span>` : ''}
+  </div>
+</div>
+</body></html>`;
+
+  // Show in preview iframe
+  const blob = new Blob([flyerHtml], { type: 'text/html' });
+  if (blobUrl) URL.revokeObjectURL(blobUrl);
+  blobUrl = URL.createObjectURL(blob);
+  document.getElementById('flyerPreview').src = blobUrl;
+
+  document.getElementById('doneAddress').textContent  = fields.address || 'Property Flyer';
+  document.getElementById('doneSubtitle').textContent =
+    [fields.propType, fields.beds && fields.beds+'bd', fields.baths && fields.baths+'ba', fields.startingPrice]
+      .filter(Boolean).join(' · ');
+
+  showStep('step3', 3);
+}
+
+// ─── Actions (Step 3) ─────────────────────────────────────────────────────────
+function openFlyer() { window.open(blobUrl, '_blank'); }
+
+function downloadHTML() {
+  // Build the same investor viewer page that share links show
+  const styleMatch = flyerHtml.match(/<style[^>]*>([\s\S]*?)<\/style>/i);
+  const bodyMatch  = flyerHtml.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+  let   flyerCss   = (styleMatch ? styleMatch[1] : '').replace(/body\{[^}]+\}/g, '');
+  const flyerBody  = bodyMatch ? bodyMatch[1] : '';
+  const addr       = fields.address || 'Property Flyer';
+
+  const investorPage = `<!DOCTYPE html><html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${addr} — Myers Home Buyers</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html{overflow-x:hidden}body{min-height:100vh;background:#e8eaf2;font-family:Arial,sans-serif;overflow-x:hidden}
+.mhb-nav{background:#1a1a2e;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(0,0,0,.35);gap:12px}
+.mhb-brand-name{color:#f5b731;font-weight:900;font-size:16px;white-space:nowrap}
+.mhb-brand-sub{color:rgba(255,255,255,.4);font-size:9px;letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+.mhb-btn-pdf{background:#f5b731;color:#1a1a2e;border:none;padding:9px 16px;border-radius:7px;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap}
+.mhb-hint{color:rgba(255,255,255,.3);font-size:9px;white-space:nowrap}
+.mhb-stage{padding:24px 0 60px;display:flex;justify-content:center;overflow:hidden}
+.mhb-card{transform-origin:top center;box-shadow:0 10px 50px rgba(0,0,0,.2);border-radius:2px;overflow:hidden;flex-shrink:0}
+${flyerCss}
+@media print{.mhb-nav{display:none!important}.mhb-stage{padding:0;display:block}.mhb-card{box-shadow:none!important;transform:none!important}body{background:white!important}@page{size:letter portrait;margin:0.25in}.flyer{width:100%!important;border:none!important}}
+</style></head><body>
+<nav class="mhb-nav">
+  <div><div class="mhb-brand-name">Myers Home Buyers</div><div class="mhb-brand-sub">Property Flyer</div></div>
+  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+    <button class="mhb-btn-pdf" onclick="window.print()">⬇ Download PDF</button>
+    <span class="mhb-hint">Choose "Save as PDF" in the dialog</span>
+  </div>
+</nav>
+<div class="mhb-stage" id="mhbStage"><div class="mhb-card" id="mhbCard">${flyerBody}</div></div>
+<script>(function(){var W=700;function sc(){var s=document.getElementById('mhbStage'),c=document.getElementById('mhbCard');if(!s||!c)return;var a=Math.min(window.innerWidth,window.screen.width);if(a>=W){c.style.transform='';s.style.height='';return;}var r=a/W;c.style.transform='scale('+r+')';s.style.height=(c.scrollHeight*r+60)+'px';s.style.alignItems='flex-start';s.style.paddingTop='16px';}window.addEventListener('load',sc);window.addEventListener('resize',sc);})();\x3c/script>
+</body></html>`;
+
+  const blob = new Blob([investorPage], { type: 'text/html' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = 'Myers_Flyer_' + addr.replace(/[^a-zA-Z0-9]/g, '_').slice(0, 40) + '.html';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+}
+
+function downloadPDF() {
+  const btn = document.getElementById('pdfBtn');
+  btn.textContent = '🖨 Opening…';
+  btn.disabled = true;
+
+  // Write the flyer HTML directly into a new window — avoids all CORS/blob issues.
+  // Works from file://, GitHub Pages, Netlify, anywhere.
+  const w = window.open('', '_blank');
+  if (w) {
+    w.document.open();
+    w.document.write(flyerHtml);
+    w.document.close();
+    // Give the new window a moment to render fully before triggering print
+    w.onload = function() { w.focus(); w.print(); };
+    // Fallback timeout in case onload already fired
+    setTimeout(function() { try { w.focus(); w.print(); } catch(e){} }, 800);
+  } else {
+    alert('Pop-ups are blocked. Please allow pop-ups for this site and try again.');
+  }
+
+  setTimeout(() => {
+    btn.textContent = '🖨 Print / Save as PDF';
+    btn.disabled = false;
+  }, 2000);
+}
+
+function buildShareLink() {
+  try {
+    // Sync any unsaved input values into the fields object first
+    FIELD_CONFIG.forEach(({key}) => {
+      const el = document.getElementById('f_' + key);
+      if (el) fields[key] = el.value;
+    });
+    // Encode as URL-encoded JSON — simplest and most reliable approach
+    const json  = JSON.stringify(fields);
+    const param = encodeURIComponent(json);
+    const base  = location.href.split('?')[0];
+    const url   = base + '?d=' + param;
+    document.getElementById('shareUrl').value = url;
+    document.getElementById('shareBox').classList.remove('hidden');
+  } catch(e) {
+    console.error('Share link error:', e);
+    alert('Error generating link: ' + e.message);
+  }
+}
+
+function copyLink() {
+  const inp = document.getElementById('shareUrl');
+  inp.select();
+  navigator.clipboard.writeText(inp.value).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    const prev = btn.textContent;
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => btn.textContent = prev, 2000);
+  }).catch(() => document.execCommand('copy'));
+}
+
+// ─── Email Modal ──────────────────────────────────────────────────────────────
+let emailHtmlContent  = '';
+let emailPlainContent = '';
+let activeEmailTab    = 'html';
+
+function openEmailModal() {
+  // Sync fields from inputs
+  FIELD_CONFIG.forEach(({key}) => {
+    const el = document.getElementById('f_' + key);
+    if (el) fields[key] = el.value;
+  });
+
+  const esc = s => (s||'—').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const f   = fields;
+  const addr = f.address || 'Property Flyer';
+
+  // ── Build HTML email ──────────────────────────────────────────────────────
+  const driveHref = (f.driveLink && f.driveLink !== '#' && f.driveLink !== '—') ? f.driveLink : null;
+
+  emailHtmlContent = `<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${esc(addr)} — Myers Home Buyers</title>
+</head>
+<body style="margin:0;padding:0;background:#f0efe9;font-family:Arial,Helvetica,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f0efe9;padding:24px 0;">
+  <tr><td align="center">
+    <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;">
+
+      <!-- HEADER -->
+      <tr><td style="background:#1a1a2e;padding:18px 28px;border-radius:10px 10px 0 0;">
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td>
+              <div style="font-size:22px;font-weight:900;color:#f5b731;letter-spacing:-0.3px;">Myers Home Buyers</div>
+              <div style="font-size:10px;color:rgba(255,255,255,.4);letter-spacing:2px;text-transform:uppercase;margin-top:2px;">Investment Property Opportunity</div>
+            </td>
+            <td align="right">
+              <div style="background:#f5b731;color:#1a1a2e;font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;padding:5px 12px;border-radius:20px;">New Listing</div>
+            </td>
+          </tr>
+        </table>
+      </td></tr>
+
+      <!-- HERO BAND -->
+      <tr><td style="background:#f5b731;padding:20px 28px;">
+        <div style="font-size:26px;font-weight:900;color:#1a1a2e;line-height:1.1;">${esc(f.address)}</div>
+        <div style="font-size:13px;color:#7a5c00;margin-top:5px;font-weight:600;">${esc(f.propType)}</div>
+      </td></tr>
+
+      <!-- STATS GRID -->
+      <tr><td style="background:#fff;padding:0;">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+          <tr>
+            <td width="25%" align="center" style="padding:16px 8px;border-right:1px dashed #f0d88a;border-bottom:1px solid #f0dfa0;">
+              <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">Bedrooms</div>
+              <div style="font-size:22px;font-weight:900;color:#1a1a2e;">${esc(f.beds)}</div>
+            </td>
+            <td width="25%" align="center" style="padding:16px 8px;border-right:1px dashed #f0d88a;border-bottom:1px solid #f0dfa0;">
+              <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">Bathrooms</div>
+              <div style="font-size:22px;font-weight:900;color:#1a1a2e;">${esc(f.baths)}</div>
+            </td>
+            <td width="25%" align="center" style="padding:16px 8px;border-right:1px dashed #f0d88a;border-bottom:1px solid #f0dfa0;">
+              <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">Sq Ft</div>
+              <div style="font-size:22px;font-weight:900;color:#1a1a2e;">${esc(f.sqft)}</div>
+            </td>
+            <td width="25%" align="center" style="padding:16px 8px;border-bottom:1px solid #f0dfa0;">
+              <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">Year Built</div>
+              <div style="font-size:22px;font-weight:900;color:#1a1a2e;">${esc(f.yearBuilt)}</div>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="4" align="center" style="padding:18px 22px;background:#fffbee;border-bottom:1px solid #f0dfa0;">
+              <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;">Starting Price</div>
+              <div style="font-size:34px;font-weight:900;color:#1a1a2e;">${esc(f.startingPrice)}</div>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2" align="center" style="padding:14px 8px;border-right:1px solid #eee;border-bottom:1px solid #eee;">
+              <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">Est. ARV</div>
+              <div style="font-size:18px;font-weight:900;color:#1a1a2e;">${esc(f.arv)}</div>
+            </td>
+            <td colspan="2" align="center" style="padding:14px 8px;border-bottom:1px solid #eee;">
+              <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">Est. Monthly Rent</div>
+              <div style="font-size:18px;font-weight:900;color:#1a1a2e;">${esc(f.rent)}</div>
+            </td>
+          </tr>
+        </table>
+      </td></tr>
+
+      <!-- SHOWING -->
+      ${f.showing && f.showing !== '—' ? `
+      <tr><td style="background:#fffbee;padding:16px 28px;text-align:center;border-top:1px solid #f0dfa0;border-bottom:1px solid #f0dfa0;">
+        <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px;">Showing</div>
+        <div style="font-size:22px;font-weight:900;color:#1a1a2e;">${esc(f.showing)}</div>
+      </td></tr>` : ''}
+
+      <!-- CLOSING & OCCUPANCY -->
+      <tr><td style="background:#fff;padding:0;">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+          <tr>
+            <td width="50%" align="center" style="padding:12px 14px;border-right:1px solid #eee;border-bottom:1px solid #eee;">
+              <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">Closing Date</div>
+              <div style="font-size:15px;font-weight:900;color:#1a1a2e;">${esc(f.closingDate)}</div>
+            </td>
+            <td width="50%" align="center" style="padding:12px 14px;border-bottom:1px solid #eee;">
+              <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">Occupancy at Closing</div>
+              <div style="font-size:15px;font-weight:900;color:#1a1a2e;">${esc(f.occupancy)}</div>
+            </td>
+          </tr>
+        </table>
+      </td></tr>
+
+      <!-- PROPERTY DETAILS -->
+      ${(f.roof || f.foundation || f.hvac) && [f.roof,f.foundation,f.hvac].some(v=>v&&v!=='—') ? `
+      <tr><td style="background:#fffbee;padding:8px 28px;border-top:1px solid #f0dfa0;border-bottom:1px solid #f0dfa0;">
+        <span style="font-size:10px;font-weight:800;color:#1a1a2e;letter-spacing:.8px;text-transform:uppercase;">Property Details</span>
+      </td></tr>
+      <tr><td style="background:#fff;padding:0;">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+          <tr>
+            <td width="33%" align="center" style="padding:12px 8px;border-right:1px dashed #eee;">
+              <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">Roof</div>
+              <div style="font-size:13px;font-weight:700;color:#1a1a2e;">${esc(f.roof)}</div>
+            </td>
+            <td width="33%" align="center" style="padding:12px 8px;border-right:1px dashed #eee;">
+              <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">Foundation</div>
+              <div style="font-size:13px;font-weight:700;color:#1a1a2e;">${esc(f.foundation)}</div>
+            </td>
+            <td width="34%" align="center" style="padding:12px 8px;">
+              <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">HVAC</div>
+              <div style="font-size:13px;font-weight:700;color:#1a1a2e;">${esc(f.hvac)}</div>
+            </td>
+          </tr>
+        </table>
+      </td></tr>` : ''}
+
+      <!-- DESCRIPTION -->
+      ${f.description && f.description !== '—' ? `
+      <tr><td style="background:#fff;padding:14px 28px 18px;border-top:1px solid #eee;">
+        <div style="font-size:10px;font-weight:800;color:#f5b731;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px;">Property Description</div>
+        <div style="font-size:13px;color:#444;line-height:1.8;">${esc(f.description)}</div>
+      </td></tr>` : ''}
+
+      <!-- TERMS -->
+      <tr><td style="background:#f8f7f4;padding:14px 28px 18px;border-top:2px solid #f5b731;">
+        <div style="font-size:10px;font-weight:800;color:#1a1a2e;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;">Terms &amp; Conditions</div>
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td width="50%" valign="top" style="padding-right:12px;">
+              <div style="font-size:11px;color:#555;line-height:1.8;">
+                • One time, one hour showing<br>
+                • You may bring your contractor<br>
+                • Offers due within 30 min of end of showing<br>
+                • Deposit is refundable if MHB cannot perform
+              </div>
+            </td>
+            <td width="50%" valign="top">
+              <div style="font-size:11px;color:#555;line-height:1.8;">
+                • $5,000 deposit due within the hour upon acceptance<br>
+                • Cashier's check or wire<br>
+                • Deposit is non-refundable if you cannot perform<br>
+                • All closings via double closing; buyers pay closing fees
+              </div>
+            </td>
+          </tr>
+        </table>
+      </td></tr>
+
+      <!-- CTA -->
+      <tr><td align="center" style="background:#fff;padding:22px 28px;border-top:1px solid #eee;">
+        ${driveHref ? `<a href="${driveHref}" target="_blank" style="display:inline-block;background:#f5b731;color:#1a1a2e;font-size:15px;font-weight:900;padding:14px 52px;border-radius:40px;text-decoration:none;letter-spacing:1px;text-transform:uppercase;">More Info</a>` : `<div style="background:#f5b731;color:#1a1a2e;font-size:15px;font-weight:900;padding:14px 52px;border-radius:40px;letter-spacing:1px;text-transform:uppercase;display:inline-block;">More Info</div>`}
+        <div style="font-size:11px;color:#bbb;margin-top:10px;">Click the button above to access photos and additional property details.</div>
+      </td></tr>
+
+      <!-- AGENT FOOTER -->
+      <tr><td style="background:#1a1a2e;padding:16px 28px;border-radius:0 0 10px 10px;text-align:center;">
+        <div style="color:rgba(255,255,255,.4);font-size:10px;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:5px;">Sales Agent</div>
+        ${f.salesAgent ? `<div style="color:#f5b731;font-size:14px;font-weight:700;">${esc(f.salesAgent)}</div>` : ''}
+        ${f.salesPhone ? `<div style="color:rgba(255,255,255,.55);font-size:12px;margin-top:2px;">${esc(f.salesPhone)}</div>` : ''}
+        <div style="color:rgba(255,255,255,.25);font-size:10px;margin-top:10px;">Myers Home Buyers · This email was generated by the MHB Flyer Tool</div>
+      </td></tr>
+
+    </table>
+  </td></tr>
+</table>
+</body></html>`;
+
+  // ── Build Plain Text email ───────────────────────────────────────────────
+  const line  = '─'.repeat(52);
+  const plain = (label, val) => `${label.padEnd(22,' ')} ${val||'—'}`;
+  emailPlainContent = [
+    'MYERS HOME BUYERS — NEW INVESTMENT PROPERTY',
+    line,
+    '',
+    f.address || '(Address)',
+    f.propType ? `Property Type: ${f.propType}` : '',
+    '',
+    plain('Bedrooms:',  f.beds),
+    plain('Bathrooms:', f.baths),
+    plain('Square Feet:',f.sqft),
+    plain('Year Built:', f.yearBuilt),
+    '',
+    line,
+    plain('Starting Price:',  f.startingPrice),
+    plain('Buy It Now Price:', f.buyNow),
+    plain('Est. ARV:',        f.arv),
+    plain('Est. Monthly Rent:',f.rent),
+    line,
+    '',
+    f.showing && f.showing !== '—' ? `Showing: ${f.showing}` : '',
+    plain('Closing Date:',      f.closingDate),
+    plain('Occupancy at Close:',f.occupancy),
+    '',
+    f.roof       && f.roof       !== '—' ? `Roof:        ${f.roof}`       : '',
+    f.foundation && f.foundation !== '—' ? `Foundation:  ${f.foundation}` : '',
+    f.hvac       && f.hvac       !== '—' ? `HVAC:        ${f.hvac}`       : '',
+    '',
+    f.description && f.description !== '—' ? `DESCRIPTION\n${f.description}` : '',
+    '',
+    line,
+    'TERMS & CONDITIONS',
+    '• One time, one hour showing',
+    '• You may bring your contractor',
+    '• Offers due within 30 minutes of end of showing',
+    '• $5,000 deposit due within the hour upon acceptance',
+    '• Cashier\'s check or wire',
+    '• Deposit is non-refundable if you cannot perform',
+    '• Deposit is refundable if Myers Home Buyers cannot perform, including if title does not clear',
+    '• All closings via double closing; buyers responsible for closing fees',
+    line,
+    '',
+    driveHref ? `More Info / Photos: ${driveHref}` : '',
+    '',
+    f.salesAgent ? `Sales Agent: ${f.salesAgent}` : '',
+    f.salesPhone ? `Phone:       ${f.salesPhone}` : '',
+    '',
+    'Myers Home Buyers',
+  ].filter(l => l !== undefined).join('\n').replace(/\n{3,}/g,'\n\n');
+
+  // ── Populate modal ────────────────────────────────────────────────────────
+  document.getElementById('emailModalAddr').textContent = addr;
+
+  // HTML preview via srcdoc
+  const frame = document.getElementById('emailPreviewFrame');
+  frame.srcdoc = emailHtmlContent;
+
+  // Plain text
+  document.getElementById('emailPlainText').textContent = emailPlainContent;
+
+  switchTab('html');
+  document.getElementById('emailModal').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeEmailModal() {
+  document.getElementById('emailModal').classList.add('hidden');
+  document.body.style.overflow = '';
+}
+function closeEmailModalOutside(e) {
+  if (e.target === document.getElementById('emailModal')) closeEmailModal();
+}
+
+function switchTab(tab) {
+  activeEmailTab = tab;
+  document.getElementById('panel-html').classList.toggle('hidden', tab !== 'html');
+  document.getElementById('panel-plain').classList.toggle('hidden', tab !== 'plain');
+  document.getElementById('tab-html').classList.toggle('active', tab === 'html');
+  document.getElementById('tab-plain').classList.toggle('active', tab === 'plain');
+}
+
+function copyEmailText(type) {
+  const text   = type === 'html' ? emailHtmlContent : emailPlainContent;
+  const btnId  = type === 'html' ? 'copyHtmlBtn' : 'copyPlainBtn';
+  const btn    = document.getElementById(btnId);
+  const orig   = btn.innerHTML;
+
+  navigator.clipboard.writeText(text).then(() => {
+    btn.innerHTML = type === 'html' ? '✓ HTML Copied!' : '✓ Text Copied!';
+    btn.style.background = '#4caf50';
+    btn.style.borderColor = '#4caf50';
+    btn.style.color = '#fff';
+    setTimeout(() => {
+      btn.innerHTML = orig;
+      btn.style.background = '';
+      btn.style.borderColor = '';
+      btn.style.color = '';
+    }, 2200);
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    ta.remove();
+    btn.innerHTML = '✓ Copied!';
+    setTimeout(() => btn.innerHTML = orig, 2000);
+  });
+}
+
+// ─── Navigation helpers ───────────────────────────────────────────────────────
+function goToEdit()  { showStep('step2', 2); }
+function startOver() {
+  document.getElementById('emailText').value = '';
+  updateCount();
+  fields       = {};
+  photoDataUrl = null;
+  flyerHtml    = '';
+  if (blobUrl) { URL.revokeObjectURL(blobUrl); blobUrl = ''; }
+  document.getElementById('photoPreview').style.display = 'none';
+  document.getElementById('photoPlaceholder').style.display = 'flex';
+  document.getElementById('removePhoto').classList.add('hidden');
+  document.getElementById('photoDrop').classList.remove('has-photo');
+  document.getElementById('shareBox').classList.add('hidden');
+  // Clear URL param
+  history.replaceState({}, '', location.pathname);
+  showStep('step1', 1);
+}
+
+function showStep(stepId, stepNum) {
+  ['step1','step2','step3'].forEach(id =>
+    document.getElementById(id).classList.add('hidden'));
+  document.getElementById(stepId).classList.remove('hidden');
+
+  for (let i = 1; i <= 3; i++) {
+    const num = document.getElementById('s' + i);
+    const lbl = document.getElementById('sl' + i);
+    num.className = 'step-num' + (i < stepNum ? ' done' : i === stepNum ? ' active' : '');
+    num.textContent = i < stepNum ? '✓' : String(i);
+    lbl.className = 'step-label' + (i === stepNum ? ' active' : '');
+  }
+
+  const soBtn = document.getElementById('startOverBtn');
+  if (soBtn) soBtn.style.display = stepNum > 1 ? 'inline-block' : 'none';
+}
+</script>
+</body>
+</html>
