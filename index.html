@@ -810,66 +810,59 @@ function generateFlyer() {
   </div>`;
 
   const esc = s => (s||'—').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const roofLine = [fields.roof,fields.foundation,fields.hvac].filter(v=>v&&v!=='—').join(' · ')||null;
 
   flyerHtml = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#f0f0f0;display:flex;justify-content:center;padding:16px;font-family:Arial,sans-serif}
-.flyer{width:560px;max-width:100%;background:#fff;border:1px solid #e8e0d0;color:#1a1a2e}
-@media print{
-  @page{size:letter portrait;margin:0.25in}
-  body{display:block;padding:0;background:white}
-  .flyer{width:100%;border:none;box-shadow:none}
-}
+body{background:#ece9e3;display:flex;justify-content:center;padding:16px;font-family:Arial,Helvetica,sans-serif}
+.flyer{width:560px;max-width:100%;background:#fff;border:1px solid #ddd;color:#1a1a2e}
+@media print{@page{size:letter portrait;margin:0.25in}body{display:block;padding:0;background:white}.flyer{width:100%;border:none}}
 .top-header{background:#fff;padding:16px 20px 18px;border-bottom:3px solid #f5b731}
 .header-top-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.address-main{font-size:26px;font-weight:900;color:#1a1a2e;line-height:1.2}
 .prop-type-label{font-size:12px;font-weight:700;color:#f5b731;letter-spacing:1.8px;text-transform:uppercase}
-.hero{width:100%;height:280px;background:#c8a060;overflow:hidden;border-top:2px solid #f5b731;border-bottom:2px solid #f5b731;display:flex;align-items:center;justify-content:center}
-.hero-placeholder{color:rgba(0,0,0,0.25);font-size:14px;letter-spacing:3px;text-transform:uppercase}
-.icon-row{display:flex;background:#fff}
+.address-main{font-size:26px;font-weight:900;color:#1a1a2e;line-height:1.2}
+.hero{width:100%;height:250px;background:#f0ede6;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.hero-placeholder{color:rgba(0,0,0,0.18);font-size:12px;letter-spacing:3px;text-transform:uppercase}
+.icon-row{display:flex;background:#fff;border-bottom:1px solid #eee}
 .icon-cell{flex:1;display:flex;flex-direction:column;align-items:center;padding:16px 8px 14px;gap:4px}
-.icon-cell+.icon-cell{border-left:2px dashed #f0d88a}
-.icon-lbl{font-size:13px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.8px;text-align:center;margin-top:6px}
+.icon-cell+.icon-cell{border-left:1px solid #eee}
+.icon-lbl{font-size:11px;font-weight:700;color:#bbb;text-transform:uppercase;letter-spacing:.8px;text-align:center;margin-top:6px}
 .icon-val{font-size:22px;font-weight:900;color:#1a1a2e;text-align:center}
-.gold-divider{height:3px;background:#f5b731;width:100%}
-.price-banner{background:#fffbee;border-bottom:1px solid #f0dfa0;padding:16px 22px;text-align:center}
-.price-banner .lbl{font-size:13px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px}
-.price-banner .price{font-size:36px;font-weight:900;color:#1a1a2e}
+.price-section{padding:16px 20px;border-bottom:1px solid #eee}
+.price-inner{display:flex;align-items:center;gap:14px}
+.price-bar{width:4px;min-height:52px;background:#f5b731;border-radius:2px;flex-shrink:0;align-self:stretch}
+.price-lbl{font-size:11px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px}
+.price-val{font-size:34px;font-weight:900;color:#1a1a2e;line-height:1}
 .stats-row{display:flex;border-bottom:1px solid #eee}
-.stat-cell{flex:1;padding:14px 8px;text-align:center;border-right:1px solid #eee}
+.stat-cell{flex:1;padding:12px 14px;border-right:1px solid #eee}
 .stat-cell:last-child{border-right:none}
-.stat-label{font-size:13px;font-weight:700;color:#888;letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px}
-.stat-value{font-size:22px;font-weight:900;color:#1a1a2e}
-.showing-center{text-align:center;padding:18px 22px;border-bottom:1px solid #e5d9b6;background:#fdfaf3;border-top:1px solid #e5d9b6}
-.showing-label{font-size:12px;font-weight:600;color:#c9a432;text-transform:uppercase;letter-spacing:1.8px;margin-bottom:6px}
+.stat-label{font-size:11px;font-weight:700;color:#888;letter-spacing:.8px;text-transform:uppercase;margin-bottom:5px}
+.stat-value{font-size:20px;font-weight:900;color:#1a1a2e}
+.info-rows{border-bottom:1px solid #eee}
+.info-row{display:flex;justify-content:space-between;align-items:baseline;padding:11px 20px}
+.info-row+.info-row{border-top:1px solid #f5f3ee}
+.info-lbl{font-size:13px;color:#888}
+.info-val{font-size:14px;font-weight:700;color:#1a1a2e;text-align:right;max-width:55%}
+.showing-center{text-align:center;padding:18px 20px;border-bottom:1px solid #e5d9b6;background:#fdfaf3;border-top:1px solid #e5d9b6}
+.showing-label{font-size:11px;font-weight:600;color:#c9a432;text-transform:uppercase;letter-spacing:1.8px;margin-bottom:6px}
 .showing-date{font-size:26px;font-weight:700;color:#1a1a2e}
-.two-col{display:flex;border-bottom:1px solid #eee;text-align:center}
-.two-col-cell{flex:1;padding:14px 18px;border-right:1px solid #eee}
-.two-col-cell:last-child{border-right:none}
-.two-col-cell .lbl{font-size:13px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px}
-.two-col-cell .val{font-size:18px;color:#1a1a2e;font-weight:900}
-.section-header{background:#fffbee;border-top:1px solid #f0dfa0;border-bottom:1px solid #f0dfa0;padding:9px 22px;font-size:13px;font-weight:800;color:#1a1a2e;letter-spacing:.8px;text-transform:uppercase}
-.details-grid{display:flex;border-bottom:1px solid #eee}
-.detail-cell{flex:1;text-align:center;padding:12px 8px;border-right:1px solid #eee}
-.detail-cell:last-child{border-right:none}
-.detail-cell .lbl{font-size:13px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px}
-.detail-cell .val{font-size:17px;color:#1a1a2e;font-weight:900}
-.desc-block{padding:14px 22px 16px;border-bottom:1px solid #eee}
-.desc-block p{font-size:16px;color:#444;line-height:1.75}
-.terms-block{padding:12px 22px 14px;border-bottom:1px solid #eee}
-.terms-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 20px}
-.terms-grid span{font-size:14px;color:#444;line-height:1.65}
-.cta-block{padding:18px 22px 14px;text-align:center;border-bottom:1px solid #eee}
-.pill-btn{display:inline-block;background:#f5b731;color:#1a1a2e;font-size:18px;font-weight:900;padding:14px 60px;border-radius:40px;letter-spacing:1px;text-transform:uppercase;min-width:220px;text-align:center;text-decoration:none}
+.section-header{background:#fafaf8;border-top:1px solid #eee;border-bottom:1px solid #eee;padding:8px 20px;font-size:11px;font-weight:700;color:#aaa;letter-spacing:1.2px;text-transform:uppercase}
+.desc-block{padding:14px 20px 16px;border-bottom:1px solid #eee}
+.desc-block p{font-size:14px;color:#444;line-height:1.75}
+.terms-block{padding:12px 20px 14px;border-bottom:1px solid #eee}
+.terms-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 16px}
+.terms-grid span{font-size:13px;color:#444;line-height:1.65}
+.cta-block{padding:20px 22px 16px;text-align:center;border-bottom:1px solid #eee}
+.pill-btn{display:inline-block;background:#f5b731;color:#1a1a2e;font-size:17px;font-weight:900;padding:14px 60px;border-radius:40px;letter-spacing:1px;text-transform:uppercase;text-align:center;text-decoration:none}
 .agent-line{text-align:center;padding:10px 22px 12px;display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap}
 .agent-dot{color:#ccc;font-size:12px}
-.agent-label{font-size:13px;color:#bbb;letter-spacing:1px;text-transform:uppercase}
-.agent-name{font-size:14px;font-weight:600;color:#888}
-.agent-phone{font-size:14px;color:#aaa}
-</style></head><body>
-<div class="flyer">
+.agent-label{font-size:12px;color:#bbb;letter-spacing:1px;text-transform:uppercase}
+.agent-name{font-size:13px;font-weight:700;color:#888}
+.agent-phone{font-size:13px;color:#aaa}
+</style></head><body><div class="flyer">
+
   <div class="top-header">
     <div class="header-top-row">
       <svg height="36" viewBox="0 0 120 138" xmlns="http://www.w3.org/2000/svg">
@@ -884,47 +877,55 @@ body{background:#f0f0f0;display:flex;justify-content:center;padding:16px;font-fa
     </div>
     <div class="address-main">${esc(fields.address)}</div>
   </div>
+
   <div class="hero">${hero}</div>
+
   <div class="icon-row">
     <div class="icon-cell">
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <svg width="26" height="26" viewBox="0 0 32 32" fill="none" stroke="#bbb" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
         <rect x="3" y="14" width="26" height="11" rx="2"/><rect x="6" y="11" width="8" height="5" rx="1.5"/>
         <rect x="18" y="11" width="8" height="5" rx="1.5"/><line x1="6" y1="25" x2="6" y2="29"/>
         <line x1="26" y1="25" x2="26" y2="29"/><path d="M3 14 L3 9 Q3 7 5 7 L27 7 Q29 7 29 9 L29 14"/>
       </svg>
-      <div class="icon-lbl">Bedrooms</div><div class="icon-val">${esc(fields.beds)}</div>
+      <div class="icon-lbl">Beds</div><div class="icon-val">${esc(fields.beds)}</div>
     </div>
     <div class="icon-cell">
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <svg width="26" height="26" viewBox="0 0 32 32" fill="none" stroke="#bbb" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
         <path d="M6 16 H26 V22 A8 8 0 0 1 18 30 H14 A8 8 0 0 1 6 22 Z"/>
-        <path d="M10 16 V10 A3 3 0 0 1 13 7"/>
-        <line x1="20" y1="4" x2="20" y2="8"/>
+        <path d="M10 16 V10 A3 3 0 0 1 13 7"/><line x1="20" y1="4" x2="20" y2="8"/>
       </svg>
-      <div class="icon-lbl">Bathrooms</div><div class="icon-val">${esc(fields.baths)}</div>
+      <div class="icon-lbl">Baths</div><div class="icon-val">${esc(fields.baths)}</div>
     </div>
     <div class="icon-cell">
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <svg width="26" height="26" viewBox="0 0 32 32" fill="none" stroke="#bbb" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
         <path d="M4 14 L16 4 L28 14 L28 30 L4 30 Z"/>
         <rect x="13" y="21" width="6" height="9" rx="1"/>
         <rect x="6" y="17" width="6" height="5" rx="1"/><rect x="20" y="17" width="6" height="5" rx="1"/>
       </svg>
-      <div class="icon-lbl">Square Feet</div><div class="icon-val">${esc(fields.sqft)}</div>
+      <div class="icon-lbl">Sqft</div><div class="icon-val">${esc(fields.sqft)}</div>
     </div>
     <div class="icon-cell">
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <svg width="26" height="26" viewBox="0 0 32 32" fill="none" stroke="#bbb" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
         <path d="M4 6 H28 V24 L22 30 H4 Z"/><line x1="4" y1="12" x2="28" y2="12"/>
         <path d="M28 24 L22 24 L22 30"/>
         <line x1="10" y1="3" x2="10" y2="9"/><line x1="16" y1="3" x2="16" y2="9"/><line x1="22" y1="3" x2="22" y2="9"/>
       </svg>
-      <div class="icon-lbl">Year Built</div><div class="icon-val">${esc(fields.yearBuilt)}</div>
+      <div class="icon-lbl">Built</div><div class="icon-val">${esc(fields.yearBuilt)}</div>
     </div>
   </div>
-  <div class="gold-divider"></div>
-  <div class="price-banner"><div class="lbl">Starting Price</div><div class="price">${esc(fields.startingPrice)}</div></div>
-  <div class="gold-divider"></div>
+
+  <div class="price-section">
+    <div class="price-inner">
+      <div class="price-bar"></div>
+      <div>
+        <div class="price-lbl">Starting Price</div>
+        <div class="price-val">${esc(fields.startingPrice)}</div>
+      </div>
+    </div>
+  </div>
+
   <div class="stats-row">
-    <div class="stat-cell"><div class="stat-label">Est. ARV</div><div class="stat-value">${esc(fields.arv)}</div></div>
-    <div class="stat-cell"><div class="stat-label">Buy It Now</div><div class="stat-value">${esc(fields.buyNow)}</div></div>
+    <div class="stat-cell"><div class="stat-label">Est. ARV</div><div class="-label">Buy It Now</div><div class="stat-value">${esc(fields.buyNow)}</div></div>
     <div class="stat-cell"><div class="stat-label">Est. Rent</div><div class="stat-value">${esc(fields.rent)}</div></div>
   </div>
   <div class="showing-center"><div class="showing-label">Showing</div><div class="showing-date">${esc(fields.showing)}</div></div>
