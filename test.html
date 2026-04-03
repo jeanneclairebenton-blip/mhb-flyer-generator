@@ -543,6 +543,7 @@ const FIELD_CONFIG = [
 // ─── State ────────────────────────────────────────────────────────────────────
 let fields      = {};
 let photoDataUrl= null;
+let photoDataUrlTiny = null; // Ultra-compressed version strictly for Email payload
 let flyerHtml   = '';
 let blobUrl     = '';
 
@@ -761,10 +762,22 @@ function photoSelected(e) { const f = e.target.files[0]; if (f) loadPhoto(f); }
 function loadPhoto(file) {
   const reader = new FileReader();
   reader.onload = ev => {
+    photoDataUrl = ev.target.result;
+    const drop   = document.getElementById('photoDrop');
+    const prev   = document.getElementById('photoPreview');
+    const ph     = document.getElementById('photoPlaceholder');
+    const rm     = document.getElementById('removePhoto');
+    prev.src     = photoDataUrl;
+    prev.style.display = 'block';
+    ph.style.display   = 'none';
+    rm.classList.remove('hidden');
+    drop.classList.add('has-photo');
+    
+    // Asynchronously create an ultra-low-weight compressed version specifically for the CRM Email HTML payload.
     const img = new Image();
     img.onload = () => {
       let w = img.width, h = img.height;
-      const MAX_W = 450, MAX_H = 450;
+      const MAX_W = 600, MAX_H = 450;
       if (w > MAX_W || h > MAX_H) {
         if (w/h > MAX_W/MAX_H) { h = Math.round(h * MAX_W/w); w = MAX_W; }
         else { w = Math.round(w * MAX_H/h); h = MAX_H; }
@@ -772,27 +785,16 @@ function loadPhoto(file) {
       const cvs = document.createElement('canvas');
       cvs.width = w; cvs.height = h;
       cvs.getContext('2d').drawImage(img, 0, 0, w, h);
-      
-      // Extremely aggressive compression for Zoho
-      photoDataUrl = cvs.toDataURL('image/jpeg', 0.4);
-      
-      const drop   = document.getElementById('photoDrop');
-      const prev   = document.getElementById('photoPreview');
-      const ph     = document.getElementById('photoPlaceholder');
-      const rm     = document.getElementById('removePhoto');
-      prev.src     = photoDataUrl;
-      prev.style.display = 'block';
-      ph.style.display   = 'none';
-      rm.classList.remove('hidden');
-      drop.classList.add('has-photo');
+      photoDataUrlTiny = cvs.toDataURL('image/jpeg', 0.5);
     };
-    img.src = ev.target.result;
+    img.src = photoDataUrl;
   };
   reader.readAsDataURL(file);
 }
 function removePhoto(e) {
   e.stopPropagation();
   photoDataUrl = null;
+  photoDataUrlTiny = null;
   const prev = document.getElementById('photoPreview');
   prev.style.display = 'none';
   prev.src = '';
@@ -1132,11 +1134,12 @@ function openEmailModal() {
   const f   = fields;
   const addr = f.address || 'Property Flyer';
 
-  // ── Build HTML email ──────────────────────────────────────────────────────
+    // ── Build HTML email ──────────────────────────────────────────────────────
   const driveHref = (f.driveLink && f.driveLink !== '#' && f.driveLink !== '—') ? f.driveLink : null;
   const roofLine  = [f.roof, f.foundation, f.hvac].filter(v => v && v !== '—').join(' · ') || null;
 
-  const heroEmail = `<img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/1x1.png" style="width:100%;height:240px;object-fit:cover;background:#ece9e1;display:block;border:2px dashed #bbb;" alt="[ CLICK THIS BOX TO INSERT PROPERTY PHOTO IN ZOHO ]"/>`;
+  // Automatically embed the transparent placeholder for the email payload to bypass Zoho limits.
+  const heroEmail = `<img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/1x1.png" style="width:100%;height:300px;object-fit:cover;background:#ece9e1;display:block;border:2px dashed #bbb;" class="hero-email-img" alt="[ CLICK THIS EXACT BOX to insert Property Photo in Zoho ]"/>`;
 
   emailHtmlContent = `<!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8">
