@@ -1340,13 +1340,12 @@ function switchTab(tab) {
 }
 
 function copyEmailText(type) {
-  const text   = type === 'html' ? emailHtmlContent : emailPlainContent;
-  const btnId  = type === 'html' ? 'copyHtmlBtn' : 'copyPlainBtn';
-  const btn    = document.getElementById(btnId);
-  const orig   = btn.innerHTML;
+  const btnId = type === 'html' ? 'copyHtmlBtn' : 'copyPlainBtn';
+  const btn   = document.getElementById(btnId);
+  const orig  = btn.innerHTML;
 
-  navigator.clipboard.writeText(text).then(() => {
-    btn.innerHTML = type === 'html' ? '✓ HTML Copied!' : '✓ Text Copied!';
+  function showSuccess(label) {
+    btn.innerHTML = label;
     btn.style.background = '#4caf50';
     btn.style.borderColor = '#4caf50';
     btn.style.color = '#fff';
@@ -1355,17 +1354,42 @@ function copyEmailText(type) {
       btn.style.background = '';
       btn.style.borderColor = '';
       btn.style.color = '';
-    }, 2200);
-  }).catch(() => {
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    ta.remove();
-    btn.innerHTML = '✓ Copied!';
-    setTimeout(() => btn.innerHTML = orig, 2000);
-  });
+    }, 2400);
+  }
+
+  if (type === 'html') {
+    // Write as text/html so Gmail/Outlook paste it as rendered email, not raw code
+    const blob = new Blob([emailHtmlContent], { type: 'text/html' });
+    const item = new ClipboardItem({ 'text/html': blob });
+    navigator.clipboard.write([item])
+      .then(() => showSuccess('✓ Copied! Paste into Gmail'))
+      .catch(() => {
+        // Fallback: plain text copy
+        navigator.clipboard.writeText(emailHtmlContent)
+          .then(() => showSuccess('✓ HTML Copied (plain fallback)'))
+          .catch(() => {
+            const ta = document.createElement('textarea');
+            ta.value = emailHtmlContent;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            ta.remove();
+            showSuccess('✓ Copied!');
+          });
+      });
+  } else {
+    navigator.clipboard.writeText(emailPlainContent)
+      .then(() => showSuccess('✓ Text Copied!'))
+      .catch(() => {
+        const ta = document.createElement('textarea');
+        ta.value = emailPlainContent;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+        showSuccess('✓ Copied!');
+      });
+  }
 }
 
 // ─── Navigation helpers ───────────────────────────────────────────────────────
