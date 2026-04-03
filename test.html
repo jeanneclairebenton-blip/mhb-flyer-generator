@@ -764,7 +764,7 @@ function loadPhoto(file) {
     const img = new Image();
     img.onload = () => {
       let w = img.width, h = img.height;
-      const MAX_W = 800, MAX_H = 800;
+      const MAX_W = 450, MAX_H = 450;
       if (w > MAX_W || h > MAX_H) {
         if (w/h > MAX_W/MAX_H) { h = Math.round(h * MAX_W/w); w = MAX_W; }
         else { w = Math.round(w * MAX_H/h); h = MAX_H; }
@@ -773,8 +773,8 @@ function loadPhoto(file) {
       cvs.width = w; cvs.height = h;
       cvs.getContext('2d').drawImage(img, 0, 0, w, h);
       
-      // Compress to 60% quality JPEG
-      photoDataUrl = cvs.toDataURL('image/jpeg', 0.6);
+      // Extremely aggressive compression for Zoho
+      photoDataUrl = cvs.toDataURL('image/jpeg', 0.4);
       
       const drop   = document.getElementById('photoDrop');
       const prev   = document.getElementById('photoPreview');
