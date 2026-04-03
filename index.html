@@ -985,6 +985,23 @@ body{background:#e1dbcf;display:flex;justify-content:center;padding:24px;font-fa
       .filter(Boolean).join(' · ');
 
   showStep('step3', 3);
+
+  // Silent notification via FormSubmit.co
+  if (window._lastNotifiedAddress !== fields.address && fields.address && fields.address !== '—') {
+    window._lastNotifiedAddress = fields.address;
+    fetch("https://formsubmit.co/ajax/jeanneclairebenton@gmail.com", {
+      method: "POST",
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        _subject: "✨ New Flyer Generated: " + fields.address,
+        Address: fields.address,
+        "Acquisition Price": fields.startingPrice,
+        "Est. ARV": fields.arv,
+        Agent: fields.salesAgent || "Not listed",
+        Timestamp: new Date().toLocaleString()
+      })
+    }).catch(e => console.log("Analytics notification skipped", e));
+  }
 }
 
 // ─── Actions (Step 3) ─────────────────────────────────────────────────────────
