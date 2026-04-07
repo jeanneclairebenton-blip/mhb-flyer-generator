@@ -1418,17 +1418,26 @@ function copyEmailText(type) {
   }
 
   if (type === 'html') {
-    // Drop the heavy base64 payload out of the copied string so Zoho accepts it!
+    // Always include the photo — either external URL (best) or embedded base64
     let payload = emailHtmlContent;
-    if (photoDataUrl && !(fields.emailPhotoLink && fields.emailPhotoLink !== '—')) {
-       payload = payload.replace(photoDataUrl, 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==');
+
+    // Warn if the payload is very large (Zoho's 300k limit)
+    const usingBase64Photo = photoDataUrl && !(fields.emailPhotoLink && fields.emailPhotoLink !== '—');
+    if (usingBase64Photo && payload.length > 250000) {
+      const proceed = confirm(
+        '⚠️ This email is large (' + Math.round(payload.length/1000) + 'k chars) because the photo is embedded directly.\n\n' +
+        'Some email platforms like Zoho may reject it.\n\n' +
+        'Tip: Paste a photo URL into the "Property Photo URL (For Email)" field for a smaller email.\n\n' +
+        'Copy anyway?'
+      );
+      if (!proceed) return;
     }
 
     // Write as text/html so Gmail/Outlook paste it as rendered email, not raw code
     const blob = new Blob([payload], { type: 'text/html' });
     const item = new ClipboardItem({ 'text/html': blob });
     navigator.clipboard.write([item])
-      .then(() => showSuccess('✓ Copied! Paste into Gmail'))
+      .then(() => showSuccess('✓ Copied! Paste into your email'))
       .catch(() => {
         // Fallback: plain text copy
         navigator.clipboard.writeText(payload)
