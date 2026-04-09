@@ -813,8 +813,10 @@ function generateFlyer() {
     if (el) fields[key] = el.value;
   });
 
-  const hero = photoDataUrl
-    ? `<img src="${photoDataUrl}" style="width:100%;height:100%;object-fit:cover;display:block;" alt="Property"/>`
+  // Use hosted URL (from ImgBB after link generation) > local upload > placeholder
+  const heroSrc = fields.photoUrl || photoDataUrl || null;
+  const hero = heroSrc
+    ? `<img src="${heroSrc}" style="width:100%;height:100%;object-fit:cover;display:block;" alt="Property"/>`
     : `<div class="hero-placeholder">[ Property Photo ]</div>`;
 
   // Logo — full Myers Home Buyers logo PNG
@@ -1092,6 +1094,34 @@ async function buildShareLink() {
       const el = document.getElementById('f_' + key);
       if (el) fields[key] = el.value;
     });
+
+    // ── If there's a locally uploaded photo, host it on ImgBB first ──────────
+    if (photoDataUrl && !fields.photoUrl) {
+      btn.textContent = '📤 Uploading photo…';
+      try {
+        // Strip the data:image/xxx;base64, prefix — ImgBB wants raw base64
+        const base64 = photoDataUrl.replace(/^data:image\/\w+;base64,/, '');
+        const formData = new FormData();
+        formData.append('key', '0064878a2d14ca849e85be0380465c90');
+        formData.append('image', base64);
+
+        const imgResp = await fetch('https://api.imgbb.com/1/upload', {
+          method: 'POST',
+          body: formData,
+          signal: AbortSignal.timeout(20000)
+        });
+        if (imgResp.ok) {
+          const imgData = await imgResp.json();
+          if (imgData.success) {
+            // Store hosted URL so the viewer can show the photo
+            fields.photoUrl = imgData.data.url;
+          }
+        }
+      } catch(e) {
+        console.warn('Photo upload failed, link will have no photo:', e);
+      }
+      btn.textContent = '⏳ Building link…';
+    }
 
     // Build the long GitHub Pages URL with all flyer data encoded
     const json  = JSON.stringify(fields);
