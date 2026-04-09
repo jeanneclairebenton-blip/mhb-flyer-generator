@@ -437,11 +437,30 @@ textarea:focus, input[type=text]:focus { border-color: #f5b731; }
 
     <div class="actions-grid" style="grid-template-columns:1fr;">
       <div class="action-card yellow">
-        <div class="action-title">Save Flyer</div>
-        <div class="action-desc">Download the flyer as an HTML file to email to investors, or save as PDF for your records.</div>
-        <button class="action-btn" style="background:#f5b731;color:#1a1a2e;margin-bottom:8px;" onclick="downloadHTML()">📄 Save as HTML (Send to Investor)</button>
-        <button class="action-btn" style="background:#1a1a2e;color:#fff;" id="pdfBtn" onclick="downloadPDF()">🖨 Download PDF</button>
-        <p style="font-size:10px;color:#aaa;margin-top:8px;line-height:1.5;">In the print dialog, choose <strong>Save as PDF</strong> as the destination.</p>
+        <div class="action-title">Send to Investor</div>
+        <div class="action-desc">Generate a hosted link your investors can open instantly — no downloads needed.</div>
+        <button class="action-btn" id="shareLinkBtn" style="background:#f5b731;color:#1a1a2e;margin-bottom:8px;font-size:15px;padding:14px;" onclick="buildShareLink()">
+          🔗 Get Investor Link
+        </button>
+
+        <!-- Share link result box -->
+        <div id="shareBox" style="display:none;margin-bottom:12px;">
+          <div style="display:flex;gap:6px;align-items:center;">
+            <input id="shareUrl" type="text" readonly
+              style="flex:1;padding:10px 12px;border:2px solid #f5b731;border-radius:8px;font-size:12px;background:#fffdf4;color:#333;outline:none;font-family:monospace;" />
+            <button onclick="copyLink()" id="copyLinkBtn"
+              style="background:#1a1a2e;color:#fff;border:none;padding:10px 14px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap;">
+              📋 Copy
+            </button>
+          </div>
+          <p style="font-size:10px;color:#888;margin-top:6px;text-align:center;">Share this link with your investors — it opens the flyer directly in their browser.</p>
+        </div>
+
+        <div style="display:flex;gap:8px;">
+          <button class="action-btn" style="background:#2a2a3e;color:#aaa;font-size:12px;padding:9px;flex:1;" onclick="downloadHTML()">📄 Save as HTML File</button>
+          <button class="action-btn" style="background:#1a1a2e;color:#fff;font-size:12px;padding:9px;flex:1;" id="pdfBtn" onclick="downloadPDF()">🖨 Download PDF</button>
+        </div>
+        <p style="font-size:10px;color:#888;margin-top:6px;line-height:1.5;text-align:center;">For PDF: choose <strong>Save as PDF</strong> in the print dialog.</p>
       </div>
     </div>
 
@@ -1062,35 +1081,62 @@ function downloadPDF() {
   }, 2000);
 }
 
-function buildShareLink() {
+async function buildShareLink() {
+  const btn = document.getElementById('shareLinkBtn');
+  btn.textContent = '⏳ Generating link…';
+  btn.disabled = true;
+
   try {
     // Sync any unsaved input values into the fields object first
     FIELD_CONFIG.forEach(({key}) => {
       const el = document.getElementById('f_' + key);
       if (el) fields[key] = el.value;
     });
-    // Encode as URL-encoded JSON — simplest and most reliable approach
+
+    // Build the long GitHub Pages URL with all flyer data encoded
     const json  = JSON.stringify(fields);
     const param = encodeURIComponent(json);
-    const base  = location.href.split('?')[0];
-    const url   = base + '?d=' + param;
-    document.getElementById('shareUrl').value = url;
-    document.getElementById('shareBox').classList.remove('hidden');
+    const base  = 'https://jeanneclairebenton-blip.github.io/mhb-flyer-generator/';
+    const longUrl = base + '?d=' + param;
+
+    // Shorten via is.gd (free, no API key, CORS-friendly)
+    let finalUrl = longUrl;
+    try {
+      const resp = await fetch(
+        'https://is.gd/create.php?format=simple&url=' + encodeURIComponent(longUrl),
+        { signal: AbortSignal.timeout(6000) }
+      );
+      if (resp.ok) {
+        const short = (await resp.text()).trim();
+        if (short.startsWith('http')) finalUrl = short;
+      }
+    } catch(e) {
+      // Shortening failed — use long URL as fallback (still works!)
+      console.warn('URL shortening failed, using full URL:', e);
+    }
+
+    document.getElementById('shareUrl').value = finalUrl;
+    document.getElementById('shareBox').style.display = 'block';
+    document.getElementById('shareUrl').select();
   } catch(e) {
     console.error('Share link error:', e);
     alert('Error generating link: ' + e.message);
+  } finally {
+    btn.textContent = '🔗 Get Investor Link';
+    btn.disabled = false;
   }
 }
 
 function copyLink() {
   const inp = document.getElementById('shareUrl');
   inp.select();
+  const btn = document.getElementById('copyLinkBtn');
   navigator.clipboard.writeText(inp.value).then(() => {
-    const btn = document.querySelector('.copy-btn');
     const prev = btn.textContent;
     btn.textContent = '✓ Copied!';
-    setTimeout(() => btn.textContent = prev, 2000);
-  }).catch(() => document.execCommand('copy'));
+    btn.style.background = '#4caf50';
+    setTimeout(() => { btn.textContent = prev; btn.style.background = ''; }, 2200);
+  }).catch(() => { document.execCommand('copy'); });
 }
 
 // ─── Email Modal ──────────────────────────────────────────────────────────────
