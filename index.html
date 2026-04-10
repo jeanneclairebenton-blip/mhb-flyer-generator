@@ -1198,12 +1198,40 @@ let emailHtmlContent  = '';
 let emailPlainContent = '';
 let activeEmailTab    = 'html';
 
-function openEmailModal() {
+async function openEmailModal() {
+  // Show loading state on button
+  const emailBtn = document.getElementById('createEmailBtn');
+  const emailBtnOrig = emailBtn ? emailBtn.innerHTML : '';
+  if (emailBtn) { emailBtn.disabled = true; emailBtn.innerHTML = '<span style="opacity:.7">📤 Preparing email…</span>'; }
+
   // Sync fields from inputs
   FIELD_CONFIG.forEach(({key}) => {
     const el = document.getElementById('f_' + key);
     if (el) fields[key] = el.value;
   });
+
+  // ── Auto-upload photo to ImgBB so email uses external URL (no huge base64) ──
+  if (photoDataUrl && !fields.photoUrl && !(fields.emailPhotoLink && fields.emailPhotoLink !== '—')) {
+    try {
+      const base64 = photoDataUrl.replace(/^data:image\/\w+;base64,/, '');
+      const formData = new FormData();
+      formData.append('key', '0064878a2d14ca849e85be0380465c90');
+      formData.append('image', base64);
+      const imgResp = await fetch('https://api.imgbb.com/1/upload', {
+        method: 'POST',
+        body: formData,
+        signal: AbortSignal.timeout(20000)
+      });
+      if (imgResp.ok) {
+        const imgData = await imgResp.json();
+        if (imgData.success) fields.photoUrl = imgData.data.url;
+      }
+    } catch(e) {
+      console.warn('Photo upload for email failed, using base64:', e);
+    }
+  }
+
+  if (emailBtn) { emailBtn.disabled = false; emailBtn.innerHTML = emailBtnOrig; }
 
   const esc = s => (s||'—').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   const f   = fields;
@@ -1557,53 +1585,43 @@ function copyEmailText(type) {
     }, 2400);
   }
 
-  if (type === 'html') {
-    // Always include the photo — either external URL (best) or embedded base64
-    let payload = emailHtmlContent;
+  function showFallbackTextarea(text) {
+    // Create a visible textarea so user can Ctrl+A → Ctrl+C manually
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;';
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'width:100%;max-width:600px;height:300px;font-family:monospace;font-size:11px;padding:10px;border-radius:8px;';
+    const hint = document.createElement('p');
+    hint.style.cssText = 'color:#fff;margin-bottom:10px;font-size:14px;text-align:center;';
+    hint.textContent = 'Press Ctrl+A then Ctrl+C (or Cmd+A / Cmd+C on Mac) to copy, then close.';
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '✕ Close';
+    closeBtn.style.cssText = 'margin-top:10px;padding:8px 24px;background:#f5b731;border:none;border-radius:6px;font-weight:700;cursor:pointer;';
+    closeBtn.onclick = () => document.body.removeChild(overlay);
+    overlay.append(hint, ta, closeBtn);
+    document.body.appendChild(overlay);
+    ta.focus(); ta.select();
+  }
 
-    // Warn if the payload is very large (Zoho's 300k limit)
-    const usingBase64Photo = photoDataUrl && !(fields.emailPhotoLink && fields.emailPhotoLink !== '—');
-    if (usingBase64Photo && payload.length > 250000) {
-      const proceed = confirm(
-        '⚠️ This email is large (' + Math.round(payload.length/1000) + 'k chars) because the photo is embedded directly.\n\n' +
-        'Some email platforms like Zoho may reject it.\n\n' +
-        'Tip: Paste a photo URL into the "Property Photo URL (For Email)" field for a smaller email.\n\n' +
-        'Copy anyway?'
-      );
-      if (!proceed) return;
-    }
+  const payload = type === 'html' ? emailHtmlContent : emailPlainContent;
 
-    // Write as text/html so Gmail/Outlook paste it as rendered email, not raw code
+  // Try modern ClipboardItem (renders as HTML when pasted into email clients)
+  if (type === 'html' && typeof ClipboardItem !== 'undefined') {
     const blob = new Blob([payload], { type: 'text/html' });
     const item = new ClipboardItem({ 'text/html': blob });
     navigator.clipboard.write([item])
       .then(() => showSuccess('✓ Copied! Paste into your email'))
       .catch(() => {
-        // Fallback: plain text copy
+        // Fallback to plain writeText
         navigator.clipboard.writeText(payload)
-          .then(() => showSuccess('✓ HTML Copied (plain fallback)'))
-          .catch(() => {
-            const ta = document.createElement('textarea');
-            ta.value = payload;
-            document.body.appendChild(ta);
-            ta.select();
-            document.execCommand('copy');
-            ta.remove();
-            showSuccess('✓ Copied!');
-          });
+          .then(() => showSuccess('✓ Copied!'))
+          .catch(() => showFallbackTextarea(payload));
       });
   } else {
-    navigator.clipboard.writeText(emailPlainContent)
-      .then(() => showSuccess('✓ Text Copied!'))
-      .catch(() => {
-        const ta = document.createElement('textarea');
-        ta.value = emailPlainContent;
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        ta.remove();
-        showSuccess('✓ Copied!');
-      });
+    navigator.clipboard.writeText(payload)
+      .then(() => showSuccess(type === 'html' ? '✓ Copied! Paste into your email' : '✓ Text Copied!'))
+      .catch(() => showFallbackTextarea(payload));
   }
 }
 
