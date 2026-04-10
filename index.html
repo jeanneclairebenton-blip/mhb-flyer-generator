@@ -932,11 +932,23 @@ body{background:#e1dbcf;display:flex;justify-content:center;padding:24px;font-fa
     ${fields.occupancy && fields.occupancy.toLowerCase().includes('leaseback') && fields.leaseDeposit && fields.leaseDeposit !== '—' ? `<div class="info-row"><span class="info-lbl">Lease Deposit</span><span class="info-val">${esc(fields.leaseDeposit)}</span></div>` : ''}
   </div>
 
-  ${fields.showing && fields.showing !== '—' ? `
+  ${(() => {
+    const isFCFS = /fcfs/i.test(fields.propType || '');
+    if (isFCFS && fields.buyNow && fields.buyNow !== '—') {
+      return `
+  <div class="showing-center">
+    <div class="showing-label">Buy It Now</div>
+    <div class="showing-date">${esc(fields.buyNow)}</div>
+  </div>`;
+    } else if (!isFCFS && fields.showing && fields.showing !== '—') {
+      return `
   <div class="showing-center">
     <div class="showing-label">Showing</div>
     <div class="showing-date">${esc(fields.showing)}</div>
-  </div>` : ''}
+  </div>`;
+    }
+    return '';
+  })()} 
 
   ${fields.description && fields.description !== '—' ? `
   <div class="section-header">Description</div>
@@ -959,6 +971,17 @@ body{background:#e1dbcf;display:flex;justify-content:center;padding:24px;font-fa
   </div>` : ''}
 
   <div class="section-header">Terms &amp; Conditions</div>
+  ${(() => {
+    const isFCFS = /fcfs/i.test(fields.propType || '');
+    if (isFCFS) return `
+  <div class="terms-block"><div class="terms-grid">
+    <div>$5,000 deposit due within the hour upon acceptance</div>
+    <div>Cashier's check or wire</div>
+    <div>Deposit is non-refundable if you are unable to perform</div>
+    <div>Deposit is refundable if Myers Home Buyers is unable to perform, including if title does not clear</div>
+    <div>All closings are done through a double closing process, buyers are responsible for closing fees</div>
+  </div></div>`;
+    return `
   <div class="terms-block"><div class="terms-grid">
     <div>One time, one hour showing</div>
     <div>$5,000 deposit on acceptance</div>
@@ -966,7 +989,8 @@ body{background:#e1dbcf;display:flex;justify-content:center;padding:24px;font-fa
     <div>Cashier's check or wire</div>
     <div>Offers due within 30 min</div>
     <div>Double close — buyers pay fees</div>
-  </div></div>
+  </div></div>`;
+  })()}
 
   <div class="cta-block">
     <a class="pill-btn" href="${(fields.driveLink||'#').replace(/"/g,'&quot;')}" target="_blank">More Info</a>
@@ -1319,12 +1343,21 @@ function openEmailModal() {
     </tr></table>` : ''}
   </td></tr>
 
-  <!-- ── SHOWING ── -->
-  ${f.showing && f.showing !== '—' ? `
+  <!-- ── SHOWING / FCFS BUY IT NOW ── -->
+  ${(() => {
+    const isFCFS = /fcfs/i.test(f.propType || '');
+    if (isFCFS && f.buyNow && f.buyNow !== '—') return `
+  <tr><td style="background:#FFF8E7;padding:20px 24px;text-align:center;border-top:1px solid #F1D9A7;border-bottom:1px solid #F1D9A7;margin-top:-1px;">
+    <div style="font-size:11px;font-weight:700;color:#D6A327;text-transform:uppercase;letter-spacing:4px;margin-bottom:8px;">Buy It Now</div>
+    <div style="font-size:22px;font-weight:800;color:#111;">${esc(f.buyNow)}</div>
+  </td></tr>`;
+    if (!isFCFS && f.showing && f.showing !== '—') return `
   <tr><td style="background:#FFF8E7;padding:20px 24px;text-align:center;border-top:1px solid #F1D9A7;border-bottom:1px solid #F1D9A7;margin-top:-1px;">
     <div style="font-size:11px;font-weight:700;color:#D6A327;text-transform:uppercase;letter-spacing:4px;margin-bottom:8px;">Showing</div>
     <div style="font-size:22px;font-weight:800;color:#111;">${esc(f.showing)}</div>
-  </td></tr>` : ''}
+  </td></tr>`;
+    return '';
+  })()} 
 
   <!-- ── DESCRIPTION ── -->
   ${f.description && f.description !== '—' ? `
@@ -1353,21 +1386,43 @@ function openEmailModal() {
   </td></tr>` : ''}
 
   <!-- ── TERMS ── -->
+  ${(() => {
+    const isFCFS = /fcfs/i.test(f.propType || '');
+    const dot = `<span style="color:#D6A327;font-size:14px;font-weight:bold;">•</span>`;
+    const item = (txt) => `<div style="font-size:11px;color:#444;line-height:1.7;margin-bottom:6px;">${dot} ${txt}</div>`;
+    const header = `<div style="font-size:11px;font-weight:800;color:#999;text-transform:uppercase;letter-spacing:3px;margin-bottom:12px;">Terms &amp; Conditions</div>`;
+    if (isFCFS) return `
   <tr><td style="padding:24px;border-bottom:1px solid #e1dbcf;">
-    <div style="font-size:11px;font-weight:800;color:#999;text-transform:uppercase;letter-spacing:3px;margin-bottom:12px;">Terms &amp; Conditions</div>
+    ${header}
     <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
       <td width="50%" valign="top" style="padding-right:10px;">
-        <div style="font-size:11px;color:#444;line-height:1.7;margin-bottom:6px;"><span style="color:#D6A327;font-size:14px;font-weight:bold;">•</span> One time, one hour showing</div>
-        <div style="font-size:11px;color:#444;line-height:1.7;margin-bottom:6px;"><span style="color:#D6A327;font-size:14px;font-weight:bold;">•</span> Bring your contractor</div>
-        <div style="font-size:11px;color:#444;line-height:1.7;margin-bottom:6px;"><span style="color:#D6A327;font-size:14px;font-weight:bold;">•</span> Offers due within 30 min</div>
+        ${item('$5,000 deposit due within the hour upon acceptance')}
+        ${item('Cashier\'s check or wire')}
+        ${item('Deposit is non-refundable if you are unable to perform')}
       </td>
       <td width="50%" valign="top">
-        <div style="font-size:11px;color:#444;line-height:1.7;margin-bottom:6px;"><span style="color:#D6A327;font-size:14px;font-weight:bold;">•</span> $5,000 deposit on acceptance</div>
-        <div style="font-size:11px;color:#444;line-height:1.7;margin-bottom:6px;"><span style="color:#D6A327;font-size:14px;font-weight:bold;">•</span> Cashier's check or wire</div>
-        <div style="font-size:11px;color:#444;line-height:1.7;margin-bottom:6px;"><span style="color:#D6A327;font-size:14px;font-weight:bold;">•</span> Double close — buyers pay fees</div>
+        ${item('Deposit is refundable if Myers Home Buyers is unable to perform, including if title does not clear')}
+        ${item('All closings are done through a double closing process, buyers are responsible for closing fees')}
       </td>
     </tr></table>
-  </td></tr>
+  </td></tr>`;
+    return `
+  <tr><td style="padding:24px;border-bottom:1px solid #e1dbcf;">
+    ${header}
+    <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+      <td width="50%" valign="top" style="padding-right:10px;">
+        ${item('One time, one hour showing')}
+        ${item('Bring your contractor')}
+        ${item('Offers due within 30 min')}
+      </td>
+      <td width="50%" valign="top">
+        ${item('$5,000 deposit on acceptance')}
+        ${item('Cashier\'s check or wire')}
+        ${item('Double close — buyers pay fees')}
+      </td>
+    </tr></table>
+  </td></tr>`;
+  })()}
 
   <!-- ── MORE INFO CTA ── -->
   <tr><td align="center" style="padding:24px;background:#fcfbf9;border-bottom:1px solid #e1dbcf;">
@@ -1412,7 +1467,7 @@ function openEmailModal() {
     plain('Est. Monthly Rent:',f.rent),
     line,
     '',
-    f.showing && f.showing !== '—' ? `Showing: ${f.showing}` : '',
+    (() => { const isFCFS = /fcfs/i.test(f.propType||''); return isFCFS && f.buyNow && f.buyNow !== '—' ? `Buy It Now: ${f.buyNow}` : (!isFCFS && f.showing && f.showing !== '—' ? `Showing: ${f.showing}` : ''); })(),
     plain('Closing Date:',      f.closingDate),
     plain('Occupancy at Close:',f.occupancy),
     f.occupancy && f.occupancy.toLowerCase().includes('leaseback') && f.leaseEndDate && f.leaseEndDate !== '—' ? plain('Lease End Date:', f.leaseEndDate) : '',
@@ -1426,14 +1481,22 @@ function openEmailModal() {
     '',
     line,
     'TERMS & CONDITIONS',
-    '• One time, one hour showing',
-    '• You may bring your contractor',
-    '• Offers due within 30 minutes of end of showing',
-    '• $5,000 deposit due within the hour upon acceptance',
-    '• Cashier\'s check or wire',
-    '• Deposit is non-refundable if you cannot perform',
-    '• Deposit is refundable if Myers Home Buyers cannot perform, including if title does not clear',
-    '• All closings via double closing; buyers responsible for closing fees',
+    ...(/fcfs/i.test(f.propType||'') ? [
+      '• $5,000 deposit due within the hour upon acceptance',
+      '• Cashier\'s check or wire',
+      '• Deposit is non-refundable if you are unable to perform',
+      '• Deposit is refundable if Myers Home Buyers is unable to perform, including if title does not clear',
+      '• All closings are done through a double closing process, buyers are responsible for closing fees',
+    ] : [
+      '• One time, one hour showing',
+      '• You may bring your contractor',
+      '• Offers due within 30 minutes of end of showing',
+      '• $5,000 deposit due within the hour upon acceptance',
+      '• Cashier\'s check or wire',
+      '• Deposit is non-refundable if you cannot perform',
+      '• Deposit is refundable if Myers Home Buyers cannot perform, including if title does not clear',
+      '• All closings via double closing; buyers responsible for closing fees',
+    ]),
     line,
     '',
     driveHref ? `More Info / Photos: ${driveHref}` : '',
