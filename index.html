@@ -1258,6 +1258,15 @@ async function openEmailModal() {
     ? (addrParts.length > 1 ? esc(addrParts.slice(1).join(',').trim()) : 'Address Withheld (Unverified)')
     : esc(f.address);
 
+  // ── Build Subject Line ────────────────────────────────────────────────────
+  const shortAddressEsc = esc(addrParts.length > 1 ? addrParts.slice(1).join(',').trim() : f.address);
+  let subjectLine = '';
+  if (isUnverified) {
+    subjectLine = `${shortAddressEsc} | ${esc(f.beds)} Bed / ${esc(f.baths)} Bath | ARV ${esc(f.arv)} | Starting ${esc(f.startingPrice)}`;
+  } else {
+    subjectLine = `${shortAddressEsc} | ${esc(f.beds)} Bed / ${esc(f.baths)} Bath | ${esc(f.sqft)} Sqft | Built ${esc(f.yearBuilt)} | ARV ${esc(f.arv)} | Starting ${esc(f.startingPrice)}`;
+  }
+
   // ── Build HTML email ──────────────────────────────────────────────────────
   const driveHref = (f.driveLink && f.driveLink !== '#' && f.driveLink !== '—') ? f.driveLink : null;
   const roofLine  = [f.roof, f.foundation, f.hvac].filter(v => v && v !== '—').join(' · ') || null;
@@ -1280,6 +1289,11 @@ async function openEmailModal() {
 <body style="margin:0;padding:24px 0;background:#e1dbcf;font-family:'Inter',Arial,sans-serif;">
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#e1dbcf;">
 <tr><td align="center" style="padding:0 16px;">
+
+<div style="max-width:560px;width:100%;text-align:left;font-family:'Inter',Arial,sans-serif;font-size:14px;color:#333;margin-bottom:12px;background:#fff;padding:12px 16px;border:1px dashed #bbb;border-radius:6px;">
+  <strong>Subject:</strong> ${subjectLine}<br>
+  <span style="font-size:11px;color:#888;">(Cut the subject line above and paste it into your email's Subject field)</span>
+</div>
 
 <table width="560" cellpadding="0" cellspacing="0" border="0"
   style="max-width:560px;width:100%;background:#fff;border:1px solid #d4ceb8;color:#111;">
@@ -1500,8 +1514,11 @@ async function openEmailModal() {
   const plain = (label, val) => `${label.padEnd(22,' ')} ${val||'—'}`;
   
   const displayAddressText = displayAddress.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+  const subjectLineText = subjectLine.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
 
   emailPlainContent = [
+    `Subject: ${subjectLineText}`,
+    '',
     'MYERS HOME BUYERS — NEW INVESTMENT PROPERTY',
     line,
     '',
