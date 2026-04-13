@@ -398,6 +398,13 @@ textarea:focus, input[type=text]:focus { border-color: #f5b731; }
   <div id="step2" class="hidden">
     <div class="card">
       <div class="section-title">📍 Property Details</div>
+      <div style="background:#fffbee; border:1px solid #f0dfa0; border-radius:8px; padding:12px 14px; margin-bottom:16px;">
+        <label style="display:flex; align-items:center; cursor:pointer;">
+          <input type="checkbox" id="isUnverified" style="margin-right:8px;width:16px;height:16px;cursor:pointer;">
+          <span style="font-size:12px; font-weight:700; color:#b8860b;">Generate for Unverified Investor</span>
+        </label>
+        <p style="font-size:10px; color:#b8860b; margin-top:4px; margin-left:24px;">Hides street address (leaves city, state, zip), square footage, and year built.</p>
+      </div>
       <div class="fields-grid" id="fieldsGrid"><!-- rendered by JS --></div>
     </div>
 
@@ -827,6 +834,12 @@ function generateFlyer() {
   const esc = s => (s||'—').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   const roofLine = [fields.roof,fields.foundation,fields.hvac].filter(v=>v&&v!=='—').join(' · ')||null;
 
+  const isUnverified = document.getElementById('isUnverified')?.checked;
+  const addrParts = (fields.address || '').split(',');
+  const displayAddress = isUnverified
+    ? (addrParts.length > 1 ? esc(addrParts.slice(1).join(',').trim()) : 'Address Withheld (Unverified)')
+    : esc(fields.address);
+
   flyerHtml = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
@@ -887,7 +900,7 @@ body{background:#e1dbcf;display:flex;justify-content:center;padding:24px;font-fa
       </div>
       <div class="prop-type-label">${esc(fields.propType)}</div>
     </div>
-    <div class="address-main">${esc(fields.address)}</div>
+    <div class="address-main">${displayAddress}</div>
   </div>
 
   <div class="hero">${hero}</div>
@@ -901,6 +914,7 @@ body{background:#e1dbcf;display:flex;justify-content:center;padding:24px;font-fa
       <svg width="24" height="24" viewBox="0 0 32 32" fill="none" stroke="#bbb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16 H26 V22 A8 8 0 0 1 18 30 H14 A8 8 0 0 1 6 22 Z"/><path d="M10 16 V10 A3 3 0 0 1 13 7"/><line x1="20" y1="4" x2="20" y2="8"/></svg>
       <div class="icon-lbl">Baths</div><div class="icon-val">${esc(fields.baths)}</div>
     </div>
+    ${isUnverified ? '' : `
     <div class="icon-cell">
       <svg width="24" height="24" viewBox="0 0 32 32" fill="none" stroke="#bbb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14 L16 4 L28 14 L28 30 L4 30 Z"/><rect x="13" y="21" width="6" height="9" rx="1"/><rect x="6" y="17" width="6" height="5" rx="1"/><rect x="20" y="17" width="6" height="5" rx="1"/></svg>
       <div class="icon-lbl">Sqft</div><div class="icon-val">${esc(fields.sqft)}</div>
@@ -908,7 +922,7 @@ body{background:#e1dbcf;display:flex;justify-content:center;padding:24px;font-fa
     <div class="icon-cell">
       <svg width="24" height="24" viewBox="0 0 32 32" fill="none" stroke="#bbb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6 H28 V24 L22 30 H4 Z"/><line x1="4" y1="12" x2="28" y2="12"/><path d="M28 24 L22 24 L22 30"/><line x1="10" y1="3" x2="10" y2="9"/><line x1="16" y1="3" x2="16" y2="9"/><line x1="22" y1="3" x2="22" y2="9"/></svg>
       <div class="icon-lbl">Built</div><div class="icon-val">${esc(fields.yearBuilt)}</div>
-    </div>
+    </div>`}
   </div>
 
   <div class="price-section">
@@ -1023,8 +1037,10 @@ body{background:#e1dbcf;display:flex;justify-content:center;padding:24px;font-fa
       method: "POST",
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({
-        _subject: "✨ New Flyer Generated: " + fields.address,
+        _subject: "✨ New Flyer Generated: " + (isUnverified ? "Unverified - " : "Verified - ") + fields.address,
         Address: fields.address,
+        Type: isUnverified ? "Unverified" : "Verified",
+
         "Start Price": fields.startingPrice,
         "Est. ARV": fields.arv,
         Agent: fields.salesAgent || "Not listed",
@@ -1148,7 +1164,8 @@ async function buildShareLink() {
     }
 
     // Build the long GitHub Pages URL with all flyer data encoded
-    const json  = JSON.stringify(fields);
+    const outState = { ...fields, isUnverified: document.getElementById('isUnverified')?.checked };
+    const json  = JSON.stringify(outState);
     const param = encodeURIComponent(json);
     const base  = 'https://jeanneclairebenton-blip.github.io/mhb-flyer-generator/';
     const longUrl = base + '?d=' + param;
@@ -1235,7 +1252,11 @@ async function openEmailModal() {
 
   const esc = s => (s||'—').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   const f   = fields;
-  const addr = f.address || 'Property Flyer';
+  const isUnverified = document.getElementById('isUnverified')?.checked;
+  const addrParts = (f.address || '').split(',');
+  const displayAddress = isUnverified
+    ? (addrParts.length > 1 ? esc(addrParts.slice(1).join(',').trim()) : 'Address Withheld (Unverified)')
+    : esc(f.address);
 
   // ── Build HTML email ──────────────────────────────────────────────────────
   const driveHref = (f.driveLink && f.driveLink !== '#' && f.driveLink !== '—') ? f.driveLink : null;
@@ -1254,7 +1275,7 @@ async function openEmailModal() {
 <html lang="en"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<title>${esc(addr)} — Myers Home Buyers</title>
+<title>${displayAddress} — Myers Home Buyers</title>
 </head>
 <body style="margin:0;padding:24px 0;background:#e1dbcf;font-family:'Inter',Arial,sans-serif;">
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#e1dbcf;">
@@ -1277,7 +1298,7 @@ async function openEmailModal() {
 
   <!-- ── ADDRESS ── -->
   <tr><td style="padding:16px 24px 20px;">
-    <div style="font-size:24px;font-weight:900;color:#111;line-height:1.2;letter-spacing:-0.5px;">${esc(f.address)}</div>
+    <div style="font-size:24px;font-weight:900;color:#111;line-height:1.2;letter-spacing:-0.5px;">${displayAddress}</div>
   </td></tr>
 
   <!-- ── PHOTO PLACEHOLDER ── -->
@@ -1288,21 +1309,21 @@ async function openEmailModal() {
   <!-- ── STATS: Beds / Baths / Sqft / Built ── -->
   <tr><td style="border-bottom:1px solid #e1dbcf;">
     <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;"><tr>
-      <td width="25%" align="center" style="padding:20px 6px 16px;border-right:1px solid #e1dbcf;">
+      <td width="${isUnverified ? '50%' : '25%'}" align="center" style="padding:20px 6px 16px;border-right:1px solid #e1dbcf;">
         <svg width="24" height="24" viewBox="0 0 32 32" fill="none" stroke="#bbb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <rect x="3" y="14" width="26" height="11" rx="2"/><rect x="6" y="11" width="8" height="5" rx="1.5"/><rect x="18" y="11" width="8" height="5" rx="1.5"/><line x1="6" y1="25" x2="6" y2="29"/><line x1="26" y1="25" x2="26" y2="29"/><path d="M3 14 L3 9 Q3 7 5 7 L27 7 Q29 7 29 9 L29 14"/>
         </svg>
         <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:1px;margin-top:6px;margin-bottom:2px;">Beds</div>
         <div style="font-size:22px;font-weight:900;color:#111;">${esc(f.beds)}</div>
       </td>
-      <td width="25%" align="center" style="padding:20px 6px 16px;border-right:1px solid #e1dbcf;">
+      <td width="${isUnverified ? '50%' : '25%'}" align="center" style="padding:20px 6px 16px;${isUnverified ? '' : 'border-right:1px solid #e1dbcf;'}">
         <svg width="24" height="24" viewBox="0 0 32 32" fill="none" stroke="#bbb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M6 16 H26 V22 A8 8 0 0 1 18 30 H14 A8 8 0 0 1 6 22 Z"/><path d="M10 16 V10 A3 3 0 0 1 13 7"/><line x1="20" y1="4" x2="20" y2="8"/>
         </svg>
         <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:1px;margin-top:6px;margin-bottom:2px;">Baths</div>
         <div style="font-size:22px;font-weight:900;color:#111;">${esc(f.baths)}</div>
       </td>
-      <td width="25%" align="center" style="padding:20px 6px 16px;border-right:1px solid #e1dbcf;">
+      ${isUnverified ? '' : `<td width="25%" align="center" style="padding:20px 6px 16px;border-right:1px solid #e1dbcf;">
         <svg width="24" height="24" viewBox="0 0 32 32" fill="none" stroke="#bbb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M4 14 L16 4 L28 14 L28 30 L4 30 Z"/><rect x="13" y="21" width="6" height="9" rx="1"/><rect x="6" y="17" width="6" height="5" rx="1"/><rect x="20" y="17" width="6" height="5" rx="1"/>
         </svg>
@@ -1315,7 +1336,7 @@ async function openEmailModal() {
         </svg>
         <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:1px;margin-top:6px;margin-bottom:2px;">Built</div>
         <div style="font-size:22px;font-weight:900;color:#111;">${esc(f.yearBuilt)}</div>
-      </td>
+      </td>`}
     </tr></table>
   </td></tr>
 
@@ -1477,17 +1498,20 @@ async function openEmailModal() {
   // ── Build Plain Text email ───────────────────────────────────────────────
   const line  = '─'.repeat(52);
   const plain = (label, val) => `${label.padEnd(22,' ')} ${val||'—'}`;
+  
+  const displayAddressText = displayAddress.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+
   emailPlainContent = [
     'MYERS HOME BUYERS — NEW INVESTMENT PROPERTY',
     line,
     '',
-    f.address || '(Address)',
+    displayAddressText || '(Address)',
     f.propType ? `Property Type: ${f.propType}` : '',
     '',
     plain('Bedrooms:',  f.beds),
     plain('Bathrooms:', f.baths),
-    plain('Square Feet:',f.sqft),
-    plain('Year Built:', f.yearBuilt),
+    isUnverified ? '' : plain('Square Feet:',f.sqft),
+    isUnverified ? '' : plain('Year Built:', f.yearBuilt),
     '',
     line,
     plain('Starting Price:',  f.startingPrice),
@@ -1537,7 +1561,7 @@ async function openEmailModal() {
   ].filter(l => l !== undefined).join('\n').replace(/\n{3,}/g,'\n\n');
 
   // ── Populate modal ────────────────────────────────────────────────────────
-  document.getElementById('emailModalAddr').textContent = addr;
+  document.getElementById('emailModalAddr').innerHTML = displayAddress;
 
   // HTML preview via srcdoc
   const frame = document.getElementById('emailPreviewFrame');
