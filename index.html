@@ -1,1706 +1,851 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Myers Home Buyers — Flyer Generator</title>
-<meta name="description" content="Free property flyer generator for Myers Home Buyers. No account required. Paste listing details, customize fields, download a PDF or share a link.">
-<!-- Google Fonts -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
-<style media="print">
-  /* When printing the flyer page, hide browser chrome */
-  @page { margin: 0; }
-  body { margin: 0; }
-</style>
-<style>
-/* ────────── Reset & Base ────────── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-body {
-  font-family: 'Inter', Arial, sans-serif;
-  background: #f4f2ee;
-  min-height: 100vh;
-  color: #1a1a2e;
-}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flyer Generator</title>
+  <meta name="description" content="Generate, share, and download beautiful flyers in seconds." />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
 
-/* ────────── App Header ────────── */
-.app-header {
-  background: #1a1a2e;
-  padding: 12px 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: sticky; top: 0; z-index: 100;
-  box-shadow: 0 2px 12px rgba(0,0,0,.35);
-}
-.app-header img { height: 32px; }
-.app-header-right { display: flex; align-items: center; gap: 12px; }
-.app-header span {
-  color: #f5b731; font-size: 10px;
-  letter-spacing: 2px; text-transform: uppercase; font-weight: 700;
-}
-.btn-start-over {
-  background: transparent; color: #f5b731;
-  border: 1.5px solid #f5b731; padding: 6px 16px;
-  border-radius: 20px; font-size: 11px; font-weight: 700;
-  cursor: pointer; letter-spacing: .5px; text-transform: uppercase;
-  display: none; transition: all .2s;
-}
-.btn-start-over:hover { background: #f5b731; color: #1a1a2e; }
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* ────────── Step Bar ────────── */
-.step-bar {
-  background: #fff;
-  border-bottom: 1px solid #e8e0d0;
-  padding: 12px 24px;
-  display: flex; gap: 28px; align-items: center;
-}
-.step { display: flex; align-items: center; gap: 8px; }
-.step-num {
-  width: 26px; height: 26px; border-radius: 50%;
-  background: #eee; color: #aaa;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 11px; font-weight: 700; transition: all .3s;
-}
-.step-num.active { background: #f5b731; color: #1a1a2e; }
-.step-num.done   { background: #4caf50; color: #fff; }
-.step-label { font-size: 12px; color: #aaa; font-weight: 500; }
-.step-label.active { color: #1a1a2e; font-weight: 700; }
-.step-sep { flex: 1; height: 1px; background: #e0d8cc; }
+    :root {
+      --bg: #0a0a14;
+      --surface: rgba(255,255,255,0.04);
+      --border: rgba(255,255,255,0.10);
+      --accent: #6c63ff;
+      --accent2: #43e97b;
+      --text: #e8e8f0;
+      --muted: #888;
+      --radius: 16px;
+    }
 
-/* ────────── Layout ────────── */
-.container  { max-width: 880px; margin: 0 auto; padding: 22px 16px 60px; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
 
-/* ────────── Cards / Sections ────────── */
-.card {
-  background: #fff;
-  border: 1px solid #e8e0d0; border-radius: 12px;
-  padding: 22px 24px; margin-bottom: 16px;
-  box-shadow: 0 2px 8px rgba(0,0,0,.04);
-}
-.card-gold  { border-color: #f5b731; }
-.section-title {
-  font-size: 10px; font-weight: 800; color: #f5b731;
-  letter-spacing: 1.8px; text-transform: uppercase; margin-bottom: 12px;
-}
+    /* ── animated gradient orbs ── */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(90px);
+      opacity: 0.18;
+      pointer-events: none;
+      animation: float 12s ease-in-out infinite;
+    }
+    .orb-1 { width: 480px; height: 480px; background: #6c63ff; top: -80px; left: -100px; animation-delay: 0s; }
+    .orb-2 { width: 360px; height: 360px; background: #43e97b; bottom: -60px; right: -60px; animation-delay: -5s; }
+    .orb-3 { width: 260px; height: 260px; background: #f093fb; top: 40%; right: 20%; animation-delay: -9s; }
 
-/* ────────── Tip Box ────────── */
-.tip {
-  background: #fff9e6; border: 1.5px solid #f5b731; border-radius: 10px;
-  padding: 13px 16px; font-size: 13px; color: #7a5c00;
-  line-height: 1.7; margin-bottom: 16px;
-}
+    @keyframes float {
+      0%,100% { transform: translateY(0) scale(1); }
+      50%      { transform: translateY(-30px) scale(1.05); }
+    }
 
-/* ────────── Inputs ────────── */
-textarea, input[type=text] {
-  width: 100%; padding: 11px 13px;
-  border: 1.5px solid #ddd; border-radius: 8px;
-  font-size: 12px; font-family: 'Inter', monospace;
-  outline: none; color: #333; background: #fff;
-  resize: vertical; transition: border-color .2s;
-}
-textarea:focus, input[type=text]:focus { border-color: #f5b731; }
-.char-count {
-  font-size: 11px; color: #bbb;
-  margin-top: 6px; display: flex; justify-content: space-between;
-}
+    /* ── header ── */
+    header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(10,10,20,0.75);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 28px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    header .logo {
+      font-weight: 800; font-size: 1.15rem;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    header .sub { color: var(--muted); font-size: 0.8rem; }
 
-/* ────────── Buttons ────────── */
-.btn-gold {
-  background: #f5b731; color: #1a1a2e;
-  border: none; padding: 14px 52px;
-  border-radius: 40px; font-size: 15px; font-weight: 900;
-  cursor: pointer; letter-spacing: 1px; text-transform: uppercase;
-  transition: transform .15s, box-shadow .15s;
-  box-shadow: 0 4px 16px rgba(245,183,49,.35);
-}
-.btn-gold:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245,183,49,.5); }
-.btn-gold:disabled { background: #eee; color: #bbb; cursor: not-allowed; box-shadow: none; }
-.btn-dark {
-  background: #1a1a2e; color: #fff;
-  border: none; padding: 11px 24px;
-  border-radius: 30px; font-size: 13px; font-weight: 700;
-  cursor: pointer; transition: opacity .2s;
-}
-.btn-dark:hover { opacity: .82; }
-.btn-outline {
-  background: #fff; color: #888;
-  border: 1.5px solid #ddd; padding: 8px 18px;
-  border-radius: 24px; font-size: 12px; font-weight: 600;
-  cursor: pointer; transition: border-color .2s, color .2s;
-}
-.btn-outline:hover { border-color: #aaa; color: #555; }
+    /* ── main layout ── */
+    .app-shell {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      min-height: calc(100vh - 57px);
+    }
 
-/* ────────── Field Grid ────────── */
-.fields-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px 20px;
-}
-.field-full { grid-column: 1 / -1; }
-.field-label {
-  font-size: 10px; font-weight: 700; color: #999;
-  letter-spacing: 1.2px; text-transform: uppercase; margin-bottom: 4px;
-}
-.field-input {
-  width: 100%; padding: 8px 10px;
-  border: 1.5px solid #e0dbd0; border-radius: 6px;
-  font-size: 12px; outline: none; color: #1a1a2e;
-  background: #fff; font-family: 'Inter', Arial, sans-serif;
-  transition: border-color .2s;
-}
-.field-input:focus { border-color: #f5b731; }
-.field-textarea {
-  width: 100%; padding: 8px 10px;
-  border: 1.5px solid #e0dbd0; border-radius: 6px;
-  font-size: 12px; outline: none; color: #1a1a2e;
-  background: #fff; font-family: 'Inter', Arial, sans-serif;
-  resize: vertical; min-height: 80px;
-  transition: border-color .2s;
-}
-.field-textarea:focus { border-color: #f5b731; }
+    /* ── controls panel ── */
+    .panel {
+      background: rgba(255,255,255,0.03);
+      border-right: 1px solid var(--border);
+      padding: 24px;
+      overflow-y: auto;
+      display: flex; flex-direction: column; gap: 20px;
+    }
 
-/* ────────── Photo Drop ────────── */
-.photo-drop {
-  border: 2px dashed #ddd; border-radius: 10px; cursor: pointer;
-  height: 110px; display: flex; align-items: center; justify-content: center;
-  text-align: center; color: #bbb; font-size: 12px;
-  transition: all .2s; position: relative; overflow: hidden; background: #fafafa;
-}
-.photo-drop.has-photo { height: 190px; border-color: #4caf50; }
-.photo-drop.dragging   { border-color: #f5b731; background: #fffbee; }
-.photo-drop img { width: 100%; height: 100%; object-fit: cover; }
-.photo-drop-inner { display: flex; flex-direction: column; align-items: center; gap: 6px; }
-.photo-drop-inner svg { color: #ccc; }
-.remove-photo {
-  position: absolute; top: 8px; right: 8px;
-  background: rgba(0,0,0,.55); color: #fff;
-  border: none; border-radius: 20px; padding: 4px 10px;
-  font-size: 11px; cursor: pointer; font-weight: 700;
-}
+    .section-title {
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--accent);
+      margin-bottom: 10px;
+    }
 
-/* ────────── Action Cards (Step 3) ────────── */
-.actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px; }
-.action-card  { border-radius: 10px; padding: 18px 20px; text-align: center; }
-.action-card.yellow { background: #fffbee; border: 1.5px solid #f0dfa0; }
-.action-card.blue   { background: #f0f4ff; border: 1.5px solid #dde5ff; }
-.action-title { font-size: 10px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; margin-bottom: 6px; }
-.action-card.yellow .action-title { color: #b8860b; }
-.action-card.blue   .action-title { color: #3a4a8a; }
-.action-desc  { font-size: 11px; color: #aaa; margin-bottom: 12px; line-height: 1.6; }
-.action-btn {
-  width: 100%; padding: 12px 24px; border-radius: 30px;
-  font-size: 13px; font-weight: 900; cursor: pointer; border: none;
-}
-.secondary-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    label { font-size: 0.8rem; color: var(--muted); font-weight: 500; }
 
-/* ────────── Email Modal ────────── */
-.modal-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,.55);
-  display: flex; align-items: center; justify-content: center;
-  z-index: 9999; padding: 16px;
-  backdrop-filter: blur(3px);
-  animation: fadeIn .2s ease;
-}
-@keyframes fadeIn { from { opacity:0 } to { opacity:1 } }
-.modal-box {
-  background: #fff; border-radius: 16px;
-  width: 100%; max-width: 660px;
-  max-height: 90vh; display: flex; flex-direction: column;
-  box-shadow: 0 24px 80px rgba(0,0,0,.28);
-  animation: slideUp .25s ease;
-}
-@keyframes slideUp { from { transform:translateY(24px);opacity:0 } to { transform:translateY(0);opacity:1 } }
-.modal-header {
-  padding: 20px 24px 16px;
-  border-bottom: 1px solid #eee;
-  display: flex; align-items: center; justify-content: space-between;
-}
-.modal-header h2 { font-size: 16px; font-weight: 800; color: #1a1a2e; }
-.modal-header p  { font-size: 11px; color: #aaa; margin-top: 2px; }
-.modal-close {
-  background: #f4f2ee; border: none; border-radius: 50%;
-  width: 32px; height: 32px; cursor: pointer;
-  font-size: 18px; color: #888; display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0; transition: background .15s;
-}
-.modal-close:hover { background: #eee; color: #333; }
-.modal-tabs {
-  display: flex; gap: 0; padding: 12px 24px 0;
-  border-bottom: 1px solid #eee;
-}
-.modal-tab {
-  padding: 8px 18px; font-size: 12px; font-weight: 700;
-  cursor: pointer; border: none; background: none; color: #aaa;
-  border-bottom: 2px solid transparent; margin-bottom: -1px;
-  transition: color .15s, border-color .15s;
-}
-.modal-tab.active { color: #1a1a2e; border-bottom-color: #f5b731; }
-.modal-body { flex: 1; overflow-y: auto; padding: 20px 24px; }
-.email-preview-frame {
-  border: 1.5px solid #e8e0d0; border-radius: 8px;
-  background: #f8f7f4; overflow: auto;
-  max-height: 380px; padding: 0;
-}
-.email-preview-frame iframe { width: 100%; border: none; display: block; }
-.email-plain {
-  font-family: 'Inter', monospace; font-size: 11.5px; color: #444;
-  line-height: 1.8; white-space: pre-wrap; word-break: break-word;
-  background: #f8f7f4; border: 1.5px solid #e8e0d0;
-  border-radius: 8px; padding: 16px; max-height: 380px;
-  overflow-y: auto;
-}
-.modal-footer {
-  padding: 16px 24px;
-  border-top: 1px solid #eee;
-  display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
-}
-.modal-footer-hint { font-size: 11px; color: #bbb; flex: 1; }
-.btn-email {
-  background: #1a1a2e; color: #f5b731;
-  border: none; padding: 11px 22px;
-  border-radius: 30px; font-size: 13px; font-weight: 700;
-  cursor: pointer; transition: opacity .2s; white-space: nowrap;
-}
-.btn-email:hover { opacity: .82; }
-.btn-email-outline {
-  background: #fff; color: #1a1a2e;
-  border: 1.5px solid #ddd; padding: 11px 22px;
-  border-radius: 30px; font-size: 13px; font-weight: 700;
-  cursor: pointer; transition: border-color .2s;
-}
-.btn-email-outline:hover { border-color: #aaa; }
-.btn-create-email {
-  background: linear-gradient(135deg,#1a1a2e,#2d2d5e);
-  color: #f5b731;
-  border: none; padding: 14px 28px;
-  border-radius: 40px; font-size: 14px; font-weight: 900;
-  cursor: pointer; letter-spacing: .5px;
-  transition: transform .15s, box-shadow .15s;
-  box-shadow: 0 4px 16px rgba(26,26,46,.25);
-  display: flex; align-items: center; gap: 8px;
-}
-.btn-create-email:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(26,26,46,.35); }
-.copied-badge {
-  background: #4caf50; color: #fff;
-  font-size: 11px; font-weight: 700; padding: 2px 8px;
-  border-radius: 12px; margin-left: 6px;
-  animation: fadeIn .2s ease;
-}
-@media (max-width: 600px) {
-  .modal-box { max-height: 95vh; }
-  .modal-footer { flex-direction: column; }
-  .btn-email, .btn-email-outline { width: 100%; text-align: center; }
-}
+    input[type=text], input[type=url], input[type=number], textarea, select {
+      width: 100%;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.875rem;
+      padding: 9px 13px;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--accent);
+      background: rgba(108,99,255,0.08);
+    }
+    textarea { resize: vertical; min-height: 80px; }
+    select option { background: #1a1a2e; }
 
-/* ────────── Share Link ────────── */
-.share-box {
-  background: #f8f7f4; border: 1.5px solid #e0dbd0; border-radius: 8px;
-  padding: 12px 14px; margin-top: 12px;
-}
-.share-box label { font-size: 10px; color: #999; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; display: block; margin-bottom: 6px; }
-.share-row { display: flex; gap: 8px; align-items: center; }
-.share-row input {
-  flex: 1; font-size: 11px; color: #555; background: #fff;
-  border: 1.5px solid #ddd; border-radius: 6px; padding: 7px 10px;
-  font-family: monospace; outline: none;
-}
-.copy-btn {
-  background: #f5b731; color: #1a1a2e; border: none;
-  padding: 7px 16px; border-radius: 6px; font-size: 11px;
-  font-weight: 700; cursor: pointer; white-space: nowrap;
-  transition: opacity .2s;
-}
-.copy-btn:hover { opacity: .85; }
+    input[type=color] {
+      width: 42px; height: 32px; border: none;
+      border-radius: 8px; cursor: pointer; background: none; padding: 0;
+    }
+    .color-row { display: flex; align-items: center; gap: 10px; }
+    .color-row input[type=text] { flex: 1; }
 
-/* ────────── Preview Frame ────────── */
-.preview-label {
-  font-size: 10px; font-weight: 700; color: #999;
-  letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px;
-}
-.preview-frame {
-  border: 1.5px solid #ddd; border-radius: 8px;
-  overflow: hidden; width: 100%;
-  height: 580px; background: #f0f0f0;
-}
+    .divider { height: 1px; background: var(--border); }
 
-/* ────────── Done header info ────────── */
-.done-address { font-size: 20px; font-weight: 900; color: #1a1a2e; }
-.done-sub     { font-size: 12px; color: #aaa; margin-top: 3px; }
+    /* ── buttons ── */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 10px 18px; border-radius: 10px; font-size: 0.875rem; font-weight: 600;
+      cursor: pointer; border: none; transition: all 0.2s; text-decoration: none;
+      font-family: 'Inter', sans-serif;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #8b5cf6);
+      color: #fff;
+      box-shadow: 0 4px 18px rgba(108,99,255,0.35);
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(108,99,255,0.5); }
+    .btn-secondary {
+      background: rgba(255,255,255,0.07);
+      color: var(--text); border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.12); }
+    .btn-success {
+      background: linear-gradient(135deg, #43e97b, #38f9d7);
+      color: #0a2e1a;
+    }
+    .btn-success:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(67,233,123,0.4); }
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
 
-/* ────────── Hidden ────────── */
-.hidden { display: none !important; }
+    /* share toast */
+    .toast {
+      position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: rgba(67,233,123,0.15); border: 1px solid rgba(67,233,123,0.4);
+      color: #43e97b; padding: 12px 24px; border-radius: 50px; font-size: 0.85rem; font-weight: 600;
+      backdrop-filter: blur(12px);
+      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.35s;
+      opacity: 0; pointer-events: none; z-index: 999;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
-/* ────────── Responsive ────────── */
-@media (max-width: 600px) {
-  .fields-grid    { grid-template-columns: 1fr; }
-  .actions-grid   { grid-template-columns: 1fr; }
-  .app-header span { display: none; }
-}
-</style>
+    /* ── preview area ── */
+    .preview-area {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 32px; gap: 16px; overflow-y: auto;
+      background: repeating-linear-gradient(45deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 12px);
+    }
+    .preview-label {
+      font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted); font-weight: 600;
+    }
+    .preview-wrapper {
+      background: #fff;
+      border-radius: 6px;
+      box-shadow: 0 20px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06);
+      overflow: hidden;
+      transform-origin: top center;
+    }
+
+    /* ══════════════════════════════════
+       FLYER STYLES  (the actual flyer)
+    ══════════════════════════════════ */
+    .flyer {
+      width: 816px;   /* 8.5in @ 96dpi */
+      min-height: 1056px; /* 11in */
+      font-family: 'Inter', sans-serif;
+      position: relative;
+      overflow: hidden;
+      background: #fff;
+      color: #1a1a2e;
+    }
+
+    .flyer-hero {
+      position: relative;
+      width: 100%;
+      height: 380px;
+      overflow: hidden;
+    }
+    .flyer-hero img {
+      width: 100%; height: 100%; object-fit: cover;
+      display: block;
+    }
+    .flyer-hero-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.65) 100%);
+    }
+    .flyer-hero-badge {
+      position: absolute; top: 22px; left: 22px;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: #fff; font-size: 0.75rem; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      padding: 7px 16px; border-radius: 50px;
+    }
+    .flyer-hero-price {
+      position: absolute; bottom: 22px; left: 22px;
+      color: #fff;
+    }
+    .flyer-hero-price .price-value {
+      font-size: 2.4rem; font-weight: 800; line-height: 1;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+    }
+    .flyer-hero-price .price-label {
+      font-size: 0.75rem; opacity: 0.85; font-weight: 500; margin-top: 4px;
+    }
+
+    .flyer-logo {
+      position: absolute; top: 18px; right: 22px;
+      background: #fff; border-radius: 10px; padding: 6px 10px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    }
+    .flyer-logo img { height: 36px; display: block; }
+
+    .flyer-body { padding: 28px 32px 0; }
+
+    .flyer-address {
+      font-size: 1.55rem; font-weight: 800; line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+    .flyer-city {
+      font-size: 1rem; color: #555; margin-top: 4px; font-weight: 500;
+    }
+
+    .flyer-specs {
+      display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap;
+    }
+    .spec-chip {
+      display: flex; align-items: center; gap: 6px;
+      padding: 7px 14px; border-radius: 50px;
+      font-size: 0.8rem; font-weight: 600;
+    }
+    .spec-chip-icon { font-size: 1rem; }
+
+    .flyer-description {
+      margin-top: 20px;
+      font-size: 0.9rem; line-height: 1.7; color: #333;
+    }
+
+    .flyer-features {
+      margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+    }
+    .feature-item {
+      display: flex; align-items: flex-start; gap: 8px;
+      font-size: 0.82rem; color: #333;
+    }
+    .feature-bullet {
+      width: 20px; height: 20px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.65rem; color: #fff; flex-shrink: 0; margin-top: 1px;
+    }
+
+    .flyer-divider {
+      height: 2px; background: #f0f0f5; margin: 24px 0;
+    }
+
+    .flyer-agent {
+      display: flex; align-items: center; gap: 16px;
+      padding: 0 32px 28px;
+    }
+    .agent-photo {
+      width: 68px; height: 68px; border-radius: 50%;
+      object-fit: cover; border: 3px solid;
+      flex-shrink: 0; background: #eee;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; font-weight: 700; color: #fff;
+      overflow: hidden;
+    }
+    .agent-info { flex: 1; }
+    .agent-name { font-size: 1rem; font-weight: 700; }
+    .agent-title { font-size: 0.78rem; color: #777; margin-top: 2px; }
+    .agent-contacts { display: flex; gap: 14px; margin-top: 8px; flex-wrap: wrap; }
+    .agent-contact { font-size: 0.78rem; color: #444; display: flex; align-items: center; gap: 5px; }
+
+    .flyer-footer {
+      margin-top: auto;
+      padding: 14px 32px;
+      font-size: 0.7rem; color: #999;
+      border-top: 1px solid #eee;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+
+    /* ── image placeholder ── */
+    .img-placeholder {
+      width: 100%; height: 380px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 12px; color: #bbb;
+    }
+    .img-placeholder-icon { font-size: 3rem; opacity: 0.4; }
+    .img-placeholder-text { font-size: 0.9rem; }
+
+    /* ── scale preview ── */
+    @media (max-width: 1300px) {
+      .preview-wrapper { transform: scale(0.72); }
+    }
+
+    /* ── responsive collapse ── */
+    @media (max-width: 900px) {
+      .app-shell { grid-template-columns: 1fr; }
+      .panel { border-right: none; border-bottom: 1px solid var(--border); }
+      .preview-wrapper { transform: scale(0.5); transform-origin: top center; }
+      .preview-area { min-height: 600px; }
+    }
+  </style>
 </head>
 <body>
 
-<!-- ══════════ HEADER ══════════ -->
-<div class="app-header">
-  <div style="display:flex;flex-direction:column;line-height:1.15;">
-    <span style="color:#f5b731;font-weight:900;font-size:18px;letter-spacing:-.2px;">Myers Home Buyers</span>
-    <span style="color:rgba(255,255,255,.55);font-weight:400;font-size:10px;letter-spacing:1.8px;text-transform:uppercase;">Flyer Generator</span>
+<!-- Ambient orbs -->
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<header>
+  <div>
+    <div class="logo">✦ FlyerGen</div>
+    <div class="sub">Generate · Share · Download</div>
   </div>
-  <div class="app-header-right">
-    <button class="btn-start-over" id="startOverBtn" onclick="startOver()">← Start Over</button>
-  </div>
-</div>
+</header>
 
-<!-- ══════════ STEP BAR ══════════ -->
-<div class="step-bar">
-  <div class="step">
-    <div class="step-num active" id="s1">1</div>
-    <div class="step-label active" id="sl1">Listing Text</div>
-  </div>
-  <div class="step-sep"></div>
-  <div class="step">
-    <div class="step-num" id="s2">2</div>
-    <div class="step-label" id="sl2">Customize</div>
-  </div>
-  <div class="step-sep"></div>
-  <div class="step">
-    <div class="step-num" id="s3">3</div>
-    <div class="step-label" id="sl3">Share &amp; Download</div>
-  </div>
-</div>
+<div class="app-shell">
+  <!-- ── LEFT PANEL ── -->
+  <div class="panel" id="panel">
 
-<div class="container">
-
-  <!-- ══════════ STEP 1 ══════════ -->
-  <div id="step1">
-    <div class="tip">
-      <strong>How it works:</strong> Paste your property listing email or notes below. The generator will auto-fill the flyer fields. Then you can tweak any details before downloading or sharing.
-    </div>
-    <div class="card card-gold">
-      <div class="section-title">Paste Listing Text</div>
-      <textarea id="emailText" rows="14" placeholder="Paste the full property email or listing notes here…" oninput="updateCount()"></textarea>
-      <div class="char-count">
-        <span id="parseStatus">Paste text above, then click Parse →</span>
-        <span id="charCount">0 chars</span>
-      </div>
-    </div>
-    <div style="text-align:center;margin-top:8px;">
-      <button class="btn-gold" id="parseBtn" onclick="parseListing()" disabled>Parse Listing →</button>
-    </div>
-    <div style="text-align:center;margin-top:14px;">
-      <button class="btn-outline" onclick="skipToManual()">Skip — enter fields manually</button>
-    </div>
-  </div>
-
-  <!-- ══════════ STEP 2 ══════════ -->
-  <div id="step2" class="hidden">
-    <div class="card">
-      <div class="section-title">📍 Property Details</div>
-      <div style="background:#fffbee; border:1px solid #f0dfa0; border-radius:8px; padding:12px 14px; margin-bottom:16px;">
-        <label style="display:flex; align-items:center; cursor:pointer;">
-          <input type="checkbox" id="isUnverified" style="margin-right:8px;width:16px;height:16px;cursor:pointer;">
-          <span style="font-size:12px; font-weight:700; color:#b8860b;">Generate for Unverified Investor</span>
-        </label>
-        <p style="font-size:10px; color:#b8860b; margin-top:4px; margin-left:24px;">Hides street address (leaves city, state, zip), square footage, and year built.</p>
-      </div>
-      <div class="fields-grid" id="fieldsGrid"><!-- rendered by JS --></div>
-    </div>
-
-    <div class="card">
-      <div class="section-title">📷 Hero Photo</div>
-      <div class="photo-drop" id="photoDrop"
-        ondragover="photoDragOver(event)"
-        ondragleave="photoDragLeave()"
-        ondrop="photoDrop(event)"
-        onclick="document.getElementById('photoFile').click()">
-        <img id="photoPreview" style="display:none;" alt="Property Photo">
-        <div class="photo-drop-inner" id="photoPlaceholder">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <rect x="3" y="3" width="18" height="18" rx="2"/>
-            <circle cx="8.5" cy="8.5" r="1.5"/>
-            <polyline points="21 15 16 10 5 21"/>
-          </svg>
-          <span>Drag &amp; drop photo or click to browse</span>
-        </div>
-        <button class="remove-photo hidden" id="removePhoto" onclick="removePhoto(event)">✕ Remove</button>
-      </div>
-      <input type="file" id="photoFile" accept="image/*" style="display:none" onchange="photoSelected(event)">
-    </div>
-
-    <div style="text-align:center;margin-top:4px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-      <button class="btn-outline" onclick="showStep('step1',1)">← Back</button>
-      <button class="btn-gold" onclick="generateFlyer()">Preview Flyer →</button>
-    </div>
-  </div>
-
-  <!-- ══════════ STEP 3 ══════════ -->
-  <div id="step3" class="hidden">
-    <div class="card" style="padding-bottom:14px;">
-      <div class="done-address" id="doneAddress"></div>
-      <div class="done-sub" id="doneSubtitle"></div>
-    </div>
-
-    <div class="actions-grid" style="grid-template-columns:1fr;">
-      <div class="action-card yellow">
-        <div class="action-title">Send to Investor</div>
-        <div class="action-desc">Generate a hosted link your investors can open instantly — no downloads needed.</div>
-        <button class="action-btn" id="shareLinkBtn" style="background:#f5b731;color:#1a1a2e;margin-bottom:8px;font-size:15px;padding:14px;" onclick="buildShareLink()">
-          🔗 Get Investor Link
-        </button>
-
-        <!-- Share link result box -->
-        <div id="shareBox" style="display:none;margin-bottom:12px;">
-          <div style="display:flex;gap:6px;align-items:center;">
-            <input id="shareUrl" type="text" readonly
-              style="flex:1;padding:10px 12px;border:2px solid #f5b731;border-radius:8px;font-size:12px;background:#fffdf4;color:#333;outline:none;font-family:monospace;" />
-            <button onclick="copyLink()" id="copyLinkBtn"
-              style="background:#1a1a2e;color:#fff;border:none;padding:10px 14px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap;">
-              📋 Copy
-            </button>
-          </div>
-          <p style="font-size:10px;color:#888;margin-top:6px;text-align:center;">Share this link with your investors — it opens the flyer directly in their browser.</p>
-        </div>
-
-        <div style="display:flex;gap:8px;">
-          <button class="action-btn" style="background:#2a2a3e;color:#aaa;font-size:12px;padding:9px;flex:1;" onclick="downloadHTML()">📄 Save as HTML File</button>
-          <button class="action-btn" style="background:#1a1a2e;color:#fff;font-size:12px;padding:9px;flex:1;" id="pdfBtn" onclick="downloadPDF()">🖨 Download PDF</button>
-        </div>
-        <p style="font-size:10px;color:#888;margin-top:6px;line-height:1.5;text-align:center;">For PDF: choose <strong>Save as PDF</strong> in the print dialog.</p>
-      </div>
-    </div>
-
-    <!-- Create Email Button -->
-    <div style="text-align:center;margin:4px 0 18px;">
-      <button class="btn-create-email" id="createEmailBtn" onclick="openEmailModal()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
-        Create Marketing Email
-      </button>
-    </div>
-
+    <!-- Property Info -->
     <div>
-      <div class="preview-label">Live Preview</div>
-      <div class="preview-frame">
-        <iframe id="flyerPreview" style="width:100%;height:100%;border:none;"></iframe>
+      <div class="section-title">📍 Property</div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="field" style="flex-direction:row;align-items:center;background:rgba(255,255,255,0.05);padding:10px 12px;border-radius:8px;border:1px solid var(--border);">
+          <input type="checkbox" id="unverifiedMode" style="width:16px;height:16px;cursor:pointer;" />
+          <label for="unverifiedMode" style="cursor:pointer;color:var(--text);font-weight:600;margin-left:8px;">Unverified Investor Mode</label>
+          <div style="font-size:0.65rem;color:var(--muted);margin-left:auto;">Hides Address, SqFt, Year</div>
+        </div>
+        <div class="field" style="flex-direction:row;align-items:center;background:rgba(255,140,0,0.08);padding:10px 12px;border-radius:8px;border:1px solid rgba(255,140,0,0.25);">
+          <input type="checkbox" id="fcfsMode" style="width:16px;height:16px;cursor:pointer;" />
+          <label for="fcfsMode" style="cursor:pointer;color:#ff8c00;font-weight:600;margin-left:8px;">FCFS Mode</label>
+          <div style="font-size:0.65rem;color:var(--muted);margin-left:auto;">Buy Now, ARV & Rent only</div>
+        </div>
+        <div class="field"><label>Street Address</label><input type="text" id="address" placeholder="123 Maple Street" /></div>
+        <div class="field"><label>City, State ZIP</label><input type="text" id="city" placeholder="Austin, TX 78701" /></div>
+        <div class="field"><label>List Price</label><input type="text" id="price" placeholder="$850,000" /></div>
+        <div class="field" id="arvField" style="display:none;"><label>ARV (After Repair Value)</label><input type="text" id="arv" placeholder="$120,000" /></div>
+        <div class="field" id="rentField" style="display:none;"><label>Rent</label><input type="text" id="rent" placeholder="$1,200/mo" /></div>
+        <div class="field"><label>Badge (e.g. "For Sale" / "Just Listed")</label><input type="text" id="badge" placeholder="For Sale" /></div>
       </div>
     </div>
 
-    <div class="secondary-actions">
-      <button class="btn-outline" onclick="goToEdit()">✏ Edit Fields</button>
-      <button class="btn-dark" onclick="openFlyer()">↗ Open Flyer in New Tab</button>
-    </div>
-  </div>
+    <div class="divider"></div>
 
-</div><!-- /container -->
-
-<!-- ══════════ EMAIL MODAL ══════════ -->
-<div class="modal-overlay hidden" id="emailModal" onclick="closeEmailModalOutside(event)">
-  <div class="modal-box">
-    <div class="modal-header">
-      <div>
-        <h2>✉ Marketing Email</h2>
-        <p>Ready-to-send investor email for <span id="emailModalAddr"></span></p>
+    <!-- Specs -->
+    <div>
+      <div class="section-title">🏠 Specs</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div class="field"><label>Beds</label><input type="text" id="beds" placeholder="4" /></div>
+        <div class="field"><label>Baths</label><input type="text" id="baths" placeholder="3" /></div>
+        <div class="field"><label>Sq Ft</label><input type="text" id="sqft" placeholder="2,400 sf" /></div>
+        <div class="field"><label>Lot</label><input type="text" id="lot" placeholder="0.25 ac" /></div>
+        <div class="field"><label>Year Built</label><input type="text" id="year" placeholder="2019" /></div>
+        <div class="field"><label>Garage</label><input type="text" id="garage" placeholder="2-car" /></div>
       </div>
-      <button class="modal-close" onclick="closeEmailModal()" title="Close">✕</button>
     </div>
-    <div class="modal-tabs">
-      <button class="modal-tab active" id="tab-html" onclick="switchTab('html')">HTML Preview</button>
-      <button class="modal-tab" id="tab-plain" onclick="switchTab('plain')">Plain Text</button>
-    </div>
-    <div class="modal-body">
-      <div id="panel-html">
-        <p style="font-size:11px;color:#aaa;margin-bottom:10px;">This is how the email will look in an HTML-capable email client.</p>
-        <div class="email-preview-frame">
-          <iframe id="emailPreviewFrame" height="420"></iframe>
+
+    <div class="divider"></div>
+
+    <!-- Description & Features -->
+    <div>
+      <div class="section-title">📝 Description</div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="field"><label>Description</label><textarea id="description" placeholder="Stunning modern home nestled in a quiet cul-de-sac..."></textarea></div>
+        <div class="field">
+          <label>Key Features (one per line)</label>
+          <textarea id="features" placeholder="Gourmet kitchen&#10;Primary suite w/ spa bath&#10;3-car garage&#10;Smart home tech"></textarea>
         </div>
       </div>
-      <div id="panel-plain" class="hidden">
-        <p style="font-size:11px;color:#aaa;margin-bottom:10px;">Copy this into Gmail, Outlook, or any email app.</p>
-        <div class="email-plain" id="emailPlainText"></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Property Image -->
+    <div>
+      <div class="section-title">🖼️ Property Photo</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="field"><label>Image URL</label><input type="url" id="imageUrl" placeholder="https://images.unsplash.com/..." /></div>
+        <div style="text-align:center;color:var(--muted);font-size:0.75rem;">— or —</div>
+        <button class="btn btn-secondary" onclick="document.getElementById('imageFile').click()">Upload from device</button>
+        <input type="file" id="imageFile" accept="image/*" style="display:none" />
       </div>
     </div>
-    <div class="modal-footer">
-      <span class="modal-footer-hint">Paste the HTML version into your email client's HTML editor, or use plain text.</span>
-      <button class="btn-email-outline" id="copyPlainBtn" onclick="copyEmailText('plain')">📋 Copy Plain Text</button>
-      <button class="btn-email" id="copyHtmlBtn" onclick="copyEmailText('html')">⟨/⟩ Copy HTML</button>
+
+    <div class="divider"></div>
+
+    <!-- Agent Info -->
+    <div>
+      <div class="section-title">👤 Agent / Brokerage</div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="field"><label>Agent Name</label><input type="text" id="agentName" placeholder="Jane Smith" /></div>
+        <div class="field"><label>Title / License</label><input type="text" id="agentTitle" placeholder="REALTOR® | DRE #01234567" /></div>
+        <div class="field"><label>Phone</label><input type="text" id="agentPhone" placeholder="(512) 555-0100" /></div>
+        <div class="field"><label>Email</label><input type="text" id="agentEmail" placeholder="jane@brokerage.com" /></div>
+        <div class="field"><label>Website</label><input type="text" id="agentWebsite" placeholder="www.janesmith.com" /></div>
+        <div class="field">
+          <label>Agent Photo URL (optional)</label>
+          <input type="url" id="agentPhoto" placeholder="https://..." />
+        </div>
+        <div class="field"><label>Brokerage Name</label><input type="text" id="brokerageName" placeholder="Keller Williams Realty" /></div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Accent Color -->
+    <div>
+      <div class="section-title">🎨 Accent Color</div>
+      <div class="color-row">
+        <input type="color" id="accentColor" value="#6c63ff" />
+        <input type="text" id="accentHex" value="#6c63ff" maxlength="7" />
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Disclaimer -->
+    <div>
+      <div class="section-title">⚠️ Disclaimer</div>
+      <div class="field">
+        <textarea id="disclaimer" style="min-height:55px;font-size:0.72rem;">Information deemed reliable but not guaranteed. Equal Housing Opportunity.</textarea>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Actions -->
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="downloadPDF()">⬇ Download PDF</button>
+      <button class="btn btn-success" onclick="shareLink()">🔗 Share Link</button>
+      <button class="btn btn-secondary" onclick="resetForm()">↺ Reset</button>
+    </div>
+    <div style="font-size:0.72rem;color:var(--muted);line-height:1.5;">
+      The <strong>Share Link</strong> encodes your entire flyer into the URL — anyone with the link can view & download it without any account.
+    </div>
+
+  </div>
+
+  <!-- ── RIGHT PREVIEW ── -->
+  <div class="preview-area">
+    <div class="preview-label">Live Preview — 8.5 × 11"</div>
+    <div class="preview-wrapper">
+      <!-- THE FLYER (this is what gets PDF'd) -->
+      <div class="flyer" id="flyer">
+
+        <!-- Hero image -->
+        <div class="flyer-hero" id="flyerHero">
+          <div class="img-placeholder" id="imgPlaceholder">
+            <div class="img-placeholder-icon">🏡</div>
+            <div class="img-placeholder-text">Add a property photo above</div>
+          </div>
+          <img id="flyerImg" src="" alt="Property" style="display:none" />
+          <div class="flyer-hero-overlay" id="heroOverlay" style="display:none"></div>
+          <div class="flyer-hero-badge" id="flyerBadge">For Sale</div>
+          <div class="flyer-hero-price">
+            <div class="price-value" id="flyerPrice">$850,000</div>
+            <div class="price-label" id="flyerPriceLabel">Asking Price</div>
+          </div>
+          <div id="flyerFcfsPricing" style="display:none;position:absolute;bottom:22px;right:22px;text-align:right;color:#fff;">
+            <div style="font-size:0.75rem;opacity:0.85;font-weight:500;">ARV</div>
+            <div id="flyerArv" style="font-size:1.6rem;font-weight:800;line-height:1;text-shadow:0 2px 12px rgba(0,0,0,0.5);">—</div>
+            <div style="font-size:0.75rem;opacity:0.85;font-weight:500;margin-top:8px;">Rent</div>
+            <div id="flyerRent" style="font-size:1.4rem;font-weight:700;line-height:1;text-shadow:0 2px 12px rgba(0,0,0,0.5);">—</div>
+          </div>
+        </div>
+
+        <!-- Flyer body -->
+        <div class="flyer-body">
+          <div class="flyer-address" id="flyerAddress">123 Maple Street</div>
+          <div class="flyer-city" id="flyerCity">Austin, TX 78701</div>
+
+          <!-- Specs chips -->
+          <div class="flyer-specs" id="flyerSpecs">
+            <div class="spec-chip" id="chip-beds" style="background:#f3f0ff;color:#6c63ff"><span class="spec-chip-icon">🛏</span><span id="spec-beds-val">4 Beds</span></div>
+            <div class="spec-chip" id="chip-baths" style="background:#f3f0ff;color:#6c63ff"><span class="spec-chip-icon">🚿</span><span id="spec-baths-val">3 Baths</span></div>
+            <div class="spec-chip" id="chip-sqft" style="background:#f3f0ff;color:#6c63ff"><span class="spec-chip-icon">📐</span><span id="spec-sqft-val">2,400 sf</span></div>
+            <div class="spec-chip" id="chip-garage" style="background:#f3f0ff;color:#6c63ff"><span class="spec-chip-icon">🚗</span><span id="spec-garage-val">2-car Garage</span></div>
+            <div class="spec-chip" id="chip-year" style="background:#eefbf3;color:#1a7a4a"><span class="spec-chip-icon">📅</span><span id="spec-year-val">Built 2019</span></div>
+            <div class="spec-chip" id="chip-lot" style="background:#fff8e6;color:#8a6100"><span class="spec-chip-icon">🌿</span><span id="spec-lot-val">0.25 ac Lot</span></div>
+          </div>
+
+          <div class="flyer-description" id="flyerDesc">
+            Stunning modern home nestled in a quiet cul-de-sac, featuring an open floor plan, chef's kitchen, and resort-style backyard. Prime location minutes from top-rated schools and shopping.
+          </div>
+
+          <div class="flyer-features" id="flyerFeatures">
+            <!-- Rendered by JS -->
+          </div>
+
+          <div class="flyer-divider"></div>
+        </div>
+
+        <!-- Agent footer -->
+        <div class="flyer-agent">
+          <div class="agent-photo" id="agentPhotoEl">JS</div>
+          <div class="agent-info">
+            <div class="agent-name" id="flyerAgentName">Jane Smith</div>
+            <div class="agent-title" id="flyerAgentTitle">REALTOR® | DRE #01234567</div>
+            <div class="agent-contacts">
+              <div class="agent-contact" id="flyerAgentPhone">📞 (512) 555-0100</div>
+              <div class="agent-contact" id="flyerAgentEmail">✉️ jane@brokerage.com</div>
+              <div class="agent-contact" id="flyerAgentSite">🌐 www.janesmith.com</div>
+            </div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:0.95rem;font-weight:700;color:#1a1a2e" id="flyerBrokerage">Keller Williams Realty</div>
+          </div>
+        </div>
+
+        <div class="flyer-footer">
+          <span id="flyerDisclaimer">Information deemed reliable but not guaranteed. Equal Housing Opportunity.</span>
+          <span>🏠</span>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- ══════════ EMBEDDED LOGO DATA ══════════ -->
-<!-- We use the actual base64 logo from the source HTML for the flyer itself -->
-<script>
-// ─── Logo (base64 PNG from myers_flyer_generator.html) ───────────────────────
-const LOGO = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAApgAAALICAYAAADbv4A+AAEAAA" +
-  "ElEQVR4nO39+bMk55XfCX7OvdfdI+ItuSATCRAgwCLBDWRxZ7EWFmvfVUW1WKVaVKukklRlapVa" +
-  "09L0mI1Nj41N/zLzJ4zZWI+1jbV1q9Wj0rRqRBVZXECQLO7gDi4gtgSQe+ZbIsLd771nfrjXPT" +
-  "zeewkuIJFIpH9hifdehIeH7/d7v+ec74ERI0aMGDFixIgRI0aMGDFixIgRI0aMGDFixIgRI0aMGD" +
-  "FiRBD/H6QBlRqT+WgFAAAAAElFTkSuQmCC";
-// (Abbreviated — the full logo is large; we substitute with the SVG below in the flyer)
+<!-- Share Toast -->
+<div class="toast" id="toast">✓ Link copied to clipboard!</div>
 
-// ─── Field configuration ──────────────────────────────────────────────────────
-const FIELD_CONFIG = [
-  { key: 'address',       label: 'Full Address',        full: true },
-  { key: 'propType',      label: 'Property Type' },
-  { key: 'beds',          label: 'Bedrooms' },
-  { key: 'baths',         label: 'Bathrooms' },
-  { key: 'sqft',          label: 'Square Footage' },
-  { key: 'yearBuilt',     label: 'Year Built' },
-  { key: 'startingPrice', label: 'Starting Price' },
-  { key: 'buyNow',        label: 'Buy It Now Price' },
-  { key: 'arv',           label: 'Estimated ARV' },
-  { key: 'rent',          label: 'Estimated Rent /mo' },
-  { key: 'showing',       label: 'Showing Date & Time', full: true },
-  { key: 'closingDate',   label: 'Closing Date' },
-  { key: 'occupancy',     label: 'Occupancy at Closing' },
-  { key: 'leaseEndDate',  label: 'Leaseback/Lease End Date' },
-  { key: 'leaseDeposit',  label: 'Leaseback/Lease Deposit Amount' },
-  { key: 'roof',          label: 'Roof' },
-  { key: 'foundation',    label: 'Foundation' },
-  { key: 'hvac',          label: 'HVAC' },
-  { key: 'description',   label: 'Property Description', full: true, tall: true },
-  { key: 'emailPhotoLink',label: 'Property Photo URL (For Email)', full: true },
-  { key: 'driveLink',     label: 'Google Drive Link',   full: true },
-  { key: 'agent',         label: 'Acquiring Agent',     full: true },
-  { key: 'salesAgent',    label: 'Sales Agent Name' },
-  { key: 'salesPhone',    label: 'Sales Agent Phone' },
+<script>
+// ─────────────────────────────────────────────
+// State management
+// ─────────────────────────────────────────────
+const FIELDS = [
+  'address','city','price','arv','rent','badge',
+  'beds','baths','sqft','lot','year','garage',
+  'description','features',
+  'imageUrl','agentName','agentTitle',
+  'agentPhone','agentEmail','agentWebsite','agentPhoto',
+  'brokerageName','accentHex','disclaimer',
+  'unverifiedMode','fcfsMode'
 ];
 
-// ─── State ────────────────────────────────────────────────────────────────────
-let fields      = {};
-let photoDataUrl= null;
-let flyerHtml   = '';
-let blobUrl     = '';
-
-// ─── On load: restore ?d= URL state ─────────────────────────────────────
-window.addEventListener('load', () => {
-  try {
-    const params = new URLSearchParams(location.search);
-    const d      = params.get('d');
-    const legacy = params.get('flyer');
-    if (!d && !legacy) return;
-
-    // Decode fields
-    if (d) {
-      fields = JSON.parse(decodeURIComponent(d));
-    } else {
-      const json = decodeURIComponent(escape(atob(legacy)));
-      const data = JSON.parse(json);
-      fields = data.fields || data || {};
+function getState() {
+  const s = {};
+  FIELDS.forEach(id => {
+    const el = document.getElementById(id);
+    if(el) {
+      if(el.type === 'checkbox') s[id] = el.checked;
+      else s[id] = el.value || '';
     }
-
-    renderFields();
-    generateFlyer(); // populates flyerHtml
-
-    // ── VIEWER MODE: build a proper branded webpage ──────────────────────
-    // Pull just the CSS and body markup out of the generated flyer HTML
-    const styleMatch = flyerHtml.match(/<style[^>]*>([\s\S]*?)<\/style>/i);
-    const bodyMatch  = flyerHtml.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
-    // Strip the flyer's own body{} rule — our viewer shell handles layout
-    let   flyerCss  = (styleMatch ? styleMatch[1] : '').replace(/body\{[^}]+\}/g, '');
-    const flyerBody = bodyMatch ? bodyMatch[1] : '';
-    const addr      = fields.address || 'Property Flyer';
-    const toolUrl   = location.href.split('?')[0];
-
-    const viewerPage = `<!DOCTYPE html><html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${addr} — Myers Home Buyers</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-html{overflow-x:hidden}
-body{min-height:100vh;background:#e8eaf2;font-family:Arial,sans-serif;overflow-x:hidden}
-/* ── Viewer nav ── */
-.mhb-nav{background:#1a1a2e;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(0,0,0,.35);gap:12px}
-.mhb-brand-name{color:#f5b731;font-weight:900;font-size:16px;letter-spacing:-.3px;white-space:nowrap}
-.mhb-brand-sub{color:rgba(255,255,255,.4);font-size:9px;letter-spacing:2px;text-transform:uppercase;margin-top:2px}
-.mhb-nav-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
-.mhb-btn-pdf{background:#f5b731;color:#1a1a2e;border:none;padding:9px 16px;border-radius:7px;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap}
-.mhb-hint{color:rgba(255,255,255,.3);font-size:9px;white-space:nowrap}
-/* ── Flyer stage ── */
-.mhb-stage{padding:24px 0 60px;display:flex;justify-content:center;overflow:hidden}
-.mhb-card{transform-origin:top center;box-shadow:0 10px 50px rgba(0,0,0,.2);border-radius:2px;overflow:hidden;flex-shrink:0}
-/* ── Flyer component styles ── */
-${flyerCss}
-/* ── Print ── */
-@media print{
-  .mhb-nav{display:none!important}
-  .mhb-stage{padding:0;display:block}
-  .mhb-card{box-shadow:none!important;transform:none!important}
-  body{background:white!important}
-  @page{size:letter portrait;margin:0.25in}
-  .flyer{width:100%!important;border:none!important;box-shadow:none!important}
-}
-</style>
-</head>
-<body>
-<nav class="mhb-nav">
-  <div>
-    <div class="mhb-brand-name">Myers Home Buyers</div>
-    <div class="mhb-brand-sub">Property Flyer</div>
-  </div>
-  <div class="mhb-nav-right">
-    <button class="mhb-btn-pdf" onclick="window.print()">⬇ Download PDF</button>
-    <span class="mhb-hint">Choose "Save as PDF" in the dialog</span>
-  </div>
-</nav>
-<div class="mhb-stage" id="mhbStage">
-  <div class="mhb-card" id="mhbCard">
-    ${flyerBody}
-  </div>
-</div>
-<script>
-(function(){
-  var FLYER_W = 700;
-  function scaleFlyer(){
-    var stage = document.getElementById('mhbStage');
-    var card  = document.getElementById('mhbCard');
-    if (!stage || !card) return;
-    var avail = Math.min(window.innerWidth, window.screen.width) - 0;
-    if (avail >= FLYER_W) {
-      card.style.transform = '';
-      stage.style.height   = '';
-      return;
-    }
-    var ratio = avail / FLYER_W;
-    card.style.transform = 'scale(' + ratio + ')';
-    // Collapse the blank space transform leaves behind
-    var naturalH = card.scrollHeight;
-    stage.style.height = (naturalH * ratio + 60) + 'px';
-    stage.style.alignItems = 'flex-start';
-    stage.style.paddingTop = '16px';
-  }
-  window.addEventListener('load',   scaleFlyer);
-  window.addEventListener('resize', scaleFlyer);
-})();
-\x3c/script>
-\x3c/body>\x3c/html>`;
-
-
-
-    document.open();
-    document.write(viewerPage);
-    document.close();
-
-  } catch(e) {
-    console.warn('Could not restore from URL:', e);
-  }
-});
-
-// ─── Step 1 helpers ───────────────────────────────────────────────────────────
-function updateCount() {
-  const v = document.getElementById('emailText').value;
-  document.getElementById('charCount').textContent = v.length.toLocaleString() + ' chars';
-  document.getElementById('parseBtn').disabled = v.trim().length < 20;
-  document.getElementById('parseStatus').textContent =
-    v.trim().length < 20 ? 'Paste text above, then click Parse →' : 'Ready to parse';
-}
-
-function skipToManual() {
-  FIELD_CONFIG.forEach(f => { if (!fields[f.key]) fields[f.key] = ''; });
-  renderFields();
-  showStep('step2', 2);
-}
-
-// ─── Regex helper ─────────────────────────────────────────────────────────────
-function g(text, re, fallback = '—') {
-  const m = text.match(re);
-  if (!m) return fallback;
-  const v = (m[1] || '').trim().replace(/\s+/g, ' ');
-  return v || fallback;
-}
-function fmt(v) {
-  const n = parseFloat((v || '').replace(/[^0-9.]/g, ''));
-  if (!v || v === '—' || isNaN(n)) return '—';
-  return '$' + n.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0});
-}
-
-// ─── Parse listing text ───────────────────────────────────────────────────────
-function parseListing() {
-  const raw = document.getElementById('emailText').value;
-  const t   = raw.replace(/\r\n/g, '\n').replace(/&amp;/g, '&');
-
-  const arvRaw  = g(t, /Estimated ARV\s*\$\s*([\d,]+\.?\d*)/i);
-  const arvN    = parseFloat(arvRaw.replace(/,/g,''));
-  const rentRaw = g(t, /Estimated Rent\s*\$\s*([\d,]+\.?\d*)/i);
-  const rentN   = parseFloat(rentRaw.replace(/,/g,''));
-  const dtRaw   = g(t, /Showing Date\s*&?\s*Time\s*(.+?)(?=No Flyer|Requested)/is);
-  const tpRaw   = g(t, /Showing Type\s+(.+?)(?=Showing Date|No Flyer|Requested)/is);
-
-  fields = {
-    address:       g(t, /Full Address\s+(.+?)(?=County\s)/is),
-    propType:      g(t, /Property Type\s+(.+?)(?=Bedrooms)/is),
-    beds:          g(t, /Bedrooms\s+(\d+)/i),
-    baths:         g(t, /Bathrooms\s+([\d.]+)/i),
-    sqft:          g(t, /Square Footage\s+([\d,]+)/i),
-    yearBuilt:     g(t, /Year Built\s+(\d{4})/i),
-    startingPrice: fmt(g(t, /Starting Price\s*\$\s*([\d,]+\.?\d*)/i)),
-    buyNow:        fmt(g(t, /Buy it Now Price\s*\$\s*([\d,]+\.?\d*)/i)),
-    arv:           (!arvRaw || isNaN(arvN) || arvN===0) ? 'TBD' : '$' + arvN.toLocaleString('en-US',{minimumFractionDigits:0}),
-    rent:          (!rentRaw || isNaN(rentN) || rentN===0) ? '—' : '$' + rentN.toLocaleString('en-US',{minimumFractionDigits:0}) + '/mo',
-    roof:          g(t, /Roof\s+(.+?)(?=Foundation)/is),
-    foundation:    g(t, /Foundation\s+(.+?)(?=HVAC)/is),
-    hvac:          g(t, /HVAC\s+(.+?)(?=Property Description)/is),
-    description:   g(t, /Property Description\s+(.+?)(?=Closing Date)/is),
-    closingDate:   g(t, /Closing Date\s+(.+?)(?=Occupancy at Closing)/is),
-    occupancy:     g(t, /Occupancy at Closing\s+(.+?)(?=Leaseback\/Lease|Showing Type)/is),
-    leaseEndDate:  g(t, /Leaseback\/Lease End Date\s+(.+?)(?=Leaseback\/Lease Deposit Amount|Showing Type)/is),
-    leaseDeposit:  g(t, /Leaseback\/Lease Deposit Amount\s*\$?\s*([\d,]+\.?\d*)/i, 'Empty') !== 'Empty' ? '$' + parseFloat(g(t, /Leaseback\/Lease Deposit Amount\s*\$?\s*([\d,]+\.?\d*)/i).replace(/,/g,'')).toLocaleString('en-US',{minimumFractionDigits:0}) : '—',
-    showing:       (dtRaw && dtRaw!=='—') ? dtRaw : tpRaw,
-    driveLink:     g(t, /Google Drive Link\s+(https:\/\/\S+)/i, '#'),
-    agent:         g(t, /Congratulations to\s+(.+?)\s+for the acquisition/i),
-    salesAgent:    '',
-    salesPhone:    '',
-  };
-
-  renderFields();
-  showStep('step2', 2);
-}
-
-// ─── Render field grid in Step 2 ─────────────────────────────────────────────
-function renderFields() {
-  const grid = document.getElementById('fieldsGrid');
-  grid.innerHTML = '';
-  FIELD_CONFIG.forEach(({key, label, full, tall}) => {
-    const wrap = document.createElement('div');
-    if (full) wrap.className = 'field-full';
-    const val = (fields[key] || '').replace(/"/g, '&quot;');
-    wrap.innerHTML = `<div class="field-label">${label}</div>` +
-      (tall
-        ? `<textarea class="field-textarea" id="f_${key}" onchange="fields['${key}']=this.value">${fields[key]||''}</textarea>`
-        : `<input class="field-input" type="text" id="f_${key}" value="${val}" onchange="fields['${key}']=this.value"/>`
-      );
-    grid.appendChild(wrap);
   });
+  s.imageData = window._imageData || '';
+  return s;
 }
 
-// ─── Photo upload ─────────────────────────────────────────────────────────────
-function photoDragOver(e) {
-  e.preventDefault();
-  document.getElementById('photoDrop').classList.add('dragging');
-}
-function photoDragLeave() { document.getElementById('photoDrop').classList.remove('dragging'); }
-function photoDrop(e) {
-  e.preventDefault(); photoDragLeave();
-  const f = e.dataTransfer.files[0]; if (f) loadPhoto(f);
-}
-function photoSelected(e) { const f = e.target.files[0]; if (f) loadPhoto(f); }
-function loadPhoto(file) {
-  const reader = new FileReader();
-  reader.onload = ev => {
-    photoDataUrl = ev.target.result;
-    const drop   = document.getElementById('photoDrop');
-    const prev   = document.getElementById('photoPreview');
-    const ph     = document.getElementById('photoPlaceholder');
-    const rm     = document.getElementById('removePhoto');
-    prev.src     = photoDataUrl;
-    prev.style.display = 'block';
-    ph.style.display   = 'none';
-    rm.classList.remove('hidden');
-    drop.classList.add('has-photo');
-  };
-  reader.readAsDataURL(file);
-}
-function removePhoto(e) {
-  e.stopPropagation();
-  photoDataUrl = null;
-  const prev = document.getElementById('photoPreview');
-  prev.style.display = 'none';
-  prev.src = '';
-  document.getElementById('photoPlaceholder').style.display = 'flex';
-  document.getElementById('removePhoto').classList.add('hidden');
-  document.getElementById('photoDrop').classList.remove('has-photo');
-}
-
-// ─── Flyer HTML builder ───────────────────────────────────────────────────────
-function generateFlyer() {
-  // Sync all inputs → fields
-  FIELD_CONFIG.forEach(({key}) => {
-    const el = document.getElementById('f_' + key);
-    if (el) fields[key] = el.value;
-  });
-
-  // Use hosted URL (from ImgBB after link generation) > local upload > placeholder
-  const heroSrc = fields.photoUrl || photoDataUrl || null;
-  const hero = heroSrc
-    ? `<img src="${heroSrc}" style="width:100%;height:100%;object-fit:cover;display:block;" alt="Property"/>`
-    : `<div class="hero-placeholder">[ Property Photo ]</div>`;
-
-  // Logo — full Myers Home Buyers logo PNG
-  const logoSvg = `<div style="display:flex;align-items:center;flex-shrink:0;">
-    <img src="https://jeanneclairebenton-blip.github.io/mhb-flyer-generator/logo-full.png" height="52" style="height:52px;object-fit:contain;display:block;" alt="Myers Home Buyers">
-  </div>`;
-
-  const esc = s => (s||'—').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  const roofLine = [fields.roof,fields.foundation,fields.hvac].filter(v=>v&&v!=='—').join(' · ')||null;
-
-  const isUnverified = document.getElementById('isUnverified')?.checked;
-  const addrParts = (fields.address || '').split(',');
-  const displayAddress = isUnverified
-    ? (addrParts.length > 1 ? esc(addrParts.slice(1).join(',').trim()) : 'Address Withheld (Unverified)')
-    : esc(fields.address);
-
-  flyerHtml = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:#e1dbcf;display:flex;justify-content:center;padding:24px;font-family:'Inter',Arial,sans-serif}
-.flyer{width:100%;max-width:560px;background:#fff;border:1px solid #d4ceb8;color:#1a1a2e;margin:0 auto;}
-@media print{@page{size:letter portrait;margin:0.25in}*{ -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }body{display:block;padding:0;background:white;margin:0}.flyer{width:100%;max-width:7.5in;height:10.5in;max-height:10.5in;overflow:hidden;border:none;margin:0 auto} .hero{height:200px!important;} .top-header{padding:14px 20px 10px!important;} .price-section{padding:12px 20px!important;} .desc-block, .terms-block{padding:0 20px 12px!important;} .section-header{padding:16px 20px 6px!important;} .showing-center{padding:12px 20px!important;} .info-row{padding:8px 20px!important;} .icon-cell{padding:12px 8px 8px!important;} .stats-row .stat-cell{padding:10px 12px!important;} .agent-line{padding:12px 20px!important;}}
-.top-header{background:#fff;padding:20px 24px 16px;border-bottom:2px solid #D6A327}
-.header-top-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.prop-type-label{font-size:11px;font-weight:700;color:#D6A327;letter-spacing:2px;text-transform:uppercase}
-.address-main{font-size:24px;font-weight:900;color:#111;line-height:1.2;letter-spacing:-0.5px}
-.hero{width:100%;height:260px;background:#ece9e1;display:flex;align-items:center;justify-content:center;border-bottom:1px solid #e1dbcf}
-.hero-placeholder{color:#b3afa3;font-size:12px;font-weight:600;letter-spacing:4px;text-transform:uppercase}
-.icon-row{display:flex;background:#fff;border-bottom:1px solid #e1dbcf}
-.icon-cell{flex:1;display:flex;flex-direction:column;align-items:center;padding:16px 8px 12px;gap:6px}
-.icon-cell+.icon-cell{border-left:1px solid #e1dbcf}
-.icon-lbl{font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:1px}
-.icon-val{font-size:22px;font-weight:900;color:#111;text-align:center}
-.price-section{padding:16px 24px;border-bottom:1px solid #e1dbcf;display:flex;align-items:center;gap:14px}
-.price-bar{width:5px;height:48px;background:#D6A327;flex-shrink:0}
-.price-lbl{font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:2px;margin-bottom:6px}
-.price-val{font-size:38px;font-weight:900;color:#111;line-height:1;letter-spacing:-1px}
-.stats-row{display:flex;border-bottom:1px solid #e1dbcf;background:#f8f6f2}
-.stat-cell{flex:1;padding:12px 16px;text-align:center;border-right:1px solid #e1dbcf}
-.stat-cell:last-child{border-right:none}
-.stat-label{font-size:10px;font-weight:700;color:#888;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
-.stat-value{font-size:16px;font-weight:900;color:#111}
-.info-rows{border-bottom:1px solid #e1dbcf}
-.info-row{display:flex;justify-content:space-between;align-items:center;padding:10px 24px}
-.info-row+.info-row{border-top:1px dashed #e1dbcf}
-.info-lbl{font-size:12px;color:#555}
-.info-val{font-size:13px;font-weight:800;color:#111;text-align:right}
-.showing-center{text-align:center;padding:16px 24px;border-bottom:1px solid #F1D9A7;background:#FFF8E7;border-top:1px solid #F1D9A7;margin:-1px 0 0}
-.showing-label{font-size:11px;font-weight:700;color:#D6A327;text-transform:uppercase;letter-spacing:4px;margin-bottom:8px}
-.showing-date{font-size:22px;font-weight:800;color:#111}
-.section-header{padding:20px 24px 8px;font-size:11px;font-weight:800;color:#999;letter-spacing:3px;text-transform:uppercase}
-.desc-block{padding:0 24px 20px;border-bottom:1px solid #e1dbcf}
-.desc-block p{font-size:12.5px;color:#333;line-height:1.7}
-.terms-block{padding:0 24px 20px;border-bottom:1px solid #e1dbcf}
-.terms-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 20px}
-@media (max-width:480px){.terms-grid{grid-template-columns:1fr;}}
-.terms-grid div{font-size:11px;color:#444;line-height:1.5;display:flex;gap:8px;align-items:flex-start}
-.terms-grid div::before{content:"•";color:#D6A327;font-size:14px;line-height:1.3;font-weight:bold}
-.cta-block{padding:20px;text-align:center;border-bottom:1px solid #e1dbcf;background:#fcfbf9}
-.pill-btn{display:inline-block;background:#F4B324;color:#111;font-size:14px;font-weight:800;padding:14px 60px;border-radius:40px;letter-spacing:2px;text-transform:uppercase;text-decoration:none}
-.agent-line{text-align:center;padding:14px 24px;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;background:#f2efe9}
-.agent-label{font-size:11px;color:#888}
-.agent-name{font-size:12px;font-weight:800;color:#555}
-.agent-phone{font-size:12px;color:#555}
-.dot{color:#bbb;font-size:10px}
-</style></head><body><div class="flyer">
-
-  <div class="top-header">
-    <div class="header-top-row">
-      <div style="display:flex;align-items:center;">
-        <img src="https://jeanneclairebenton-blip.github.io/mhb-flyer-generator/logo-full.png" height="52" style="height:52px;object-fit:contain;display:block;" alt="Myers Home Buyers">
-      </div>
-      <div class="prop-type-label">${esc(fields.propType)}</div>
-    </div>
-    <div class="address-main">${displayAddress}</div>
-  </div>
-
-  <div class="hero">${hero}</div>
-
-  <div class="icon-row">
-    <div class="icon-cell">
-      <svg width="24" height="24" viewBox="0 0 32 32" fill="none" stroke="#bbb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="14" width="26" height="11" rx="2"/><rect x="6" y="11" width="8" height="5" rx="1.5"/><rect x="18" y="11" width="8" height="5" rx="1.5"/><line x1="6" y1="25" x2="6" y2="29"/><line x1="26" y1="25" x2="26" y2="29"/><path d="M3 14 L3 9 Q3 7 5 7 L27 7 Q29 7 29 9 L29 14"/></svg>
-      <div class="icon-lbl">Beds</div><div class="icon-val">${esc(fields.beds)}</div>
-    </div>
-    <div class="icon-cell">
-      <svg width="24" height="24" viewBox="0 0 32 32" fill="none" stroke="#bbb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16 H26 V22 A8 8 0 0 1 18 30 H14 A8 8 0 0 1 6 22 Z"/><path d="M10 16 V10 A3 3 0 0 1 13 7"/><line x1="20" y1="4" x2="20" y2="8"/></svg>
-      <div class="icon-lbl">Baths</div><div class="icon-val">${esc(fields.baths)}</div>
-    </div>
-    ${isUnverified ? '' : `
-    <div class="icon-cell">
-      <svg width="24" height="24" viewBox="0 0 32 32" fill="none" stroke="#bbb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14 L16 4 L28 14 L28 30 L4 30 Z"/><rect x="13" y="21" width="6" height="9" rx="1"/><rect x="6" y="17" width="6" height="5" rx="1"/><rect x="20" y="17" width="6" height="5" rx="1"/></svg>
-      <div class="icon-lbl">Sqft</div><div class="icon-val">${esc(fields.sqft)}</div>
-    </div>
-    <div class="icon-cell">
-      <svg width="24" height="24" viewBox="0 0 32 32" fill="none" stroke="#bbb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6 H28 V24 L22 30 H4 Z"/><line x1="4" y1="12" x2="28" y2="12"/><path d="M28 24 L22 24 L22 30"/><line x1="10" y1="3" x2="10" y2="9"/><line x1="16" y1="3" x2="16" y2="9"/><line x1="22" y1="3" x2="22" y2="9"/></svg>
-      <div class="icon-lbl">Built</div><div class="icon-val">${esc(fields.yearBuilt)}</div>
-    </div>`}
-  </div>
-
-  <div class="price-section">
-    <div class="price-bar"></div>
-    <div>
-      <div class="price-lbl">Start Price</div>
-      <div class="price-val">${esc(fields.startingPrice)}</div>
-    </div>
-  </div>
-
-  <div class="stats-row">
-    <div class="stat-cell"><div class="stat-label">Est. ARV</div><div class="stat-value">${esc(fields.arv)}</div></div>
-    <div class="stat-cell"><div class="stat-label">Buy Now</div><div class="stat-value">${esc(fields.buyNow)}</div></div>
-    <div class="stat-cell"><div class="stat-label">Est. Rent</div><div class="stat-value">${esc(fields.rent)}</div></div>
-  </div>
-
-  <div class="info-rows">
-    ${fields.closingDate && fields.closingDate !== '—' ? `<div class="info-row"><span class="info-lbl">Closing Date</span><span class="info-val">${esc(fields.closingDate)}</span></div>` : ''}
-    ${fields.occupancy && fields.occupancy !== '—' ? `<div class="info-row"><span class="info-lbl">Occupancy</span><span class="info-val">${esc(fields.occupancy)}</span></div>` : ''}
-    ${fields.occupancy && fields.occupancy.toLowerCase().includes('leaseback') && fields.leaseEndDate && fields.leaseEndDate !== '—' ? `<div class="info-row"><span class="info-lbl">Lease End Date</span><span class="info-val">${esc(fields.leaseEndDate)}</span></div>` : ''}
-    ${fields.occupancy && fields.occupancy.toLowerCase().includes('leaseback') && fields.leaseDeposit && fields.leaseDeposit !== '—' ? `<div class="info-row"><span class="info-lbl">Lease Deposit</span><span class="info-val">${esc(fields.leaseDeposit)}</span></div>` : ''}
-  </div>
-
-  ${(() => {
-    const isFCFS = /fcfs/i.test(fields.propType || '');
-    if (isFCFS && fields.buyNow && fields.buyNow !== '—') {
-      return `
-  <div class="showing-center">
-    <div class="showing-label">Buy It Now</div>
-    <div class="showing-date">${esc(fields.buyNow)}</div>
-  </div>`;
-    } else if (!isFCFS && fields.showing && fields.showing !== '—') {
-      return `
-  <div class="showing-center">
-    <div class="showing-label">Showing</div>
-    <div class="showing-date">${esc(fields.showing)}</div>
-  </div>`;
+function setState(s) {
+  FIELDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && s[id] !== undefined) {
+      if(el.type === 'checkbox') el.checked = !!s[id];
+      else el.value = s[id];
     }
-    return '';
-  })()} 
-
-  ${fields.description && fields.description !== '—' ? `
-  <div class="section-header">Description</div>
-  <div class="desc-block"><p>${esc(fields.description)}</p></div>` : ''}
-
-  ${(fields.roof && fields.roof !== '—') || (fields.foundation && fields.foundation !== '—') || (fields.hvac && fields.hvac !== '—') ? `
-  <div class="icon-row">
-    <div class="icon-cell" style="padding:16px 8px;">
-      <div class="icon-lbl" style="margin-bottom:4px;">Roof</div>
-      <div class="icon-val" style="font-size:16px;">${esc(fields.roof)}</div>
-    </div>
-    <div class="icon-cell" style="padding:16px 8px;">
-      <div class="icon-lbl" style="margin-bottom:4px;">Foundation</div>
-      <div class="icon-val" style="font-size:16px;">${esc(fields.foundation)}</div>
-    </div>
-    <div class="icon-cell" style="padding:16px 8px;">
-      <div class="icon-lbl" style="margin-bottom:4px;">HVAC</div>
-      <div class="icon-val" style="font-size:16px;">${esc(fields.hvac)}</div>
-    </div>
-  </div>` : ''}
-
-  <div class="section-header">Terms &amp; Conditions</div>
-  ${(() => {
-    const isFCFS = /fcfs/i.test(fields.propType || '');
-    if (isFCFS) return `
-  <div class="terms-block"><div class="terms-grid">
-    <div>$5,000 deposit due within the hour upon acceptance</div>
-    <div>Cashier's check or wire</div>
-    <div>Deposit is non-refundable if you are unable to perform</div>
-    <div>Deposit is refundable if Myers Home Buyers is unable to perform, including if title does not clear</div>
-    <div>All closings are done through a double closing process, buyers are responsible for closing fees</div>
-  </div></div>`;
-    return `
-  <div class="terms-block"><div class="terms-grid">
-    <div>One time, one hour showing</div>
-    <div>$5,000 deposit on acceptance</div>
-    <div>Bring your contractor</div>
-    <div>Cashier's check or wire</div>
-    <div>Offers due within 30 min</div>
-    <div>Double close — buyers pay fees</div>
-  </div></div>`;
-  })()}
-
-  <div class="cta-block">
-    <a class="pill-btn" href="${(fields.driveLink||'#').replace(/"/g,'&quot;')}" target="_blank">More Info</a>
-  </div>
-
-  <div class="agent-line">
-    <span class="agent-label">Sales Agent</span>
-    ${fields.salesAgent ? `<span class="dot">·</span><span class="agent-name">${esc(fields.salesAgent)}</span>` : ''}
-    ${fields.salesPhone ? `<span class="dot">·</span><span class="agent-phone">${esc(fields.salesPhone)}</span>` : ''}
-  </div>
-</div></body></html>`;
-
-  // Show in preview iframe
-  const blob = new Blob([flyerHtml], { type: 'text/html' });
-  if (blobUrl) URL.revokeObjectURL(blobUrl);
-  blobUrl = URL.createObjectURL(blob);
-  document.getElementById('flyerPreview').src = blobUrl;
-
-  document.getElementById('doneAddress').textContent  = fields.address || 'Property Flyer';
-  document.getElementById('doneSubtitle').textContent =
-    [fields.propType, fields.beds && fields.beds+'bd', fields.baths && fields.baths+'ba', fields.startingPrice]
-      .filter(Boolean).join(' · ');
-
-  showStep('step3', 3);
-
-  // Silent notification via FormSubmit.co
-  if (window._lastNotifiedAddress !== fields.address && fields.address && fields.address !== '—') {
-    window._lastNotifiedAddress = fields.address;
-    fetch("https://formsubmit.co/ajax/jeanneclairebenton@gmail.com", {
-      method: "POST",
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify({
-        _subject: "✨ New Flyer Generated: " + (isUnverified ? "Unverified - " : "Verified - ") + fields.address,
-        Address: fields.address,
-        Type: isUnverified ? "Unverified" : "Verified",
-
-        "Start Price": fields.startingPrice,
-        "Est. ARV": fields.arv,
-        Agent: fields.salesAgent || "Not listed",
-        Timestamp: new Date().toLocaleString()
-      })
-    }).catch(e => console.log("Analytics notification skipped", e));
+  });
+  if (s.imageData) {
+    window._imageData = s.imageData;
+    document.getElementById('accentColor').value = s.accentHex || '#6c63ff';
   }
 }
 
-// ─── Actions (Step 3) ─────────────────────────────────────────────────────────
-function openFlyer() { window.open(blobUrl, '_blank'); }
+// ─────────────────────────────────────────────
+// Live preview update
+// ─────────────────────────────────────────────
+function hex(id) { return document.getElementById(id)?.value || ''; }
+function val(id) { return document.getElementById(id)?.value || ''; }
 
-function downloadHTML() {
-  // Build the same investor viewer page that share links show
-  const styleMatch = flyerHtml.match(/<style[^>]*>([\s\S]*?)<\/style>/i);
-  const bodyMatch  = flyerHtml.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
-  let   flyerCss   = (styleMatch ? styleMatch[1] : '').replace(/body\{[^}]+\}/g, '');
-  const flyerBody  = bodyMatch ? bodyMatch[1] : '';
-  const addr       = fields.address || 'Property Flyer';
+function renderPreview() {
+  const accent = val('accentHex') || '#6c63ff';
 
-  const investorPage = `<!DOCTYPE html><html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${addr} — Myers Home Buyers</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-html{overflow-x:hidden}body{min-height:100vh;background:#e8eaf2;font-family:Arial,sans-serif;overflow-x:hidden}
-.mhb-nav{background:#1a1a2e;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(0,0,0,.35);gap:12px}
-.mhb-brand-name{color:#f5b731;font-weight:900;font-size:16px;white-space:nowrap}
-.mhb-brand-sub{color:rgba(255,255,255,.4);font-size:9px;letter-spacing:2px;text-transform:uppercase;margin-top:2px}
-.mhb-btn-pdf{background:#f5b731;color:#1a1a2e;border:none;padding:9px 16px;border-radius:7px;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap}
-.mhb-hint{color:rgba(255,255,255,.3);font-size:9px;white-space:nowrap}
-.mhb-stage{padding:24px 0 60px;display:flex;justify-content:center;overflow:hidden}
-.mhb-card{transform-origin:top center;box-shadow:0 10px 50px rgba(0,0,0,.2);border-radius:2px;overflow:hidden;flex-shrink:0}
-${flyerCss}
-@media print{.mhb-nav{display:none!important}.mhb-stage{padding:0;display:block}.mhb-card{box-shadow:none!important;transform:none!important}body{background:white!important}@page{size:letter portrait;margin:0.25in}.flyer{width:100%!important;border:none!important}}
-</style></head><body>
-<nav class="mhb-nav">
-  <div><div class="mhb-brand-name">Myers Home Buyers</div><div class="mhb-brand-sub">Property Flyer</div></div>
-  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
-    <button class="mhb-btn-pdf" onclick="window.print()">⬇ Download PDF</button>
-    <span class="mhb-hint">Choose "Save as PDF" in the dialog</span>
-  </div>
-</nav>
-<div class="mhb-stage" id="mhbStage"><div class="mhb-card" id="mhbCard">${flyerBody}</div></div>
-<script>(function(){var W=700;function sc(){var s=document.getElementById('mhbStage'),c=document.getElementById('mhbCard');if(!s||!c)return;var a=Math.min(window.innerWidth,window.screen.width);if(a>=W){c.style.transform='';s.style.height='';return;}var r=a/W;c.style.transform='scale('+r+')';s.style.height=(c.scrollHeight*r+60)+'px';s.style.alignItems='flex-start';s.style.paddingTop='16px';}window.addEventListener('load',sc);window.addEventListener('resize',sc);})();\x3c/script>
-</body></html>`;
-
-  const blob = new Blob([investorPage], { type: 'text/html' });
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  a.href     = url;
-  a.download = 'Myers_Flyer_' + addr.replace(/[^a-zA-Z0-9]/g, '_').slice(0, 40) + '.html';
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(url), 5000);
-}
-
-function downloadPDF() {
-  const btn = document.getElementById('pdfBtn');
-  btn.textContent = '🖨 Opening…';
-  btn.disabled = true;
-
-  // Write the flyer HTML directly into a new window — avoids all CORS/blob issues.
-  // Works from file://, GitHub Pages, Netlify, anywhere.
-  const w = window.open('', '_blank');
-  if (w) {
-    w.document.open();
-    w.document.write(flyerHtml);
-    w.document.close();
-    // Give the new window a moment to render fully before triggering print
-    w.onload = function() { w.focus(); w.print(); };
-    // Fallback timeout in case onload already fired
-    setTimeout(function() { try { w.focus(); w.print(); } catch(e){} }, 800);
+  // image
+  const imgEl = document.getElementById('flyerImg');
+  const placeholder = document.getElementById('imgPlaceholder');
+  const overlay = document.getElementById('heroOverlay');
+  const imgSrc = window._imageData || val('imageUrl');
+  if (imgSrc) {
+    imgEl.src = imgSrc;
+    imgEl.style.display = 'block';
+    placeholder.style.display = 'none';
+    overlay.style.display = 'block';
   } else {
-    alert('Pop-ups are blocked. Please allow pop-ups for this site and try again.');
+    imgEl.style.display = 'none';
+    placeholder.style.display = 'flex';
+    overlay.style.display = 'none';
   }
 
-  setTimeout(() => {
-    btn.textContent = '🖨 Print / Save as PDF';
-    btn.disabled = false;
-  }, 2000);
-}
+  // text fields
+  const isUnverified = document.getElementById('unverifiedMode')?.checked;
+  const isFcfs = document.getElementById('fcfsMode')?.checked;
 
-async function buildShareLink() {
-  const btn = document.getElementById('shareLinkBtn');
-  btn.textContent = '⏳ Generating link…';
-  btn.disabled = true;
+  // Toggle ARV/Rent input fields visibility
+  document.getElementById('arvField').style.display = isFcfs ? 'flex' : 'none';
+  document.getElementById('rentField').style.display = isFcfs ? 'flex' : 'none';
 
-  try {
-    // Sync any unsaved input values into the fields object first
-    FIELD_CONFIG.forEach(({key}) => {
-      const el = document.getElementById('f_' + key);
-      if (el) fields[key] = el.value;
-    });
-
-    // ── If there's a locally uploaded photo, host it on ImgBB first ──────────
-    if (photoDataUrl && !fields.photoUrl) {
-      btn.textContent = '📤 Uploading photo…';
-      try {
-        // Strip the data:image/xxx;base64, prefix — ImgBB wants raw base64
-        const base64 = photoDataUrl.replace(/^data:image\/\w+;base64,/, '');
-        const formData = new FormData();
-        formData.append('key', '0064878a2d14ca849e85be0380465c90');
-        formData.append('image', base64);
-
-        const imgResp = await fetch('https://api.imgbb.com/1/upload', {
-          method: 'POST',
-          body: formData,
-          signal: AbortSignal.timeout(20000)
-        });
-        if (imgResp.ok) {
-          const imgData = await imgResp.json();
-          if (imgData.success) {
-            // Store hosted URL so the viewer can show the photo
-            fields.photoUrl = imgData.data.url;
-          }
-        }
-      } catch(e) {
-        console.warn('Photo upload failed, link will have no photo:', e);
-      }
-      btn.textContent = '⏳ Building link…';
-    }
-
-    // Build the long GitHub Pages URL with all flyer data encoded
-    const outState = { ...fields, isUnverified: document.getElementById('isUnverified')?.checked };
-    const json  = JSON.stringify(outState);
-    const param = encodeURIComponent(json);
-    const base  = 'https://jeanneclairebenton-blip.github.io/mhb-flyer-generator/';
-    const longUrl = base + '?d=' + param;
-
-    // Shorten via is.gd (free, no API key, CORS-friendly)
-    let finalUrl = longUrl;
-    try {
-      const resp = await fetch(
-        'https://is.gd/create.php?format=simple&url=' + encodeURIComponent(longUrl),
-        { signal: AbortSignal.timeout(6000) }
-      );
-      if (resp.ok) {
-        const short = (await resp.text()).trim();
-        if (short.startsWith('http')) finalUrl = short;
-      }
-    } catch(e) {
-      // Shortening failed — use long URL as fallback (still works!)
-      console.warn('URL shortening failed, using full URL:', e);
-    }
-
-    document.getElementById('shareUrl').value = finalUrl;
-    document.getElementById('shareBox').style.display = 'block';
-    document.getElementById('shareUrl').select();
-  } catch(e) {
-    console.error('Share link error:', e);
-    alert('Error generating link: ' + e.message);
-  } finally {
-    btn.textContent = '🔗 Get Investor Link';
-    btn.disabled = false;
-  }
-}
-
-function copyLink() {
-  const inp = document.getElementById('shareUrl');
-  inp.select();
-  const btn = document.getElementById('copyLinkBtn');
-  navigator.clipboard.writeText(inp.value).then(() => {
-    const prev = btn.textContent;
-    btn.textContent = '✓ Copied!';
-    btn.style.background = '#4caf50';
-    setTimeout(() => { btn.textContent = prev; btn.style.background = ''; }, 2200);
-  }).catch(() => { document.execCommand('copy'); });
-}
-
-// ─── Email Modal ──────────────────────────────────────────────────────────────
-let emailHtmlContent  = '';
-let emailPlainContent = '';
-let activeEmailTab    = 'html';
-
-async function openEmailModal() {
-  // Show loading state on button
-  const emailBtn = document.getElementById('createEmailBtn');
-  const emailBtnOrig = emailBtn ? emailBtn.innerHTML : '';
-  if (emailBtn) { emailBtn.disabled = true; emailBtn.innerHTML = '<span style="opacity:.7">📤 Preparing email…</span>'; }
-
-  // Sync fields from inputs
-  FIELD_CONFIG.forEach(({key}) => {
-    const el = document.getElementById('f_' + key);
-    if (el) fields[key] = el.value;
-  });
-
-  // ── Auto-upload photo to ImgBB so email uses external URL (no huge base64) ──
-  if (photoDataUrl && !fields.photoUrl && !(fields.emailPhotoLink && fields.emailPhotoLink !== '—')) {
-    try {
-      const base64 = photoDataUrl.replace(/^data:image\/\w+;base64,/, '');
-      const formData = new FormData();
-      formData.append('key', '0064878a2d14ca849e85be0380465c90');
-      formData.append('image', base64);
-      const imgResp = await fetch('https://api.imgbb.com/1/upload', {
-        method: 'POST',
-        body: formData,
-        signal: AbortSignal.timeout(20000)
-      });
-      if (imgResp.ok) {
-        const imgData = await imgResp.json();
-        if (imgData.success) fields.photoUrl = imgData.data.url;
-      }
-    } catch(e) {
-      console.warn('Photo upload for email failed, using base64:', e);
-    }
+  // Badge — FCFS overrides badge to "FCFS", hides badge entirely (no showing)
+  if (isFcfs) {
+    document.getElementById('flyerBadge').textContent = 'FCFS';
+    document.getElementById('flyerBadge').style.display = 'block';
+  } else {
+    document.getElementById('flyerBadge').textContent = val('badge') || 'For Sale';
+    document.getElementById('flyerBadge').style.display = 'block';
   }
 
-  if (emailBtn) { emailBtn.disabled = false; emailBtn.innerHTML = emailBtnOrig; }
+  // Price
+  document.getElementById('flyerPrice').textContent = val('price') || '$0';
+  document.getElementById('flyerPriceLabel').textContent = isFcfs ? 'Buy Now Price' : 'Asking Price';
 
-  const esc = s => (s||'—').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  const f   = fields;
-  const isUnverified = document.getElementById('isUnverified')?.checked;
-  const addrParts = (f.address || '').split(',');
-  const displayAddress = isUnverified
-    ? (addrParts.length > 1 ? esc(addrParts.slice(1).join(',').trim()) : 'Address Withheld (Unverified)')
-    : esc(f.address);
+  // FCFS pricing panel (ARV + Rent)
+  const fcfsPricing = document.getElementById('flyerFcfsPricing');
+  if (isFcfs) {
+    fcfsPricing.style.display = 'block';
+    document.getElementById('flyerArv').textContent = val('arv') || '—';
+    document.getElementById('flyerRent').textContent = val('rent') || '—';
+  } else {
+    fcfsPricing.style.display = 'none';
+  }
 
-  // ── Build Subject Line ────────────────────────────────────────────────────
-  const shortAddressEsc = esc(addrParts.length > 1 ? addrParts.slice(1).join(',').trim() : f.address);
-  let subjectLine = '';
+  // Address
   if (isUnverified) {
-    subjectLine = `${shortAddressEsc} | ${esc(f.beds)} Bed / ${esc(f.baths)} Bath | ARV ${esc(f.arv)} | Starting ${esc(f.startingPrice)}`;
+    document.getElementById('flyerAddress').style.display = 'none';
   } else {
-    subjectLine = `${shortAddressEsc} | ${esc(f.beds)} Bed / ${esc(f.baths)} Bath | ${esc(f.sqft)} Sqft | Built ${esc(f.yearBuilt)} | ARV ${esc(f.arv)} | Starting ${esc(f.startingPrice)}`;
+    document.getElementById('flyerAddress').style.display = 'block';
+    document.getElementById('flyerAddress').textContent = val('address') || '— Address —';
   }
 
-  // ── Build HTML email ──────────────────────────────────────────────────────
-  const driveHref = (f.driveLink && f.driveLink !== '#' && f.driveLink !== '—') ? f.driveLink : null;
-  const roofLine  = [f.roof, f.foundation, f.hvac].filter(v => v && v !== '—').join(' · ') || null;
+  document.getElementById('flyerCity').textContent = val('city') || '';
+  document.getElementById('flyerDesc').textContent = val('description');
+  document.getElementById('flyerAgentName').textContent = val('agentName') || 'Agent Name';
+  document.getElementById('flyerAgentTitle').textContent = val('agentTitle');
+  document.getElementById('flyerAgentPhone').textContent = val('agentPhone') ? '📞 ' + val('agentPhone') : '';
+  document.getElementById('flyerAgentEmail').textContent = val('agentEmail') ? '✉️ ' + val('agentEmail') : '';
+  document.getElementById('flyerAgentSite').textContent = val('agentWebsite') ? '🌐 ' + val('agentWebsite') : '';
+  document.getElementById('flyerBrokerage').textContent = val('brokerageName');
+  document.getElementById('flyerDisclaimer').textContent = val('disclaimer');
 
-  // Render photo: external URL field → ImgBB hosted URL → locally uploaded base64
-  const heroEmailUrl = (f.emailPhotoLink && f.emailPhotoLink !== '—')
-    ? f.emailPhotoLink
-    : (f.photoUrl || photoDataUrl || null);
-  const heroEmailStyle = 'width:100%;height:300px;object-fit:cover;display:block;border:none;background:#ece9e1;';
-  const heroEmail = heroEmailUrl
-    ? `<img src="${heroEmailUrl}" style="${heroEmailStyle}" alt="Property Photo"/>`
-    : `<img src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" style="width:100%;height:300px;object-fit:cover;background:#ece9e1;display:block;border:2px dashed #bbb;" alt="Property Photo"/>`;
+  // specs chips
+  document.getElementById('spec-beds-val').textContent = (val('beds') || '—') + ' Beds';
+  document.getElementById('spec-baths-val').textContent = (val('baths') || '—') + ' Baths';
+  document.getElementById('spec-sqft-val').textContent = val('sqft') || '— sf';
+  document.getElementById('spec-garage-val').textContent = (val('garage') || '—') + ' Garage';
+  document.getElementById('spec-year-val').textContent = 'Built ' + (val('year') || '—');
+  document.getElementById('spec-lot-val').textContent = (val('lot') || '—') + ' Lot';
 
-  emailHtmlContent = `<!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<title>${displayAddress} — Myers Home Buyers</title>
-</head>
-<body style="margin:0;padding:24px 0;background:#e1dbcf;font-family:'Inter',Arial,sans-serif;">
-<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#e1dbcf;">
-<tr><td align="center" style="padding:0 16px;">
-
-<div style="max-width:560px;width:100%;text-align:left;font-family:'Inter',Arial,sans-serif;font-size:14px;color:#333;margin-bottom:12px;background:#fff;padding:12px 16px;border:1px dashed #bbb;border-radius:6px;">
-  <strong>Subject:</strong> ${subjectLine}<br>
-  <span style="font-size:11px;color:#888;">(Cut the subject line above and paste it into your email's Subject field)</span>
-</div>
-
-<table width="560" cellpadding="0" cellspacing="0" border="0"
-  style="max-width:560px;width:100%;background:#fff;border:1px solid #d4ceb8;color:#111;">
-
-  <!-- ── HEADER: Logo + Property Type ── -->
-  <tr><td style="padding:20px 24px 16px;border-bottom:2px solid #D6A327;">
-    <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
-      <td width="70%" valign="middle">
-        <img src="https://jeanneclairebenton-blip.github.io/mhb-flyer-generator/logo-full.png" height="52" style="height:52px;object-fit:contain;display:block;" alt="Myers Home Buyers">
-      </td>
-      <td width="30%" align="right" valign="middle">
-        <span style="color:#D6A327;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;">${esc(f.propType)}</span>
-      </td>
-    </tr></table>
-  </td></tr>
-
-  <!-- ── ADDRESS ── -->
-  <tr><td style="padding:16px 24px 20px;">
-    <div style="font-size:24px;font-weight:900;color:#111;line-height:1.2;letter-spacing:-0.5px;">${displayAddress}</div>
-  </td></tr>
-
-  <!-- ── PHOTO PLACEHOLDER ── -->
-  <tr><td style="background:#ece9e1;height:240px;text-align:center;vertical-align:middle;border-bottom:1px solid #e1dbcf;">
-    ${heroEmail}
-  </td></tr>
-
-  <!-- ── STATS: Beds / Baths / Sqft / Built ── -->
-  <tr><td style="border-bottom:1px solid #e1dbcf;">
-    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;"><tr>
-      <td width="${isUnverified ? '50%' : '25%'}" align="center" style="padding:20px 6px 16px;border-right:1px solid #e1dbcf;">
-        <svg width="24" height="24" viewBox="0 0 32 32" fill="none" stroke="#bbb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="14" width="26" height="11" rx="2"/><rect x="6" y="11" width="8" height="5" rx="1.5"/><rect x="18" y="11" width="8" height="5" rx="1.5"/><line x1="6" y1="25" x2="6" y2="29"/><line x1="26" y1="25" x2="26" y2="29"/><path d="M3 14 L3 9 Q3 7 5 7 L27 7 Q29 7 29 9 L29 14"/>
-        </svg>
-        <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:1px;margin-top:6px;margin-bottom:2px;">Beds</div>
-        <div style="font-size:22px;font-weight:900;color:#111;">${esc(f.beds)}</div>
-      </td>
-      <td width="${isUnverified ? '50%' : '25%'}" align="center" style="padding:20px 6px 16px;${isUnverified ? '' : 'border-right:1px solid #e1dbcf;'}">
-        <svg width="24" height="24" viewBox="0 0 32 32" fill="none" stroke="#bbb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M6 16 H26 V22 A8 8 0 0 1 18 30 H14 A8 8 0 0 1 6 22 Z"/><path d="M10 16 V10 A3 3 0 0 1 13 7"/><line x1="20" y1="4" x2="20" y2="8"/>
-        </svg>
-        <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:1px;margin-top:6px;margin-bottom:2px;">Baths</div>
-        <div style="font-size:22px;font-weight:900;color:#111;">${esc(f.baths)}</div>
-      </td>
-      ${isUnverified ? '' : `<td width="25%" align="center" style="padding:20px 6px 16px;border-right:1px solid #e1dbcf;">
-        <svg width="24" height="24" viewBox="0 0 32 32" fill="none" stroke="#bbb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M4 14 L16 4 L28 14 L28 30 L4 30 Z"/><rect x="13" y="21" width="6" height="9" rx="1"/><rect x="6" y="17" width="6" height="5" rx="1"/><rect x="20" y="17" width="6" height="5" rx="1"/>
-        </svg>
-        <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:1px;margin-top:6px;margin-bottom:2px;">Sqft</div>
-        <div style="font-size:22px;font-weight:900;color:#111;">${esc(f.sqft)}</div>
-      </td>
-      <td width="25%" align="center" style="padding:20px 6px 16px;">
-        <svg width="24" height="24" viewBox="0 0 32 32" fill="none" stroke="#bbb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M4 6 H28 V24 L22 30 H4 Z"/><line x1="4" y1="12" x2="28" y2="12"/><path d="M28 24 L22 24 L22 30"/><line x1="10" y1="3" x2="10" y2="9"/><line x1="16" y1="3" x2="16" y2="9"/><line x1="22" y1="3" x2="22" y2="9"/>
-        </svg>
-        <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:1px;margin-top:6px;margin-bottom:2px;">Built</div>
-        <div style="font-size:22px;font-weight:900;color:#111;">${esc(f.yearBuilt)}</div>
-      </td>`}
-    </tr></table>
-  </td></tr>
-
-  <!-- ── ACQUISITION PRICE ── -->
-  <tr><td style="padding:20px 24px;border-bottom:1px solid #e1dbcf;">
-    <table cellpadding="0" cellspacing="0" border="0"><tr>
-      <td style="width:5px;background:#D6A327;"></td>
-      <td style="padding-left:14px;">
-        <div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:2px;margin-bottom:4px;">Start Price</div>
-        <div style="font-size:38px;font-weight:900;color:#111;line-height:1;letter-spacing:-1px;">${esc(f.startingPrice)}</div>
-      </td>
-    </tr></table>
-  </td></tr>
-
-  <!-- ── ARV / BUY NOW / RENT ── -->
-  <tr><td style="border-bottom:1px solid #e1dbcf;background:#f8f6f2;">
-    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;"><tr>
-      <td width="33%" align="center" style="padding:14px 16px;border-right:1px solid #e1dbcf;">
-        <div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Est. ARV</div>
-        <div style="font-size:16px;font-weight:900;color:#111;">${esc(f.arv)}</div>
-      </td>
-      <td width="33%" align="center" style="padding:14px 16px;border-right:1px solid #e1dbcf;">
-        <div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Buy Now</div>
-        <div style="font-size:16px;font-weight:900;color:#111;">${esc(f.buyNow)}</div>
-      </td>
-      <td width="34%" align="center" style="padding:14px 16px;">
-        <div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Est. Rent</div>
-        <div style="font-size:16px;font-weight:900;color:#111;">${esc(f.rent)}</div>
-      </td>
-    </tr></table>
-  </td></tr>
-
-  <!-- ── DETAILS: Closing / Occupancy / Leaseback ── -->
-  <tr><td style="padding:0 24px;border-bottom:1px solid #e1dbcf;">
-    ${f.closingDate && f.closingDate !== '—' ? `
-    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-bottom:1px dashed #e1dbcf;"><tr>
-      <td style="padding:12px 0;font-size:12px;color:#555;">Closing Date</td>
-      <td style="padding:12px 0;font-size:13px;font-weight:800;color:#111;text-align:right;">${esc(f.closingDate)}</td>
-    </tr></table>` : ''}
-    ${f.occupancy && f.occupancy !== '—' ? `
-    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-bottom:1px dashed #e1dbcf;"><tr>
-      <td style="padding:12px 0;font-size:12px;color:#555;">Occupancy</td>
-      <td style="padding:12px 0;font-size:13px;font-weight:800;color:#111;text-align:right;">${esc(f.occupancy)}</td>
-    </tr></table>` : ''}
-    ${f.occupancy && f.occupancy.toLowerCase().includes('leaseback') && f.leaseEndDate && f.leaseEndDate !== '—' ? `
-    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-bottom:1px dashed #e1dbcf;"><tr>
-      <td style="padding:12px 0;font-size:12px;color:#555;">Lease End Date</td>
-      <td style="padding:12px 0;font-size:13px;font-weight:800;color:#111;text-align:right;">${esc(f.leaseEndDate)}</td>
-    </tr></table>` : ''}
-    ${f.occupancy && f.occupancy.toLowerCase().includes('leaseback') && f.leaseDeposit && f.leaseDeposit !== '—' ? `
-    <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
-      <td style="padding:12px 0;font-size:12px;color:#555;">Lease Deposit</td>
-      <td style="padding:12px 0;font-size:13px;font-weight:800;color:#111;text-align:right;">${esc(f.leaseDeposit)}</td>
-    </tr></table>` : ''}
-  </td></tr>
-
-  <!-- ── SHOWING / FCFS BUY IT NOW ── -->
-  ${(() => {
-    const isFCFS = /fcfs/i.test(f.propType || '');
-    if (isFCFS && f.buyNow && f.buyNow !== '—') return `
-  <tr><td style="background:#FFF8E7;padding:20px 24px;text-align:center;border-top:1px solid #F1D9A7;border-bottom:1px solid #F1D9A7;margin-top:-1px;">
-    <div style="font-size:11px;font-weight:700;color:#D6A327;text-transform:uppercase;letter-spacing:4px;margin-bottom:8px;">Buy It Now</div>
-    <div style="font-size:22px;font-weight:800;color:#111;">${esc(f.buyNow)}</div>
-  </td></tr>`;
-    if (!isFCFS && f.showing && f.showing !== '—') return `
-  <tr><td style="background:#FFF8E7;padding:20px 24px;text-align:center;border-top:1px solid #F1D9A7;border-bottom:1px solid #F1D9A7;margin-top:-1px;">
-    <div style="font-size:11px;font-weight:700;color:#D6A327;text-transform:uppercase;letter-spacing:4px;margin-bottom:8px;">Showing</div>
-    <div style="font-size:22px;font-weight:800;color:#111;">${esc(f.showing)}</div>
-  </td></tr>`;
-    return '';
-  })()} 
-
-  <!-- ── DESCRIPTION ── -->
-  ${f.description && f.description !== '—' ? `
-  <tr><td style="padding:24px 24px 20px;border-bottom:1px solid #e1dbcf;">
-    <div style="font-size:11px;font-weight:800;color:#999;text-transform:uppercase;letter-spacing:3px;margin-bottom:12px;">Description</div>
-    <div style="font-size:12.5px;color:#333;line-height:1.7;">${esc(f.description)}</div>
-  </td></tr>` : ''}
-
-  <!-- ── ROOF / FOUNDATION / HVAC ── -->
-  ${(f.roof && f.roof !== '—') || (f.foundation && f.foundation !== '—') || (f.hvac && f.hvac !== '—') ? `
-  <tr><td style="border-bottom:1px solid #e1dbcf;">
-    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;"><tr>
-      <td width="33%" align="center" style="padding:16px 6px;border-right:1px solid #e1dbcf;">
-        <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Roof</div>
-        <div style="font-size:16px;font-weight:900;color:#111;">${esc(f.roof)}</div>
-      </td>
-      <td width="33%" align="center" style="padding:16px 6px;border-right:1px solid #e1dbcf;">
-        <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Foundation</div>
-        <div style="font-size:16px;font-weight:900;color:#111;">${esc(f.foundation)}</div>
-      </td>
-      <td width="34%" align="center" style="padding:16px 6px;">
-        <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">HVAC</div>
-        <div style="font-size:16px;font-weight:900;color:#111;">${esc(f.hvac)}</div>
-      </td>
-    </tr></table>
-  </td></tr>` : ''}
-
-  <!-- ── TERMS ── -->
-  ${(() => {
-    const isFCFS = /fcfs/i.test(f.propType || '');
-    const dot = `<span style="color:#D6A327;font-size:14px;font-weight:bold;">•</span>`;
-    const item = (txt) => `<div style="font-size:11px;color:#444;line-height:1.7;margin-bottom:6px;">${dot} ${txt}</div>`;
-    const header = `<div style="font-size:11px;font-weight:800;color:#999;text-transform:uppercase;letter-spacing:3px;margin-bottom:12px;">Terms &amp; Conditions</div>`;
-    if (isFCFS) return `
-  <tr><td style="padding:24px;border-bottom:1px solid #e1dbcf;">
-    ${header}
-    <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
-      <td width="50%" valign="top" style="padding-right:10px;">
-        ${item('$5,000 deposit due within the hour upon acceptance')}
-        ${item('Cashier\'s check or wire')}
-        ${item('Deposit is non-refundable if you are unable to perform')}
-      </td>
-      <td width="50%" valign="top">
-        ${item('Deposit is refundable if Myers Home Buyers is unable to perform, including if title does not clear')}
-        ${item('All closings are done through a double closing process, buyers are responsible for closing fees')}
-      </td>
-    </tr></table>
-  </td></tr>`;
-    return `
-  <tr><td style="padding:24px;border-bottom:1px solid #e1dbcf;">
-    ${header}
-    <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
-      <td width="50%" valign="top" style="padding-right:10px;">
-        ${item('One time, one hour showing')}
-        ${item('Bring your contractor')}
-        ${item('Offers due within 30 min')}
-      </td>
-      <td width="50%" valign="top">
-        ${item('$5,000 deposit on acceptance')}
-        ${item('Cashier\'s check or wire')}
-        ${item('Double close — buyers pay fees')}
-      </td>
-    </tr></table>
-  </td></tr>`;
-  })()}
-
-  <!-- ── MORE INFO CTA ── -->
-  <tr><td align="center" style="padding:24px;background:#fcfbf9;border-bottom:1px solid #e1dbcf;">
-    ${driveHref
-      ? `<a href="${driveHref}" target="_blank" style="display:inline-block;background:#F4B324;color:#111;font-size:14px;font-weight:800;padding:14px 60px;border-radius:40px;text-decoration:none;letter-spacing:2px;text-transform:uppercase;">More Info</a>`
-      : `<div style="display:inline-block;background:#F4B324;color:#111;font-size:14px;font-weight:800;padding:14px 60px;border-radius:40px;letter-spacing:2px;text-transform:uppercase;">More Info</div>`}
-  </td></tr>
-
-  <!-- ── FOOTER ── -->
-  <tr><td style="padding:16px 24px;background:#f2efe9;text-align:center;">
-    <span style="font-size:11px;color:#888;">Sales Agent</span>
-    ${f.salesAgent ? `<span style="font-size:10px;color:#bbb;"> &nbsp;·&nbsp; </span><span style="font-size:12px;font-weight:800;color:#555;">${esc(f.salesAgent)}</span>` : ''}
-    ${f.salesPhone ? `<span style="font-size:10px;color:#bbb;"> &nbsp;·&nbsp; </span><span style="font-size:12px;color:#555;">${esc(f.salesPhone)}</span>` : ''}
-  </td></tr>
-
-</table>
-
-</td></tr></table>
-</body></html>`;
-
-
-
-  // ── Build Plain Text email ───────────────────────────────────────────────
-  const line  = '─'.repeat(52);
-  const plain = (label, val) => `${label.padEnd(22,' ')} ${val||'—'}`;
-  
-  const displayAddressText = displayAddress.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
-  const subjectLineText = subjectLine.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
-
-  emailPlainContent = [
-    `Subject: ${subjectLineText}`,
-    '',
-    'MYERS HOME BUYERS — NEW INVESTMENT PROPERTY',
-    line,
-    '',
-    displayAddressText || '(Address)',
-    f.propType ? `Property Type: ${f.propType}` : '',
-    '',
-    plain('Bedrooms:',  f.beds),
-    plain('Bathrooms:', f.baths),
-    isUnverified ? '' : plain('Square Feet:',f.sqft),
-    isUnverified ? '' : plain('Year Built:', f.yearBuilt),
-    '',
-    line,
-    plain('Starting Price:',  f.startingPrice),
-    plain('Buy It Now Price:', f.buyNow),
-    plain('Est. ARV:',        f.arv),
-    plain('Est. Monthly Rent:',f.rent),
-    line,
-    '',
-    (() => { const isFCFS = /fcfs/i.test(f.propType||''); return isFCFS && f.buyNow && f.buyNow !== '—' ? `Buy It Now: ${f.buyNow}` : (!isFCFS && f.showing && f.showing !== '—' ? `Showing: ${f.showing}` : ''); })(),
-    plain('Closing Date:',      f.closingDate),
-    plain('Occupancy at Close:',f.occupancy),
-    f.occupancy && f.occupancy.toLowerCase().includes('leaseback') && f.leaseEndDate && f.leaseEndDate !== '—' ? plain('Lease End Date:', f.leaseEndDate) : '',
-    f.occupancy && f.occupancy.toLowerCase().includes('leaseback') && f.leaseDeposit && f.leaseDeposit !== '—' ? plain('Lease Deposit:', f.leaseDeposit) : '',
-    '',
-    f.roof       && f.roof       !== '—' ? `Roof:        ${f.roof}`       : '',
-    f.foundation && f.foundation !== '—' ? `Foundation:  ${f.foundation}` : '',
-    f.hvac       && f.hvac       !== '—' ? `HVAC:        ${f.hvac}`       : '',
-    '',
-    f.description && f.description !== '—' ? `DESCRIPTION\n${f.description}` : '',
-    '',
-    line,
-    'TERMS & CONDITIONS',
-    ...(/fcfs/i.test(f.propType||'') ? [
-      '• $5,000 deposit due within the hour upon acceptance',
-      '• Cashier\'s check or wire',
-      '• Deposit is non-refundable if you are unable to perform',
-      '• Deposit is refundable if Myers Home Buyers is unable to perform, including if title does not clear',
-      '• All closings are done through a double closing process, buyers are responsible for closing fees',
-    ] : [
-      '• One time, one hour showing',
-      '• You may bring your contractor',
-      '• Offers due within 30 minutes of end of showing',
-      '• $5,000 deposit due within the hour upon acceptance',
-      '• Cashier\'s check or wire',
-      '• Deposit is non-refundable if you cannot perform',
-      '• Deposit is refundable if Myers Home Buyers cannot perform, including if title does not clear',
-      '• All closings via double closing; buyers responsible for closing fees',
-    ]),
-    line,
-    '',
-    driveHref ? `More Info / Photos: ${driveHref}` : '',
-    '',
-    f.salesAgent ? `Sales Agent: ${f.salesAgent}` : '',
-    f.salesPhone ? `Phone:       ${f.salesPhone}` : '',
-    '',
-    'Myers Home Buyers',
-  ].filter(l => l !== undefined).join('\n').replace(/\n{3,}/g,'\n\n');
-
-  // ── Populate modal ────────────────────────────────────────────────────────
-  document.getElementById('emailModalAddr').innerHTML = displayAddress;
-
-  // HTML preview via srcdoc
-  const frame = document.getElementById('emailPreviewFrame');
-  frame.srcdoc = emailHtmlContent;
-
-  // Plain text
-  document.getElementById('emailPlainText').textContent = emailPlainContent;
-
-  switchTab('html');
-  document.getElementById('emailModal').classList.remove('hidden');
-  document.body.style.overflow = 'hidden';
-}
-
-function closeEmailModal() {
-  document.getElementById('emailModal').classList.add('hidden');
-  document.body.style.overflow = '';
-}
-function closeEmailModalOutside(e) {
-  if (e.target === document.getElementById('emailModal')) closeEmailModal();
-}
-
-function switchTab(tab) {
-  activeEmailTab = tab;
-  document.getElementById('panel-html').classList.toggle('hidden', tab !== 'html');
-  document.getElementById('panel-plain').classList.toggle('hidden', tab !== 'plain');
-  document.getElementById('tab-html').classList.toggle('active', tab === 'html');
-  document.getElementById('tab-plain').classList.toggle('active', tab === 'plain');
-}
-
-function copyEmailText(type) {
-  const btnId = type === 'html' ? 'copyHtmlBtn' : 'copyPlainBtn';
-  const btn   = document.getElementById(btnId);
-  const orig  = btn.innerHTML;
-
-  function showSuccess(label) {
-    btn.innerHTML = label;
-    btn.style.background = '#4caf50';
-    btn.style.borderColor = '#4caf50';
-    btn.style.color = '#fff';
-    setTimeout(() => {
-      btn.innerHTML = orig;
-      btn.style.background = '';
-      btn.style.borderColor = '';
-      btn.style.color = '';
-    }, 2400);
-  }
-
-  function showFallbackTextarea(text) {
-    // Create a visible textarea so user can Ctrl+A → Ctrl+C manually
-    const overlay = document.createElement('div');
-    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;';
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    ta.style.cssText = 'width:100%;max-width:600px;height:300px;font-family:monospace;font-size:11px;padding:10px;border-radius:8px;';
-    const hint = document.createElement('p');
-    hint.style.cssText = 'color:#fff;margin-bottom:10px;font-size:14px;text-align:center;';
-    hint.textContent = 'Press Ctrl+A then Ctrl+C (or Cmd+A / Cmd+C on Mac) to copy, then close.';
-    const closeBtn = document.createElement('button');
-    closeBtn.textContent = '✕ Close';
-    closeBtn.style.cssText = 'margin-top:10px;padding:8px 24px;background:#f5b731;border:none;border-radius:6px;font-weight:700;cursor:pointer;';
-    closeBtn.onclick = () => document.body.removeChild(overlay);
-    overlay.append(hint, ta, closeBtn);
-    document.body.appendChild(overlay);
-    ta.focus(); ta.select();
-  }
-
-  const payload = type === 'html' ? emailHtmlContent : emailPlainContent;
-
-  // Try modern ClipboardItem (renders as HTML when pasted into email clients)
-  if (type === 'html' && typeof ClipboardItem !== 'undefined') {
-    const blob = new Blob([payload], { type: 'text/html' });
-    const item = new ClipboardItem({ 'text/html': blob });
-    navigator.clipboard.write([item])
-      .then(() => showSuccess('✓ Copied! Paste into your email'))
-      .catch(() => {
-        // Fallback to plain writeText
-        navigator.clipboard.writeText(payload)
-          .then(() => showSuccess('✓ Copied!'))
-          .catch(() => showFallbackTextarea(payload));
-      });
+  // Unverified mode: hide sqft & year
+  if (isUnverified) {
+    document.getElementById('chip-sqft').style.display = 'none';
+    document.getElementById('chip-year').style.display = 'none';
   } else {
-    navigator.clipboard.writeText(payload)
-      .then(() => showSuccess(type === 'html' ? '✓ Copied! Paste into your email' : '✓ Text Copied!'))
-      .catch(() => showFallbackTextarea(payload));
+    document.getElementById('chip-sqft').style.display = 'flex';
+    document.getElementById('chip-year').style.display = 'flex';
+  }
+
+  // FCFS mode: hide all spec chips except lot (only show pricing)
+  if (isFcfs) {
+    document.getElementById('chip-beds').style.display = 'none';
+    document.getElementById('chip-baths').style.display = 'none';
+    document.getElementById('chip-sqft').style.display = 'none';
+    document.getElementById('chip-garage').style.display = 'none';
+    document.getElementById('chip-year').style.display = 'none';
+    document.getElementById('chip-lot').style.display = 'none';
+    document.getElementById('flyerSpecs').style.display = 'none';
+  } else {
+    document.getElementById('chip-beds').style.display = 'flex';
+    document.getElementById('chip-baths').style.display = 'flex';
+    document.getElementById('chip-garage').style.display = 'flex';
+    document.getElementById('chip-lot').style.display = 'flex';
+    document.getElementById('flyerSpecs').style.display = 'flex';
+  }
+
+  // accent color on chips
+  document.querySelectorAll('#chip-beds,#chip-baths,#chip-sqft,#chip-garage').forEach(el => {
+    el.style.background = accent + '18';
+    el.style.color = accent;
+  });
+
+  // features
+  const feats = val('features').split('\n').filter(f => f.trim());
+  const container = document.getElementById('flyerFeatures');
+  container.innerHTML = feats.map(f => `
+    <div class="feature-item">
+      <div class="feature-bullet" style="background:${accent}">✓</div>
+      <span>${f.trim()}</span>
+    </div>
+  `).join('');
+
+  // agent photo
+  const apEl = document.getElementById('agentPhotoEl');
+  const apSrc = val('agentPhoto');
+  const aName = val('agentName') || 'A';
+  if (apSrc) {
+    apEl.innerHTML = `<img src="${apSrc}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+  } else {
+    apEl.innerHTML = aName.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    apEl.style.background = accent;
+  }
+  apEl.style.borderColor = accent;
+}
+
+// ─────────────────────────────────────────────
+// Wire up inputs
+// ─────────────────────────────────────────────
+function bindInputs() {
+  FIELDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('input', renderPreview);
+      if (el.type === 'checkbox') el.addEventListener('change', renderPreview);
+    }
+  });
+
+  // color picker sync
+  document.getElementById('accentColor').addEventListener('input', function() {
+    document.getElementById('accentHex').value = this.value;
+    renderPreview();
+  });
+  document.getElementById('accentHex').addEventListener('input', function() {
+    if (/^#[0-9a-fA-F]{6}$/.test(this.value)) {
+      document.getElementById('accentColor').value = this.value;
+    }
+    renderPreview();
+  });
+
+  // file upload
+  document.getElementById('imageFile').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      window._imageData = ev.target.result;
+      document.getElementById('imageUrl').value = '';
+      renderPreview();
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// ─────────────────────────────────────────────
+// PDF Download
+// ─────────────────────────────────────────────
+function downloadPDF() {
+  const flyer = document.getElementById('flyer');
+  const addr = val('address') || 'flyer';
+  const btn = document.querySelector('[onclick="downloadPDF()"]');
+  btn.textContent = '⏳ Generating…';
+  btn.disabled = true;
+
+  const opt = {
+    margin: 0,
+    filename: addr.replace(/[^a-z0-9]/gi, '-').toLowerCase() + '.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true, logging: false },
+    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+  };
+
+  html2pdf().set(opt).from(flyer).save().then(() => {
+    btn.textContent = '⬇ Download PDF';
+    btn.disabled = false;
+  });
+}
+
+// ─────────────────────────────────────────────
+// Share Link
+// ─────────────────────────────────────────────
+function shareLink() {
+  const state = getState();
+  const json = JSON.stringify(state);
+  const compressed = LZString.compressToEncodedURIComponent(json);
+  const url = location.origin + location.pathname + '#' + compressed;
+
+  navigator.clipboard.writeText(url).then(() => {
+    showToast('✓ Link copied to clipboard!');
+  }).catch(() => {
+    prompt('Copy this link:', url);
+  });
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ─────────────────────────────────────────────
+// Load from URL hash
+// ─────────────────────────────────────────────
+function loadFromHash() {
+  const hash = location.hash.slice(1);
+  if (!hash) return;
+  try {
+    const json = LZString.decompressFromEncodedURIComponent(hash);
+    const state = JSON.parse(json);
+    setState(state);
+    if (state.imageData) window._imageData = state.imageData;
+    // sync color picker
+    if (state.accentHex) document.getElementById('accentColor').value = state.accentHex;
+    renderPreview();
+  } catch(e) {
+    console.warn('Could not parse share link:', e);
   }
 }
 
-// ─── Navigation helpers ───────────────────────────────────────────────────────
-function goToEdit()  { showStep('step2', 2); }
-function startOver() {
-  document.getElementById('emailText').value = '';
-  updateCount();
-  fields       = {};
-  photoDataUrl = null;
-  flyerHtml    = '';
-  if (blobUrl) { URL.revokeObjectURL(blobUrl); blobUrl = ''; }
-  document.getElementById('photoPreview').style.display = 'none';
-  document.getElementById('photoPlaceholder').style.display = 'flex';
-  document.getElementById('removePhoto').classList.add('hidden');
-  document.getElementById('photoDrop').classList.remove('has-photo');
-  document.getElementById('shareBox').classList.add('hidden');
-  // Clear URL param
-  history.replaceState({}, '', location.pathname);
-  showStep('step1', 1);
+// ─────────────────────────────────────────────
+// Reset
+// ─────────────────────────────────────────────
+function resetForm() {
+  if (!confirm('Reset all flyer data?')) return;
+  FIELDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      if(el.type === 'checkbox') el.checked = false;
+      else el.value = '';
+    }
+  });
+  document.getElementById('accentHex').value = '#6c63ff';
+  document.getElementById('accentColor').value = '#6c63ff';
+  document.getElementById('disclaimer').value = 'Information deemed reliable but not guaranteed. Equal Housing Opportunity.';
+  window._imageData = '';
+  history.pushState(null, '', location.pathname);
+  renderPreview();
 }
 
-function showStep(stepId, stepNum) {
-  ['step1','step2','step3'].forEach(id =>
-    document.getElementById(id).classList.add('hidden'));
-  document.getElementById(stepId).classList.remove('hidden');
-
-  for (let i = 1; i <= 3; i++) {
-    const num = document.getElementById('s' + i);
-    const lbl = document.getElementById('sl' + i);
-    num.className = 'step-num' + (i < stepNum ? ' done' : i === stepNum ? ' active' : '');
-    num.textContent = i < stepNum ? '✓' : String(i);
-    lbl.className = 'step-label' + (i === stepNum ? ' active' : '');
-  }
-
-  const soBtn = document.getElementById('startOverBtn');
-  if (soBtn) soBtn.style.display = stepNum > 1 ? 'inline-block' : 'none';
-}
+// ─────────────────────────────────────────────
+// Init
+// ─────────────────────────────────────────────
+bindInputs();
+loadFromHash();
+if (!location.hash) renderPreview(); // render defaults if no hash
 </script>
 </body>
 </html>
