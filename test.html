@@ -8,6 +8,8 @@
 <!-- Google Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<!-- HEIC Image Support -->
+<script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
 <style media="print">
   /* When printing the flyer page, hide browser chrome */
   @page { margin: 0; }
@@ -419,7 +421,7 @@ textarea:focus, input[type=text]:focus { border-color: #f5b731; }
         </div>
         <button class="remove-photo hidden" id="removePhoto" onclick="removePhoto(event)">✕ Remove</button>
       </div>
-      <input type="file" id="photoFile" accept="image/*" style="display:none" onchange="photoSelected(event)">
+      <input type="file" id="photoFile" accept="image/*,.heic,.heif" style="display:none" onchange="photoSelected(event)">
     </div>
 
     <div style="text-align:center;margin-top:4px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
@@ -534,6 +536,7 @@ const FIELD_CONFIG = [
   { key: 'foundation',    label: 'Foundation' },
   { key: 'hvac',          label: 'HVAC' },
   { key: 'description',   label: 'Property Description', full: true, tall: true },
+  { key: 'emailPhotoLink',label: 'Property Photo URL (For Email)', full: true },
   { key: 'driveLink',     label: 'Google Drive Link',   full: true },
   { key: 'agent',         label: 'Acquiring Agent',     full: true },
   { key: 'salesAgent',    label: 'Sales Agent Name' },
@@ -760,36 +763,71 @@ function photoDrop(e) {
 }
 function photoSelected(e) { const f = e.target.files[0]; if (f) loadPhoto(f); }
 function loadPhoto(file) {
-  const reader = new FileReader();
-  reader.onload = ev => {
-    photoDataUrl = ev.target.result;
-    const drop   = document.getElementById('photoDrop');
-    const prev   = document.getElementById('photoPreview');
-    const ph     = document.getElementById('photoPlaceholder');
-    const rm     = document.getElementById('removePhoto');
-    prev.src     = photoDataUrl;
-    prev.style.display = 'block';
-    ph.style.display   = 'none';
-    rm.classList.remove('hidden');
-    drop.classList.add('has-photo');
-    
-    // Asynchronously create an ultra-low-weight compressed version specifically for the CRM Email HTML payload.
-    const img = new Image();
-    img.onload = () => {
-      let w = img.width, h = img.height;
-      const MAX_W = 600, MAX_H = 450;
-      if (w > MAX_W || h > MAX_H) {
-        if (w/h > MAX_W/MAX_H) { h = Math.round(h * MAX_W/w); w = MAX_W; }
-        else { w = Math.round(w * MAX_H/h); h = MAX_H; }
-      }
-      const cvs = document.createElement('canvas');
-      cvs.width = w; cvs.height = h;
-      cvs.getContext('2d').drawImage(img, 0, 0, w, h);
-      photoDataUrlTiny = cvs.toDataURL('image/jpeg', 0.5);
+  const isHeic = file.name.toLowerCase().endsWith('.heic') || file.name.toLowerCase().endsWith('.heif') || file.type === 'image/heic' || file.type === 'image/heif';
+  const phSpan = document.querySelector('#photoPlaceholder span');
+  const origText = phSpan ? phSpan.textContent : 'Drag & drop photo or click to browse';
+
+  if (isHeic) {
+    if (typeof heic2any === 'undefined') {
+      alert('HEIC converter is still loading or failed to load. Please try again in a few seconds or use a JPEG/PNG image.');
+      return;
+    }
+    if (phSpan) {
+      phSpan.textContent = 'Converting HEIC to JPEG... Please wait.';
+    }
+    heic2any({
+      blob: file,
+      toType: 'image/jpeg',
+      quality: 0.7
+    })
+    .then(function(convertedBlob) {
+      const convertedFile = new File([convertedBlob], file.name.replace(/\.heic$/i, '.jpg').replace(/\.heif$/i, '.jpg'), {
+        type: 'image/jpeg'
+      });
+      readAndDisplay(convertedFile);
+    })
+    .catch(function(err) {
+      console.error('HEIC conversion failed:', err);
+      alert('Failed to convert HEIC image: ' + err.message);
+      if (phSpan) phSpan.textContent = origText;
+    });
+  } else {
+    readAndDisplay(file);
+  }
+
+  function readAndDisplay(f) {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      photoDataUrl = ev.target.result;
+      const drop   = document.getElementById('photoDrop');
+      const prev   = document.getElementById('photoPreview');
+      const ph     = document.getElementById('photoPlaceholder');
+      const rm     = document.getElementById('removePhoto');
+      prev.src     = photoDataUrl;
+      prev.style.display = 'block';
+      ph.style.display   = 'none';
+      if (phSpan) phSpan.textContent = origText;
+      rm.classList.remove('hidden');
+      drop.classList.add('has-photo');
+      
+      // Asynchronously create an ultra-low-weight compressed version specifically for the CRM Email HTML payload.
+      const img = new Image();
+      img.onload = () => {
+        let w = img.width, h = img.height;
+        const MAX_W = 600, MAX_H = 450;
+        if (w > MAX_W || h > MAX_H) {
+          if (w/h > MAX_W/MAX_H) { h = Math.round(h * MAX_W/w); w = MAX_W; }
+          else { w = Math.round(w * MAX_H/h); h = MAX_H; }
+        }
+        const cvs = document.createElement('canvas');
+        cvs.width = w; cvs.height = h;
+        cvs.getContext('2d').drawImage(img, 0, 0, w, h);
+        photoDataUrlTiny = cvs.toDataURL('image/jpeg', 0.5);
+      };
+      img.src = photoDataUrl;
     };
-    img.src = photoDataUrl;
-  };
-  reader.readAsDataURL(file);
+    reader.readAsDataURL(f);
+  }
 }
 function removePhoto(e) {
   e.stopPropagation();
@@ -1138,8 +1176,13 @@ function openEmailModal() {
   const driveHref = (f.driveLink && f.driveLink !== '#' && f.driveLink !== '—') ? f.driveLink : null;
   const roofLine  = [f.roof, f.foundation, f.hvac].filter(v => v && v !== '—').join(' · ') || null;
 
-  // Automatically embed the transparent placeholder for the email payload to bypass Zoho limits.
-  const heroEmail = `<img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/1x1.png" style="width:100%;height:300px;object-fit:cover;background:#ece9e1;display:block;border:2px dashed #bbb;" class="hero-email-img" alt="[ CLICK THIS EXACT BOX to insert Property Photo in Zoho ]"/>`;
+  // Render the external link if provided, otherwise show the uploaded Photo in the preview! 
+  const heroEmailUrl = (f.emailPhotoLink && f.emailPhotoLink !== '—') ? f.emailPhotoLink : photoDataUrl;
+  const heroEmailStyle = 'width:100%;height:300px;object-fit:cover;display:block;border:none;background:#ece9e1;';
+  const heroEmailAlt = '[ CLICK THIS EXACT BOX in Zoho to insert external property photo ]';
+  const heroEmail = heroEmailUrl 
+    ? `<img src="${heroEmailUrl}" style="${heroEmailStyle}" class="hero-email-img" alt="${heroEmailAlt}"/>`
+    : `<img src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" style="width:100%;height:300px;object-fit:cover;background:#ece9e1;display:block;border:2px dashed #bbb;" alt="Property Photo"/>`;
 
   emailHtmlContent = `<!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8">
@@ -1159,7 +1202,9 @@ function openEmailModal() {
     <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
       <td width="70%" valign="middle">
         <table cellpadding="0" cellspacing="0" border="0"><tr>
-          
+          <td valign="middle" style="padding-right:12px;">
+            <img src="https://jeanneclairebenton-blip.github.io/mhb-flyer-generator/icon.png" height="44" style="height:44px;object-fit:contain;display:block;" alt="Icon">
+          </td>
           <td valign="middle" style="padding-top:3px;">
             <div style="font-family:'Century Gothic',Futura,'Tw Cen MT',sans-serif;font-weight:400;font-size:38px;color:#000;line-height:0.9;letter-spacing:-1.5px;">Myers</div>
             <div style="font-family:'Century Gothic',Futura,'Tw Cen MT',sans-serif;font-weight:300;font-size:17px;color:#000;line-height:0.9;letter-spacing:-0.2px;padding-left:1px;margin-top:2px;">Home Buyers</div>
@@ -1444,18 +1489,24 @@ function copyEmailText(type) {
   }
 
   if (type === 'html') {
+    // Drop the heavy base64 payload out of the copied string so Zoho accepts it!
+    let payload = emailHtmlContent;
+    if (photoDataUrl && !(fields.emailPhotoLink && fields.emailPhotoLink !== '—')) {
+       payload = payload.replace(photoDataUrl, 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==');
+    }
+
     // Write as text/html so Gmail/Outlook paste it as rendered email, not raw code
-    const blob = new Blob([emailHtmlContent], { type: 'text/html' });
+    const blob = new Blob([payload], { type: 'text/html' });
     const item = new ClipboardItem({ 'text/html': blob });
     navigator.clipboard.write([item])
       .then(() => showSuccess('✓ Copied! Paste into Gmail'))
       .catch(() => {
         // Fallback: plain text copy
-        navigator.clipboard.writeText(emailHtmlContent)
+        navigator.clipboard.writeText(payload)
           .then(() => showSuccess('✓ HTML Copied (plain fallback)'))
           .catch(() => {
             const ta = document.createElement('textarea');
-            ta.value = emailHtmlContent;
+            ta.value = payload;
             document.body.appendChild(ta);
             ta.select();
             document.execCommand('copy');
