@@ -1256,13 +1256,26 @@ async function buildShareLink() {
 
     // ── If there's a locally uploaded photo, host it on GitHub Pages ──────────
     if (photoDataUrl && !fields.photoUrl) {
-      btn.textContent = '📤 Uploading photo…';
       const token = getGhToken();
-      if (token) {
-        try {
-          fields.photoUrl = await uploadPhotoToGitHub(photoDataUrl, token);
-        } catch(e) {
-          console.warn('Photo upload failed, link will have no photo:', e);
+      if (!token) {
+        // No token saved — show the setup popup, then retry
+        btn.textContent = '🔗 Get Investor Link';
+        btn.disabled = false;
+        openGhTokenModal(() => buildShareLink());
+        return;
+      }
+      btn.textContent = '📤 Uploading photo…';
+      try {
+        fields.photoUrl = await uploadPhotoToGitHub(photoDataUrl, token);
+      } catch(e) {
+        console.warn('Photo upload failed:', e);
+        if (e.message && (e.message.includes('Bad credentials') || e.message.includes('401'))) {
+          localStorage.removeItem('gh_token');
+          alert('Your GitHub token is invalid or expired. Please re-enter it.');
+          btn.textContent = '🔗 Get Investor Link';
+          btn.disabled = false;
+          openGhTokenModal(() => buildShareLink());
+          return;
         }
       }
       btn.textContent = '⏳ Building link…';
@@ -1334,10 +1347,13 @@ async function openEmailModal() {
 
   // ── Auto-upload photo to GitHub Pages so email uses external URL (no huge base64) ──
   if (photoDataUrl && !fields.photoUrl && !(fields.emailPhotoLink && fields.emailPhotoLink !== '—')) {
-    try {
-      fields.photoUrl = await uploadPhotoToGitHub(photoDataUrl);
-    } catch(e) {
-      console.warn('Photo upload for email failed, using base64:', e);
+    const token = getGhToken();
+    if (token) {
+      try {
+        fields.photoUrl = await uploadPhotoToGitHub(photoDataUrl, token);
+      } catch(e) {
+        console.warn('Photo upload for email failed, using base64:', e);
+      }
     }
   }
 
