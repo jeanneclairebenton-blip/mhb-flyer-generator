@@ -530,6 +530,36 @@ textarea:focus, input[type=text]:focus { border-color: #f5b731; }
   </div>
 </div>
 
+<!-- ══════════ GITHUB TOKEN MODAL ══════════ -->
+<div class="modal-overlay hidden" id="ghTokenModal">
+  <div class="modal-box" style="max-width:480px;">
+    <div class="modal-header">
+      <div>
+        <h2>🔐 GitHub Setup (one-time)</h2>
+        <p>Required to host flyer photos</p>
+      </div>
+      <button class="modal-close" onclick="closeGhTokenModal()" title="Close">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:#555;line-height:1.7;margin-bottom:16px;">
+        To host your flyer photos, we need a GitHub Personal Access Token with <strong>repo</strong> permissions.<br><br>
+        1. Go to <a href="https://github.com/settings/tokens/new" target="_blank" style="color:#f5b731;">github.com/settings/tokens/new</a><br>
+        2. Give it a name (e.g. "Flyer Generator")<br>
+        3. Check <strong>repo</strong> → Generate Token → copy it here.<br><br>
+        Your token is saved only in this browser — never sent anywhere else.
+      </p>
+      <input type="password" id="ghTokenInput" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off"
+        style="width:100%;padding:12px 14px;border-radius:8px;border:1.5px solid #ddd;background:#f8f7f4;color:#333;font-size:14px;font-family:monospace;outline:none;"
+        onfocus="this.style.borderColor='#f5b731'" onblur="this.style.borderColor='#ddd'">
+    </div>
+    <div class="modal-footer">
+      <span class="modal-footer-hint">Saved in your browser only</span>
+      <button class="btn-email-outline" onclick="closeGhTokenModal()">Cancel</button>
+      <button class="btn-email" id="ghTokenSaveBtn" onclick="saveGhToken()">Save & Continue</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══════════ EMBEDDED LOGO DATA ══════════ -->
 <!-- We use the actual base64 logo from the source HTML for the flyer itself -->
 <script>
@@ -540,6 +570,23 @@ const LOGO = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAApgAAALICAYAAADbv4A+
   "zeewkuIJFIpH9hifdehIeH7/d7v+ec74ERI0aMGDFixIgRI0aMGDFixIgRI0aMGDFixIgRI0aMGD" +
   "FiRBD/H6QBlRqT+WgFAAAAAElFTkSuQmCC";
 // (Abbreviated — the full logo is large; we substitute with the SVG below in the flyer)
+
+// ─── GitHub hosting (replaces Imgur for self-hosted images) ───────────────────
+const GH_OWNER = 'jeanneclairebenton-blip';
+const GH_REPO  = 'mhb-flyer-generator';
+const GH_PAGES = 'https://jeanneclairebenton-blip.github.io/mhb-flyer-generator';
+let   _ghTokenCallback = null; // callback after token is saved
+
+function getGhToken() { return localStorage.getItem('gh_token') || ''; }
+function openGhTokenModal(cb) { _ghTokenCallback = cb; document.getElementById('ghTokenModal').classList.remove('hidden'); document.getElementById('ghTokenInput').focus(); }
+function closeGhTokenModal() { document.getElementById('ghTokenModal').classList.add('hidden'); }
+function saveGhToken() {
+  const t = document.getElementById('ghTokenInput').value.trim();
+  if (!t) { alert('Please enter your GitHub token.'); return; }
+  localStorage.setItem('gh_token', t);
+  closeGhTokenModal();
+  if (_ghTokenCallback) { _ghTokenCallback(t); _ghTokenCallback = null; }
+}
 
 // ─── Field configuration ──────────────────────────────────────────────────────
 const FIELD_CONFIG = [
@@ -857,7 +904,7 @@ function generateFlyer() {
     if (el) fields[key] = el.value;
   });
 
-  // Use hosted URL (from Imgur after link generation) > local upload > placeholder
+  // Use hosted URL (from GitHub after link generation) > local upload > placeholder
   const heroSrc = fields.photoUrl || photoDataUrl || null;
   const hero = heroSrc
     ? `<img src="${heroSrc}" style="width:100%;height:100%;object-fit:cover;display:block;" alt="Property"/>`
@@ -1160,6 +1207,41 @@ function downloadPDF() {
   }, 2000);
 }
 
+
+// ─── Upload photo to GitHub Pages (self-hosted, no third-party) ───────────────
+async function uploadPhotoToGitHub(base64DataUrl, token) {
+  const extMatch = base64DataUrl.match(/^data:image\/(\w+);/);
+  const ext = extMatch ? extMatch[1].replace('jpeg', 'jpg') : 'jpg';
+  const filename = 'photo-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.' + ext;
+  const path = 'images/' + filename;
+  const base64 = base64DataUrl.replace(/^data:image\/\w+;base64,/, '');
+
+  const resp = await fetch(
+    `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${path}`,
+    {
+      method: 'PUT',
+      headers: {
+        'Authorization': `token ${token}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        message: `Add flyer photo: ${filename}`,
+        content: base64,
+        branch: 'main'
+      }),
+      signal: AbortSignal.timeout(30000)
+    }
+  );
+
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({}));
+    throw new Error(err.message || 'GitHub API error');
+  }
+
+  return `${GH_PAGES}/${path}`;
+}
+
 async function buildShareLink() {
   const btn = document.getElementById('shareLinkBtn');
   btn.textContent = '⏳ Generating link…';
@@ -1172,30 +1254,16 @@ async function buildShareLink() {
       if (el) fields[key] = el.value;
     });
 
-    // ── If there's a locally uploaded photo, host it on Imgur first ──────────
+    // ── If there's a locally uploaded photo, host it on GitHub Pages ──────────
     if (photoDataUrl && !fields.photoUrl) {
       btn.textContent = '📤 Uploading photo…';
-      try {
-        // Strip the data:image/xxx;base64, prefix for Imgur
-        const base64 = photoDataUrl.replace(/^data:image\/\w+;base64,/, '');
-        const formData = new FormData();
-        formData.append('image', base64);
-
-        const imgResp = await fetch('https://api.imgur.com/3/image', {
-          method: 'POST',
-          headers: { 'Authorization': 'Client-ID 546c25a59c58ad7' },
-          body: formData,
-          signal: AbortSignal.timeout(20000)
-        });
-        if (imgResp.ok) {
-          const imgData = await imgResp.json();
-          if (imgData.success) {
-            // Store hosted URL so the viewer can show the photo
-            fields.photoUrl = imgData.data.link;
-          }
+      const token = getGhToken();
+      if (token) {
+        try {
+          fields.photoUrl = await uploadPhotoToGitHub(photoDataUrl, token);
+        } catch(e) {
+          console.warn('Photo upload failed, link will have no photo:', e);
         }
-      } catch(e) {
-        console.warn('Photo upload failed, link will have no photo:', e);
       }
       btn.textContent = '⏳ Building link…';
     }
@@ -1264,22 +1332,10 @@ async function openEmailModal() {
     if (el) fields[key] = el.value;
   });
 
-  // ── Auto-upload photo to Imgur so email uses external URL (no huge base64) ──
+  // ── Auto-upload photo to GitHub Pages so email uses external URL (no huge base64) ──
   if (photoDataUrl && !fields.photoUrl && !(fields.emailPhotoLink && fields.emailPhotoLink !== '—')) {
     try {
-      const base64 = photoDataUrl.replace(/^data:image\/\w+;base64,/, '');
-      const formData = new FormData();
-      formData.append('image', base64);
-      const imgResp = await fetch('https://api.imgur.com/3/image', {
-        method: 'POST',
-        headers: { 'Authorization': 'Client-ID 546c25a59c58ad7' },
-        body: formData,
-        signal: AbortSignal.timeout(20000)
-      });
-      if (imgResp.ok) {
-        const imgData = await imgResp.json();
-        if (imgData.success) fields.photoUrl = imgData.data.link;
-      }
+      fields.photoUrl = await uploadPhotoToGitHub(photoDataUrl);
     } catch(e) {
       console.warn('Photo upload for email failed, using base64:', e);
     }
@@ -1308,7 +1364,7 @@ async function openEmailModal() {
   const driveHref = (f.driveLink && f.driveLink !== '#' && f.driveLink !== '—') ? f.driveLink : null;
   const roofLine  = [f.roof, f.foundation, f.hvac].filter(v => v && v !== '—').join(' · ') || null;
 
-  // Render photo: external URL field → Imgur hosted URL → locally uploaded base64
+  // Render photo: external URL field → GitHub hosted URL → locally uploaded base64
   const heroEmailUrl = (f.emailPhotoLink && f.emailPhotoLink !== '—')
     ? f.emailPhotoLink
     : (f.photoUrl || photoDataUrl || null);
