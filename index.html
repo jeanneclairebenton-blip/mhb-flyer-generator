@@ -1208,7 +1208,7 @@ function downloadPDF() {
 }
 
 
-// ─── Upload photo to GitHub Pages (self-hosted, no third-party) ───────────────
+// ─── Upload photo to GitHub (self-hosted, no third-party) ─────────────────────
 async function uploadPhotoToGitHub(base64DataUrl, token) {
   const extMatch = base64DataUrl.match(/^data:image\/(\w+);/);
   const ext = extMatch ? extMatch[1].replace('jpeg', 'jpg') : 'jpg';
@@ -1236,10 +1236,12 @@ async function uploadPhotoToGitHub(base64DataUrl, token) {
 
   if (!resp.ok) {
     const err = await resp.json().catch(() => ({}));
-    throw new Error(err.message || 'GitHub API error');
+    throw new Error(err.message || 'GitHub API error (' + resp.status + ')');
   }
 
-  return `${GH_PAGES}/${path}`;
+  // Use the raw GitHub URL — available INSTANTLY (GitHub Pages can take minutes)
+  const data = await resp.json();
+  return data.content?.download_url || `https://raw.githubusercontent.com/${GH_OWNER}/${GH_REPO}/main/${path}`;
 }
 
 async function buildShareLink() {
@@ -1254,7 +1256,7 @@ async function buildShareLink() {
       if (el) fields[key] = el.value;
     });
 
-    // ── If there's a locally uploaded photo, host it on GitHub Pages ──────────
+    // ── If there's a locally uploaded photo, host it on GitHub ──────────────
     if (photoDataUrl && !fields.photoUrl) {
       const token = getGhToken();
       if (!token) {
@@ -1266,7 +1268,12 @@ async function buildShareLink() {
       }
       btn.textContent = '📤 Uploading photo…';
       try {
-        fields.photoUrl = await uploadPhotoToGitHub(photoDataUrl, token);
+        const url = await uploadPhotoToGitHub(photoDataUrl, token);
+        if (url) {
+          fields.photoUrl = url;
+        } else {
+          alert('Photo upload returned no URL. The link will be generated without a photo.');
+        }
       } catch(e) {
         console.warn('Photo upload failed:', e);
         if (e.message && (e.message.includes('Bad credentials') || e.message.includes('401'))) {
@@ -1277,6 +1284,7 @@ async function buildShareLink() {
           openGhTokenModal(() => buildShareLink());
           return;
         }
+        alert('Photo upload failed: ' + e.message + '\n\nThe link will be generated without a photo.');
       }
       btn.textContent = '⏳ Building link…';
     }
