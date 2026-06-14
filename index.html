@@ -756,7 +756,7 @@ function skipToManual() {
 function g(text, re, fallback = '—') {
   const m = text.match(re);
   if (!m) return fallback;
-  const v = (m[1] || '').trim().replace(/\s+/g, ' ');
+  const v = (m[1] || '').trim().replace(/\s+/g, ' ').replace(/\s+,/g, ',');
   return v || fallback;
 }
 function fmt(v) {
@@ -796,7 +796,7 @@ function parseListing() {
     occupancy:     g(t, /Occupancy at Closing\s+(.+?)(?=Leaseback\/Lease|Showing Type)/is),
     leaseEndDate:  g(t, /Leaseback\/Lease End Date\s+(.+?)(?=Leaseback\/Lease Deposit Amount|Showing Type)/is),
     leaseDeposit:  g(t, /Leaseback\/Lease Deposit Amount\s*\$?\s*([\d,]+\.?\d*)/i, 'Empty') !== 'Empty' ? '$' + parseFloat(g(t, /Leaseback\/Lease Deposit Amount\s*\$?\s*([\d,]+\.?\d*)/i).replace(/,/g,'')).toLocaleString('en-US',{minimumFractionDigits:0}) : '—',
-    showing:       (dtRaw && dtRaw!=='—') ? dtRaw : tpRaw,
+    showing:       (() => { let s = (dtRaw && dtRaw!=='—') ? dtRaw : tpRaw; return s ? s.replace(/(\d{4})\s+(\d{1,2}:\d{2})/g, '$1 @ $2') : s; })(),
     driveLink:     g(t, /Google Drive Link\s+(https:\/\/\S+)/i, '#'),
     agent:         g(t, /Congratulations to\s+(.+?)\s+for the acquisition/i),
     salesAgent:    '',
