@@ -1787,7 +1787,8 @@ function copyEmailText(type) {
 function copyRawCode() {
   const btn  = document.getElementById('copyRawBtn');
   const orig = btn.innerHTML;
-  const code = emailHtmlContent || '';
+  // Strip the subject-line helper block from the raw code
+  const code = (emailHtmlContent || '').replace(/<div[^>]*style="[^"]*border[^"]*dashed[^"]*"[^>]*>[\s\S]*?<\/div>\s*/i, '');
 
   function showSuccess() {
     btn.innerHTML = '✓ Raw Code Copied!';
