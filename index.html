@@ -919,7 +919,7 @@ function generateFlyer() {
   const esc = s => (s||'—').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   const roofLine = [fields.roof,fields.foundation,fields.hvac].filter(v=>v&&v!=='—').join(' · ')||null;
 
-  const isUnverified = document.getElementById('isUnverified')?.checked;
+  const isUnverified = document.getElementById('isUnverified')?.checked || fields.isUnverified;
   const addrParts = (fields.address || '').split(',');
   const displayAddress = isUnverified
     ? (addrParts.length > 1 ? esc(addrParts.slice(1).join(',').trim()) : 'Address Withheld (Unverified)')
