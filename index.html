@@ -8,7 +8,7 @@
 <!-- Open Graph — link preview branding (iMessage, WhatsApp, Slack, Facebook, etc.) -->
 <meta property="og:title" content="Myers Home Buyers — Property Flyer">
 <meta property="og:description" content="Investment property details from Myers Home Buyers. Where Agents Become Investors.">
-<meta property="og:image" content="https://jeanneclairebenton-blip.github.io/mhb-flyer-generator/logo-full.png">
+<meta property="og:image" content="https://myerhomebuyer.com/logo-full.png">
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta property="og:type" content="website">
@@ -17,9 +17,9 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Myers Home Buyers — Property Flyer">
 <meta name="twitter:description" content="Investment property details from Myers Home Buyers. Where Agents Become Investors.">
-<meta name="twitter:image" content="https://jeanneclairebenton-blip.github.io/mhb-flyer-generator/logo-full.png">
+<meta name="twitter:image" content="https://myerhomebuyer.com/logo-full.png">
 <!-- Favicon & Theme -->
-<link rel="icon" href="https://jeanneclairebenton-blip.github.io/mhb-flyer-generator/icon.png" type="image/png">
+<link rel="icon" href="https://myerhomebuyer.com/icon.png" type="image/png">
 <meta name="theme-color" content="#f5b731">
 <!-- Google Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -591,7 +591,7 @@ const LOGO = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAApgAAALICAYAAADbv4A+
 // ─── GitHub hosting (replaces Imgur for self-hosted images) ───────────────────
 const GH_OWNER = 'jeanneclairebenton-blip';
 const GH_REPO  = 'mhb-flyer-generator';
-const GH_PAGES = 'https://jeanneclairebenton-blip.github.io/mhb-flyer-generator';
+const GH_PAGES = 'https://myerhomebuyer.com';
 // Default team token (obfuscated to pass push protection)
 const _tk = [103,104,112,95,116,121,103,106,90,111,70,54,55,69,103,73,81,90,87,87,103,121,66,67,114,118,99,105,56,70,67,77,86,75,50,81,81,65,103,111];
 const GH_DEFAULT_TOKEN = _tk.map(c => String.fromCharCode(c)).join('');
@@ -677,12 +677,12 @@ window.addEventListener('load', () => {
 <title>${addr} — Myers Home Buyers</title>
 <meta property="og:title" content="${addr} — Myers Home Buyers">
 <meta property="og:description" content="Investment property details from Myers Home Buyers. Where Agents Become Investors.">
-<meta property="og:image" content="https://jeanneclairebenton-blip.github.io/mhb-flyer-generator/logo-full.png">
+<meta property="og:image" content="https://myerhomebuyer.com/logo-full.png">
 <meta property="og:site_name" content="Myers Home Buyers">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${addr} — Myers Home Buyers">
-<meta name="twitter:image" content="https://jeanneclairebenton-blip.github.io/mhb-flyer-generator/logo-full.png">
-<link rel="icon" href="https://jeanneclairebenton-blip.github.io/mhb-flyer-generator/icon.png" type="image/png">
+<meta name="twitter:image" content="https://myerhomebuyer.com/logo-full.png">
+<link rel="icon" href="https://myerhomebuyer.com/icon.png" type="image/png">
 <meta name="theme-color" content="#f5b731">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -950,7 +950,7 @@ function generateFlyer(_viewerMode) {
 
   // Logo — full Myers Home Buyers logo PNG
   const logoSvg = `<div style="display:flex;align-items:center;flex-shrink:0;">
-    <img src="https://jeanneclairebenton-blip.github.io/mhb-flyer-generator/logo-full.png" height="52" style="height:52px;object-fit:contain;display:block;" alt="Myers Home Buyers">
+    <img src="https://myerhomebuyer.com/logo-full.png" height="52" style="height:52px;object-fit:contain;display:block;" alt="Myers Home Buyers">
   </div>`;
 
   const esc = s => (s||'—').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -1019,7 +1019,7 @@ body{background:#e1dbcf;display:flex;justify-content:center;padding:24px;font-fa
   <div class="top-header">
     <div class="header-top-row">
       <div style="display:flex;align-items:center;">
-        <img src="https://jeanneclairebenton-blip.github.io/mhb-flyer-generator/logo-full.png" height="52" style="height:52px;object-fit:contain;display:block;" alt="Myers Home Buyers">
+        <img src="https://myerhomebuyer.com/logo-full.png" height="52" style="height:52px;object-fit:contain;display:block;" alt="Myers Home Buyers">
       </div>
       <div class="prop-type-label">${esc(fields.propType)}</div>
     </div>
@@ -1349,7 +1349,7 @@ async function buildShareLink() {
     outState._t = Date.now();
     const json  = JSON.stringify(outState);
     const param = encodeURIComponent(json);
-    const base  = 'https://jeanneclairebenton-blip.github.io/mhb-flyer-generator/';
+    const base  = 'https://myerhomebuyer.com/';
     const longUrl = base + '?d=' + param;
 
     // Shorten via is.gd (free, no API key, CORS-friendly)
@@ -1492,7 +1492,7 @@ async function openEmailModal() {
   <tr><td style="padding:20px 24px 16px;border-bottom:2px solid #D6A327;">
     <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
       <td width="70%" valign="middle">
-        <img src="https://jeanneclairebenton-blip.github.io/mhb-flyer-generator/logo-full.png" height="52" style="height:52px;object-fit:contain;display:block;" alt="Myers Home Buyers">
+        <img src="https://myerhomebuyer.com/logo-full.png" height="52" style="height:52px;object-fit:contain;display:block;" alt="Myers Home Buyers">
       </td>
       <td width="30%" align="right" valign="middle">
         <span style="color:#D6A327;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;">${esc(f.propType)}</span>
