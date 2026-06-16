@@ -1313,7 +1313,12 @@ async function buildShareLink() {
     }
 
     // Build the long GitHub Pages URL with all flyer data encoded
-    const outState = { ...fields, isUnverified: document.getElementById('isUnverified')?.checked };
+    // Use fields.isUnverified which was already synced from the checkbox in generateFlyer()
+    const outState = { ...fields };
+    const isUnv = !!fields.isUnverified;
+    outState.isUnverified = isUnv;
+    // Add cache-bust so URL shorteners never return a stale cached link
+    outState._t = Date.now();
     const json  = JSON.stringify(outState);
     const param = encodeURIComponent(json);
     const base  = 'https://jeanneclairebenton-blip.github.io/mhb-flyer-generator/';
@@ -1337,6 +1342,23 @@ async function buildShareLink() {
 
     document.getElementById('shareUrl').value = finalUrl;
     document.getElementById('shareBox').style.display = 'block';
+    // Show which type of link was generated
+    let typeLabel = document.getElementById('shareLinkType');
+    if (!typeLabel) {
+      typeLabel = document.createElement('p');
+      typeLabel.id = 'shareLinkType';
+      typeLabel.style.cssText = 'font-size:12px;font-weight:700;margin-bottom:8px;text-align:center;padding:6px 12px;border-radius:6px;';
+      document.getElementById('shareBox').insertBefore(typeLabel, document.getElementById('shareBox').firstChild);
+    }
+    if (isUnv) {
+      typeLabel.textContent = '🔒 UNVERIFIED INVESTOR LINK — Address, Sqft & Year Built are hidden';
+      typeLabel.style.background = '#fff3cd';
+      typeLabel.style.color = '#856404';
+    } else {
+      typeLabel.textContent = '✅ VERIFIED INVESTOR LINK — Full details visible';
+      typeLabel.style.background = '#d4edda';
+      typeLabel.style.color = '#155724';
+    }
     document.getElementById('shareUrl').select();
   } catch(e) {
     console.error('Share link error:', e);
