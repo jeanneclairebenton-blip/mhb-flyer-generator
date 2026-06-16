@@ -905,6 +905,10 @@ function generateFlyer() {
     if (el) fields[key] = el.value;
   });
 
+  // Sync the unverified checkbox into fields so it persists across regenerations
+  const chk = document.getElementById('isUnverified');
+  if (chk) fields.isUnverified = chk.checked;
+
   // Use hosted URL (from GitHub after link generation) > local upload > placeholder
   const heroSrc = fields.photoUrl || photoDataUrl || null;
   const hero = heroSrc
@@ -1107,6 +1111,12 @@ body{background:#e1dbcf;display:flex;justify-content:center;padding:24px;font-fa
   if (blobUrl) URL.revokeObjectURL(blobUrl);
   blobUrl = URL.createObjectURL(blob);
   document.getElementById('flyerPreview').src = blobUrl;
+
+  // Reset the share box so the old link from a previous generation doesn't persist
+  document.getElementById('shareBox').style.display = 'none';
+  document.getElementById('shareUrl').value = '';
+  const slBtn = document.getElementById('shareLinkBtn');
+  if (slBtn) { slBtn.textContent = '🔗 Get Investor Link'; slBtn.disabled = false; }
 
   document.getElementById('doneAddress').textContent  = fields.address || 'Property Flyer';
   document.getElementById('doneSubtitle').textContent =
