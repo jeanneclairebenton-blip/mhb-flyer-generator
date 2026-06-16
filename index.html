@@ -641,7 +641,7 @@ window.addEventListener('load', () => {
     }
 
     renderFields();
-    generateFlyer(); // populates flyerHtml
+    generateFlyer(true); // populates flyerHtml — pass true for viewer mode
 
     // ── VIEWER MODE: build a proper branded webpage ──────────────────────
     // Pull just the CSS and body markup out of the generated flyer HTML
@@ -898,9 +898,9 @@ function removePhoto(e) {
 }
 
 // ─── Flyer HTML builder ───────────────────────────────────────────────────────
-function generateFlyer() {
-  // Detect if we're in viewer mode (no editor UI present)
-  const _isViewerMode = !document.getElementById('step1');
+function generateFlyer(_viewerMode) {
+  // _viewerMode = true when called from the ?d= URL load handler (viewer/investor link)
+  const _isViewerMode = !!_viewerMode;
 
   // Sync all inputs → fields (only when editor UI is present)
   if (!_isViewerMode) {
