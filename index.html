@@ -899,15 +899,20 @@ function removePhoto(e) {
 
 // ─── Flyer HTML builder ───────────────────────────────────────────────────────
 function generateFlyer() {
-  // Sync all inputs → fields
-  FIELD_CONFIG.forEach(({key}) => {
-    const el = document.getElementById('f_' + key);
-    if (el) fields[key] = el.value;
-  });
+  // Detect if we're in viewer mode (no editor UI present)
+  const _isViewerMode = !document.getElementById('step1');
 
-  // Sync the unverified checkbox into fields so it persists across regenerations
-  const chk = document.getElementById('isUnverified');
-  if (chk) fields.isUnverified = chk.checked;
+  // Sync all inputs → fields (only when editor UI is present)
+  if (!_isViewerMode) {
+    FIELD_CONFIG.forEach(({key}) => {
+      const el = document.getElementById('f_' + key);
+      if (el) fields[key] = el.value;
+    });
+
+    // Sync the unverified checkbox into fields so it persists across regenerations
+    const chk = document.getElementById('isUnverified');
+    if (chk) fields.isUnverified = chk.checked;
+  }
 
   // Use hosted URL (from GitHub after link generation) > local upload > placeholder
   const heroSrc = fields.photoUrl || photoDataUrl || null;
@@ -923,7 +928,8 @@ function generateFlyer() {
   const esc = s => (s||'—').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   const roofLine = [fields.roof,fields.foundation,fields.hvac].filter(v=>v&&v!=='—').join(' · ')||null;
 
-  const isUnverified = document.getElementById('isUnverified')?.checked || fields.isUnverified;
+  // In viewer mode, use the isUnverified flag from URL data; in editor, use the checkbox
+  const isUnverified = _isViewerMode ? !!fields.isUnverified : (document.getElementById('isUnverified')?.checked || false);
   const addrParts = (fields.address || '').split(',');
   const displayAddress = isUnverified
     ? (addrParts.length > 1 ? esc(addrParts.slice(1).join(',').trim()) : 'Address Withheld (Unverified)')
@@ -1106,24 +1112,30 @@ body{background:#e1dbcf;display:flex;justify-content:center;padding:24px;font-fa
   </div>
 </div></body></html>`;
 
-  // Show in preview iframe
+  // Show in preview iframe (only when editor UI is present)
   const blob = new Blob([flyerHtml], { type: 'text/html' });
   if (blobUrl) URL.revokeObjectURL(blobUrl);
   blobUrl = URL.createObjectURL(blob);
-  document.getElementById('flyerPreview').src = blobUrl;
+
+  const previewEl = document.getElementById('flyerPreview');
+  if (previewEl) previewEl.src = blobUrl;
 
   // Reset the share box so the old link from a previous generation doesn't persist
-  document.getElementById('shareBox').style.display = 'none';
-  document.getElementById('shareUrl').value = '';
+  const shareBoxEl = document.getElementById('shareBox');
+  if (shareBoxEl) shareBoxEl.style.display = 'none';
+  const shareUrlEl = document.getElementById('shareUrl');
+  if (shareUrlEl) shareUrlEl.value = '';
   const slBtn = document.getElementById('shareLinkBtn');
   if (slBtn) { slBtn.textContent = '🔗 Get Investor Link'; slBtn.disabled = false; }
 
-  document.getElementById('doneAddress').textContent  = fields.address || 'Property Flyer';
-  document.getElementById('doneSubtitle').textContent =
+  const doneAddrEl = document.getElementById('doneAddress');
+  if (doneAddrEl) doneAddrEl.textContent = fields.address || 'Property Flyer';
+  const doneSubEl = document.getElementById('doneSubtitle');
+  if (doneSubEl) doneSubEl.textContent =
     [fields.propType, fields.beds && fields.beds+'bd', fields.baths && fields.baths+'ba', fields.startingPrice]
       .filter(Boolean).join(' · ');
 
-  showStep('step3', 3);
+  if (!_isViewerMode) showStep('step3', 3);
 
   // Silent notification via FormSubmit.co
   if (window._lastNotifiedAddress !== fields.address && fields.address && fields.address !== '—') {
