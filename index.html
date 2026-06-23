@@ -1340,32 +1340,89 @@ async function buildShareLink() {
       btn.textContent = '⏳ Building link…';
     }
 
-    // Build the long GitHub Pages URL with all flyer data encoded
+    // Build the flyer data for the viewer
     // Use fields.isUnverified which was already synced from the checkbox in generateFlyer()
     const outState = { ...fields };
     const isUnv = !!fields.isUnverified;
     outState.isUnverified = isUnv;
-    // Add cache-bust so URL shorteners never return a stale cached link
     outState._t = Date.now();
     const json  = JSON.stringify(outState);
     const param = encodeURIComponent(json);
     const base  = 'https://deals.myershomebuyers.com/';
-    const longUrl = base + '?d=' + param;
+    const viewerUrl = base + '?d=' + param;
 
-    // Shorten via is.gd (free, no API key, CORS-friendly)
-    let finalUrl = longUrl;
+    // ── Build a property landing page with OG tags for rich link previews ──
+    btn.textContent = '⏳ Creating property page…';
+    const addrParts = (fields.address || '').split(',');
+    const ogTitle = isUnv
+      ? (addrParts.length > 1 ? addrParts.slice(1).join(',').trim() : 'Investment Property') + ' — Myers Home Buyers'
+      : (fields.address || 'Investment Property') + ' — Myers Home Buyers';
+    const ogDescParts = [
+      fields.beds && fields.beds + 'bd',
+      fields.baths && fields.baths + 'ba',
+      !isUnv && fields.sqft && fields.sqft + ' sqft',
+      fields.startingPrice && 'Starting ' + fields.startingPrice,
+      fields.arv && 'ARV ' + fields.arv
+    ].filter(Boolean);
+    const ogDesc = ogDescParts.length
+      ? ogDescParts.join(' · ') + ' | Myers Home Buyers'
+      : 'Investment property details from Myers Home Buyers. Where Agents Become Investors.';
+    const ogImage = fields.photoUrl || 'https://deals.myershomebuyers.com/logo-full.png';
+
+    // Escape for HTML attributes
+    const he = s => (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+    const landingHtml = `<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${he(ogTitle)}</title>
+<meta property="og:title" content="${he(ogTitle)}">
+<meta property="og:description" content="${he(ogDesc)}">
+<meta property="og:image" content="${he(ogImage)}">
+<meta property="og:image:width" content="800">
+<meta property="og:image:height" content="600">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Myers Home Buyers">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${he(ogTitle)}">
+<meta name="twitter:description" content="${he(ogDesc)}">
+<meta name="twitter:image" content="${he(ogImage)}">
+<link rel="icon" href="https://deals.myershomebuyers.com/icon.png" type="image/png">
+<meta name="theme-color" content="#f5b731">
+<meta http-equiv="refresh" content="0;url=${he(viewerUrl)}">
+<script>window.location.replace(${JSON.stringify(viewerUrl)});</script>
+</head><body style="font-family:Arial,sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#1a1a2e;color:#f5b731;text-align:center;padding:20px;">
+<div><p style="font-size:20px;font-weight:700;">Myers Home Buyers</p><p style="color:#ccc;margin-top:8px;">Loading property flyer…</p></div>
+</body></html>`;
+
+    // Upload as a dedicated page to GitHub
+    const pageId = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    const pagePath = 'deals/' + pageId + '.html';
+    const token = getGhToken();
+
+    let finalUrl = viewerUrl; // fallback to direct viewer URL
     try {
-      const resp = await fetch(
-        'https://is.gd/create.php?format=simple&url=' + encodeURIComponent(longUrl),
-        { signal: AbortSignal.timeout(6000) }
+      const ghResp = await fetch(
+        `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${pagePath}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Authorization': `token ${token}`,
+            'Accept': 'application/vnd.github.v3+json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            message: `Add property page: ${fields.address || pageId}`,
+            content: btoa(unescape(encodeURIComponent(landingHtml))),
+            branch: 'main'
+          }),
+          signal: AbortSignal.timeout(30000)
+        }
       );
-      if (resp.ok) {
-        const short = (await resp.text()).trim();
-        if (short.startsWith('http')) finalUrl = short;
+      if (ghResp.ok) {
+        finalUrl = base + pagePath;
       }
     } catch(e) {
-      // Shortening failed — use long URL as fallback (still works!)
-      console.warn('URL shortening failed, using full URL:', e);
+      console.warn('Property page upload failed, using direct URL:', e);
     }
 
     document.getElementById('shareUrl').value = finalUrl;
