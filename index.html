@@ -8,7 +8,7 @@
 <!-- Open Graph — link preview branding (iMessage, WhatsApp, Slack, Facebook, etc.) -->
 <meta property="og:title" content="Myers Home Buyers — Property Flyer">
 <meta property="og:description" content="Investment property details from Myers Home Buyers. Where Agents Become Investors.">
-<meta property="og:image" content="https://deals.myershomebuyers.com/logo-full.png">
+<meta property="og:image" content="https://deals.myershomebuyers.com/logo-og.png">
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta property="og:type" content="website">
@@ -17,7 +17,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Myers Home Buyers — Property Flyer">
 <meta name="twitter:description" content="Investment property details from Myers Home Buyers. Where Agents Become Investors.">
-<meta name="twitter:image" content="https://deals.myershomebuyers.com/logo-full.png">
+<meta name="twitter:image" content="https://deals.myershomebuyers.com/logo-og.png">
 <!-- Favicon & Theme -->
 <link rel="icon" href="https://deals.myershomebuyers.com/icon.png" type="image/png">
 <meta name="theme-color" content="#f5b731">
@@ -677,11 +677,11 @@ window.addEventListener('load', () => {
 <title>${addr} — Myers Home Buyers</title>
 <meta property="og:title" content="${addr} — Myers Home Buyers">
 <meta property="og:description" content="Investment property details from Myers Home Buyers. Where Agents Become Investors.">
-<meta property="og:image" content="https://deals.myershomebuyers.com/logo-full.png">
+<meta property="og:image" content="https://deals.myershomebuyers.com/logo-og.png">
 <meta property="og:site_name" content="Myers Home Buyers">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${addr} — Myers Home Buyers">
-<meta name="twitter:image" content="https://deals.myershomebuyers.com/logo-full.png">
+<meta name="twitter:image" content="https://deals.myershomebuyers.com/logo-og.png">
 <link rel="icon" href="https://deals.myershomebuyers.com/icon.png" type="image/png">
 <meta name="theme-color" content="#f5b731">
 <style>
@@ -1367,7 +1367,7 @@ async function buildShareLink() {
     const ogDesc = ogDescParts.length
       ? ogDescParts.join(' · ') + ' | Myers Home Buyers'
       : 'Investment property details from Myers Home Buyers. Where Agents Become Investors.';
-    const ogImage = fields.photoUrl || 'https://deals.myershomebuyers.com/logo-full.png';
+    const ogImage = fields.photoUrl || 'https://deals.myershomebuyers.com/logo-og.png';
 
     // Escape for HTML attributes
     const he = s => (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
