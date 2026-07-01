@@ -798,6 +798,23 @@ function parseListing() {
   const raw = document.getElementById('emailText').value;
   const t   = raw.replace(/\r\n/g, '\n').replace(/&amp;/g, '&');
 
+  // ── Auto-detect email format ──────────────────────────────────────────────
+  // "Address email" (zohoforms): has "USD" after prices, "Trelly Link", no County field
+  // "New Contract email" (existing): has "$" before prices, "County" field, "Congratulations to"
+  const isAddressEmail = /\d+\.?\d*\s*USD/i.test(t) || /Trelly Link/i.test(t);
+
+  if (isAddressEmail) {
+    parseAddressEmail(t);
+  } else {
+    parseContractEmail(t);
+  }
+
+  renderFields();
+  showStep('step2', 2);
+}
+
+// ─── Parser: New Contract Email (existing — do not change) ────────────────────
+function parseContractEmail(t) {
   const arvRaw  = g(t, /Estimated ARV\s*\$\s*([\d,]+\.?\d*)/i);
   const arvN    = parseFloat(arvRaw.replace(/,/g,''));
   const rentRaw = g(t, /Estimated Rent\s*\$\s*([\d,]+\.?\d*)/i);
@@ -830,9 +847,88 @@ function parseListing() {
     salesAgent:    '',
     salesPhone:    '',
   };
+}
 
-  renderFields();
-  showStep('step2', 2);
+// ─── Parser: Address Email (zohoforms — "submitted as a new property") ────────
+function parseAddressEmail(t) {
+  // Helper: extract value between two known labels
+  // Handles both tab-separated (pasted from Gmail table) and newline-separated formats
+  function val(label, nextLabel, fallback) {
+    if (fallback === undefined) fallback = '—';
+    const le = label.replace(/[-\/\\^$*+?.()|[\]{}&]/g, '\\$&');
+    const ne = nextLabel ? nextLabel.replace(/[-\/\\^$*+?.()|[\]{}&]/g, '\\$&') : null;
+    const re = ne
+      ? new RegExp(le + '\\s+(.+?)\\s*(?=' + ne + ')', 'is')
+      : new RegExp(le + '\\s+(.+?)\\s*$', 'is');
+    const m = t.match(re);
+    if (!m) return fallback;
+    const v = m[1].trim().replace(/\s+/g, ' ');
+    return v || fallback;
+  }
+
+  // Format USD price: "118000.00 USD" → "$118,000"
+  function fmtUSD(raw) {
+    const n = parseFloat((raw || '').replace(/[^0-9.]/g, ''));
+    if (!raw || raw === '—' || isNaN(n) || n === 0) return '—';
+    return '$' + n.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+  }
+
+  // Extract agent name from "XXX has inputted" line
+  const agentMatch = t.match(/^(.+?)\s+has inputted/im);
+  const agentName = agentMatch ? agentMatch[1].trim() : '—';
+
+  // Extract drive link — could be in "Trelly Link" or "Google Drive Link"
+  const trellyRaw = val('Trelly Link', 'Google Drive Link');
+  const gdriveRaw = val('Google Drive Link', 'Requested Flyer');
+  const driveUrl = (gdriveRaw && gdriveRaw !== '—' && gdriveRaw.startsWith('http'))
+    ? gdriveRaw
+    : (trellyRaw && trellyRaw !== '—' && trellyRaw.startsWith('http'))
+      ? trellyRaw
+      : '#';
+
+  // Parse rent for /mo formatting
+  const rentRaw = val('Estimated Rent', 'Property Type');
+  const rentN   = parseFloat((rentRaw || '').replace(/[^0-9.]/g, ''));
+
+  // Parse ARV
+  const arvRaw = val('Estimated ARV', 'Estimated Rent');
+  const arvN   = parseFloat((arvRaw || '').replace(/[^0-9.]/g, ''));
+
+  // Parse showing — between "Showing Date & Time" and "Trelly Link"
+  const showingRaw = val('Showing Date & Time', 'Trelly Link');
+  const showingVal = (showingRaw && showingRaw !== '—')
+    ? showingRaw.replace(/(\d{4})\s+(\d{1,2}:\d{2})/g, '$1 @ $2')
+    : val('Showing Type', 'Showing Date');
+
+  // Parse lease deposit
+  const depositRaw = val('Leaseback/Lease Deposit Amount', 'Showing Type');
+  const depositN   = parseFloat((depositRaw || '').replace(/[^0-9.]/g, ''));
+
+  fields = {
+    address:       val('Full Address', 'Starting Price'),
+    propType:      val('Property Type', 'Year Built'),
+    beds:          val('Bedrooms', 'Bathrooms'),
+    baths:         val('Bathrooms', 'Square Footage'),
+    sqft:          val('Square Footage', 'Roof'),
+    yearBuilt:     val('Year Built', 'Bedrooms'),
+    startingPrice: fmtUSD(val('Starting Price', 'Estimated ARV')),
+    buyNow:        '—',
+    arv:           (!arvRaw || isNaN(arvN) || arvN === 0) ? 'TBD' : '$' + arvN.toLocaleString('en-US', {minimumFractionDigits: 0}),
+    rent:          (!rentRaw || isNaN(rentN) || rentN === 0) ? '—' : '$' + rentN.toLocaleString('en-US', {minimumFractionDigits: 0}) + '/mo',
+    roof:          val('Roof', 'Foundation'),
+    foundation:    val('Foundation', 'HVAC'),
+    hvac:          val('HVAC', 'Property Description'),
+    description:   val('Property Description', 'Closing Date'),
+    closingDate:   val('Closing Date', 'Occupancy at Closing'),
+    occupancy:     val('Occupancy at Closing', 'Leaseback'),
+    leaseEndDate:  val('Leaseback/Lease End Date', 'Leaseback/Lease Deposit'),
+    leaseDeposit:  (!depositRaw || isNaN(depositN) || depositN === 0) ? '—' : '$' + depositN.toLocaleString('en-US', {minimumFractionDigits: 0}),
+    showing:       showingVal,
+    driveLink:     driveUrl,
+    agent:         agentName,
+    salesAgent:    '',
+    salesPhone:    '',
+  };
 }
 
 // ─── Render field grid in Step 2 ─────────────────────────────────────────────
