@@ -1161,8 +1161,8 @@ body{background:#e1dbcf;display:flex;justify-content:center;padding:24px;font-fa
   <div class="info-rows">
     ${fields.closingDate && fields.closingDate !== '—' ? `<div class="info-row"><span class="info-lbl">Closing Date</span><span class="info-val">${esc(fields.closingDate)}</span></div>` : ''}
     ${fields.occupancy && fields.occupancy !== '—' ? `<div class="info-row"><span class="info-lbl">Occupancy</span><span class="info-val">${esc(fields.occupancy)}</span></div>` : ''}
-    ${fields.occupancy && fields.occupancy.toLowerCase().includes('leaseback') && fields.leaseEndDate && fields.leaseEndDate !== '—' ? `<div class="info-row"><span class="info-lbl">Lease End Date</span><span class="info-val">${esc(fields.leaseEndDate)}</span></div>` : ''}
-    ${fields.occupancy && fields.occupancy.toLowerCase().includes('leaseback') && fields.leaseDeposit && fields.leaseDeposit !== '—' ? `<div class="info-row"><span class="info-lbl">Lease Deposit</span><span class="info-val">${esc(fields.leaseDeposit)}</span></div>` : ''}
+    ${fields.leaseEndDate && fields.leaseEndDate !== '—' ? `<div class="info-row"><span class="info-lbl">Lease End Date</span><span class="info-val">${esc(fields.leaseEndDate)}</span></div>` : ''}
+    ${fields.leaseDeposit && fields.leaseDeposit !== '—' ? `<div class="info-row"><span class="info-lbl">Lease Deposit</span><span class="info-val">${esc(fields.leaseDeposit)}</span></div>` : ''}
   </div>
 
   ${(() => {
@@ -1738,12 +1738,12 @@ async function openEmailModal() {
       <td style="padding:12px 0;font-size:12px;color:#555;">Occupancy</td>
       <td style="padding:12px 0;font-size:13px;font-weight:800;color:#111;text-align:right;">${esc(f.occupancy)}</td>
     </tr></table>` : ''}
-    ${f.occupancy && f.occupancy.toLowerCase().includes('leaseback') && f.leaseEndDate && f.leaseEndDate !== '—' ? `
+    ${f.leaseEndDate && f.leaseEndDate !== '—' ? `
     <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-bottom:1px dashed #e1dbcf;"><tr>
       <td style="padding:12px 0;font-size:12px;color:#555;">Lease End Date</td>
       <td style="padding:12px 0;font-size:13px;font-weight:800;color:#111;text-align:right;">${esc(f.leaseEndDate)}</td>
     </tr></table>` : ''}
-    ${f.occupancy && f.occupancy.toLowerCase().includes('leaseback') && f.leaseDeposit && f.leaseDeposit !== '—' ? `
+    ${f.leaseDeposit && f.leaseDeposit !== '—' ? `
     <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
       <td style="padding:12px 0;font-size:12px;color:#555;">Lease Deposit</td>
       <td style="padding:12px 0;font-size:13px;font-weight:800;color:#111;text-align:right;">${esc(f.leaseDeposit)}</td>
@@ -1883,8 +1883,8 @@ async function openEmailModal() {
     (() => { const isFCFS = /fcfs/i.test(f.propType||''); return isFCFS && f.buyNow && f.buyNow !== '—' ? `Buy It Now: ${f.buyNow}` : (!isFCFS && f.showing && f.showing !== '—' ? `Showing: ${f.showing}` : ''); })(),
     plain('Closing Date:',      f.closingDate),
     plain('Occupancy at Close:',f.occupancy),
-    f.occupancy && f.occupancy.toLowerCase().includes('leaseback') && f.leaseEndDate && f.leaseEndDate !== '—' ? plain('Lease End Date:', f.leaseEndDate) : '',
-    f.occupancy && f.occupancy.toLowerCase().includes('leaseback') && f.leaseDeposit && f.leaseDeposit !== '—' ? plain('Lease Deposit:', f.leaseDeposit) : '',
+    f.leaseEndDate && f.leaseEndDate !== '—' ? plain('Lease End Date:', f.leaseEndDate) : '',
+    f.leaseDeposit && f.leaseDeposit !== '—' ? plain('Lease Deposit:', f.leaseDeposit) : '',
     '',
     f.roof       && f.roof       !== '—' ? `Roof:        ${f.roof}`       : '',
     f.foundation && f.foundation !== '—' ? `Foundation:  ${f.foundation}` : '',
