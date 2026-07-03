@@ -642,17 +642,32 @@ let photoDataUrl= null;
 let flyerHtml   = '';
 let blobUrl     = '';
 
-// ─── On load: restore ?d= URL state ─────────────────────────────────────
+// ─── On load: restore ?d= or #d= URL state ──────────────────────────────
 window.addEventListener('load', () => {
   try {
     const params = new URLSearchParams(location.search);
-    const d      = params.get('d');
+    let d      = params.get('d');
     const legacy = params.get('flyer');
+
+    // Also check hash fragment (#d=...) as fallback — hash has no length limit
+    if (!d && !legacy && location.hash.startsWith('#d=')) {
+      d = decodeURIComponent(location.hash.slice(3));
+    }
+
     if (!d && !legacy) return;
 
     // Decode fields
     if (d) {
-      fields = JSON.parse(decodeURIComponent(d));
+      let jsonStr = d;
+      try {
+        // If it looks percent-encoded, decode it
+        if (d.includes('%7B') || d.includes('%22')) {
+          jsonStr = decodeURIComponent(d);
+        }
+      } catch(decErr) {
+        // Already decoded, use as-is
+      }
+      fields = JSON.parse(jsonStr);
     } else {
       const json = decodeURIComponent(escape(atob(legacy)));
       const data = JSON.parse(json);
@@ -761,7 +776,14 @@ ${flyerCss}
     document.close();
 
   } catch(e) {
-    console.warn('Could not restore from URL:', e);
+    console.error('Viewer error:', e);
+    // Show visible error instead of silently falling back to editor
+    const errDiv = document.createElement('div');
+    errDiv.style.cssText = 'background:#fff3cd;color:#856404;padding:16px 20px;margin:16px;border-radius:8px;border:1px solid #ffc107;font-family:Arial,sans-serif;font-size:14px;';
+    errDiv.innerHTML = '<strong>⚠️ Link Error:</strong> Could not load property flyer. ' +
+      '<br><small style="color:#666;">Error: ' + (e.message || e) + '</small>' +
+      '<br><small style="color:#666;">URL length: ' + location.href.length + ' chars</small>';
+    document.body.insertBefore(errDiv, document.body.firstChild);
   }
 });
 
@@ -1463,7 +1485,8 @@ async function buildShareLink() {
     const json  = JSON.stringify(outState);
     const param = encodeURIComponent(json);
     const base  = 'https://deals.myershomebuyers.com/';
-    const viewerUrl = base + '?d=' + param;
+    // Use hash fragment (#d=) instead of query string (?d=) — no URL length limit
+    const viewerUrl = base + '#d=' + param;
 
     // ── Build a property landing page with OG tags for rich link previews ──
     btn.textContent = '⏳ Creating property page…';
@@ -1502,8 +1525,7 @@ async function buildShareLink() {
 <meta name="twitter:image" content="${he(ogImage)}">
 <link rel="icon" href="https://deals.myershomebuyers.com/icon.png" type="image/png">
 <meta name="theme-color" content="#f5b731">
-<meta http-equiv="refresh" content="0;url=${he(viewerUrl)}">
-<script>window.location.replace(${JSON.stringify(viewerUrl)});\x3c/script>
+<script>window.location.replace(${JSON.stringify(viewerUrl)});\\x3c/script>
 </head><body style="font-family:Arial,sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#1a1a2e;color:#f5b731;text-align:center;padding:20px;">
 <div><p style="font-size:20px;font-weight:700;">Myers Home Buyers</p><p style="color:#ccc;margin-top:8px;">Loading property flyer…</p></div>
 </body></html>`;
