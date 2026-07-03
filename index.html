@@ -1535,9 +1535,13 @@ async function buildShareLink() {
     const pagePath = 'deals/' + pageId + '.html';
     const token = getGhToken();
 
-    let finalUrl = viewerUrl; // fallback to direct viewer URL
+    // Always use the direct viewer URL — works INSTANTLY (no deploy wait)
+    let finalUrl = viewerUrl;
+
+    // Upload landing page in the background for social media rich previews
+    // (don't block on it or use its URL — the direct link is what matters)
     try {
-      const ghResp = await fetch(
+      fetch(
         `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${pagePath}`,
         {
           method: 'PUT',
@@ -1553,12 +1557,9 @@ async function buildShareLink() {
           }),
           signal: AbortSignal.timeout(30000)
         }
-      );
-      if (ghResp.ok) {
-        finalUrl = base + pagePath;
-      }
+      ).catch(e => console.warn('Landing page upload (background):', e));
     } catch(e) {
-      console.warn('Property page upload failed, using direct URL:', e);
+      console.warn('Property page upload failed:', e);
     }
 
     document.getElementById('shareUrl').value = finalUrl;
