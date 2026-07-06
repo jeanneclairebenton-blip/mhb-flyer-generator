@@ -642,22 +642,31 @@ let photoDataUrl= null;
 let flyerHtml   = '';
 let blobUrl     = '';
 
-// ─── On load: restore ?d= or #d= URL state ──────────────────────────────
-window.addEventListener('load', () => {
+// ─── On load: restore ?d=, #d= or #id= URL state ──────────────────────────────
+window.addEventListener('load', async () => {
   try {
     const params = new URLSearchParams(location.search);
     let d      = params.get('d');
     const legacy = params.get('flyer');
+    let id = null;
 
-    // Also check hash fragment (#d=...) as fallback — hash has no length limit
-    if (!d && !legacy && location.hash.startsWith('#d=')) {
+    // Also check hash fragment (#id= or #d=...) as fallback — hash has no length limit
+    if (location.hash.startsWith('#id=')) {
+      id = location.hash.slice(4);
+    } else if (!d && !legacy && location.hash.startsWith('#d=')) {
       d = decodeURIComponent(location.hash.slice(3));
     }
 
-    if (!d && !legacy) return;
+    if (!d && !legacy && !id) return;
 
     // Decode fields
-    if (d) {
+    if (id) {
+      // Fetch the short-link data directly from GitHub's raw CDN (instant, no Pages deploy needed)
+      const url = `https://raw.githubusercontent.com/${GH_OWNER}/${GH_REPO}/main/data/${id}.json`;
+      const resp = await fetch(url);
+      if (!resp.ok) throw new Error('Could not load property data (Not found)');
+      fields = await resp.json();
+    } else if (d) {
       let jsonStr = d;
       try {
         // If it looks percent-encoded, decode it
@@ -1483,13 +1492,42 @@ async function buildShareLink() {
     outState.isUnverified = isUnv;
     outState._t = Date.now();
     const json  = JSON.stringify(outState);
-    const param = encodeURIComponent(json);
     const base  = 'https://deals.myershomebuyers.com/';
-    // Use hash fragment (#d=) instead of query string (?d=) — no URL length limit
-    const viewerUrl = base + '#d=' + param;
 
-    // ── Build a property landing page with OG tags for rich link previews ──
-    btn.textContent = '⏳ Creating property page…';
+    // ── Upload property data as a JSON file (available instantly via raw URL) ──
+    btn.textContent = '⏳ Saving property data…';
+    const pageId = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    const dataPath = 'data/' + pageId + '.json';
+    const token = getGhToken();
+
+    // Upload JSON data file
+    const dataResp = await fetch(
+      `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${dataPath}`,
+      {
+        method: 'PUT',
+        headers: {
+          'Authorization': `token ${token}`,
+          'Accept': 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          message: `Add property data: ${fields.address || pageId}`,
+          content: btoa(unescape(encodeURIComponent(json))),
+          branch: 'main'
+        }),
+        signal: AbortSignal.timeout(30000)
+      }
+    );
+
+    if (!dataResp.ok) {
+      const err = await dataResp.json().catch(() => ({}));
+      throw new Error('Data upload failed: ' + (err.message || dataResp.status));
+    }
+
+    // Short URL using the ID — viewer fetches data from raw.githubusercontent.com
+    const finalUrl = base + '#id=' + pageId;
+
+    // ── Build a landing page with OG tags for rich link previews (background) ──
     const addrParts = (fields.address || '').split(',');
     const ogTitle = isUnv
       ? (addrParts.length > 1 ? addrParts.slice(1).join(',').trim() : 'Investment Property') + ' — Myers Home Buyers'
@@ -1525,21 +1563,13 @@ async function buildShareLink() {
 <meta name="twitter:image" content="${he(ogImage)}">
 <link rel="icon" href="https://deals.myershomebuyers.com/icon.png" type="image/png">
 <meta name="theme-color" content="#f5b731">
-<script>window.location.replace(${JSON.stringify(viewerUrl)});\\x3c/script>
+<script>window.location.replace(${JSON.stringify(finalUrl)});\\x3c/script>
 </head><body style="font-family:Arial,sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#1a1a2e;color:#f5b731;text-align:center;padding:20px;">
 <div><p style="font-size:20px;font-weight:700;">Myers Home Buyers</p><p style="color:#ccc;margin-top:8px;">Loading property flyer…</p></div>
 </body></html>`;
 
-    // Upload as a dedicated page to GitHub
-    const pageId = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    // Upload landing page in the background (for social media rich previews)
     const pagePath = 'deals/' + pageId + '.html';
-    const token = getGhToken();
-
-    // Always use the direct viewer URL — works INSTANTLY (no deploy wait)
-    let finalUrl = viewerUrl;
-
-    // Upload landing page in the background for social media rich previews
-    // (don't block on it or use its URL — the direct link is what matters)
     try {
       fetch(
         `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${pagePath}`,
